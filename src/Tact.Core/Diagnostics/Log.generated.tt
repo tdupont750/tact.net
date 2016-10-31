@@ -1,0 +1,76 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+<# var logLevels= new [] { "Trace", "Debug", "Info", "Warn", "Error", "Fatal" }; #>
+using System;
+using System.IO;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+ 
+// ReSharper disable once CheckNamespace
+namespace Tact
+{
+    using Diagnostics;
+
+    namespace Diagnostics
+    {
+        public enum LogLevel
+        {
+<# for(var i = 0; i < logLevels.Length; i++) { #>
+            <#= logLevels[i] #> = <#= i #>,
+<# } #>
+        }
+    }
+
+    public static class LogExtensions
+    {
+        private static readonly char[] DirectorySeparatorChars = {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar};
+        private static readonly Regex ClassNameRegex = new Regex(@"([\w]+)\.[\w]+$", RegexOptions.Compiled);
+ 
+<# foreach(var level in logLevels) { #>
+<# for(var argCount = 0; argCount <= 8; argCount++) { #>
+<# var paramName = argCount == 0 ? "message" : "format"; #>
+<# for(var hasException = 0; hasException < 2; hasException++) { #>
+        public static void <#= level #>(
+            this ILog log,
+<# if (hasException == 1) { #>
+            Exception ex,
+<# } #>
+            string <#= paramName #>,
+<# for(var i = 0; i < argCount; i++) { #>
+            object arg<#= i #>,
+<# } #>
+            LogCallSite logCallSite = default(LogCallSite),
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "",
+            [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            if (!log.IsEnabled(LogLevel.<#= level #>)) return;
+            var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(<#= paramName #>, memberName, sourceFilePath, sourceLineNumber) : <#= paramName #>;
+            log.Log(LogLevel.<#= level #>,<# if (hasException == 1) { #> ex,<# } #> newFormat<# for(var i = 0; i < argCount; i++) { #>, arg<#= i #><# } #>);
+        }
+ 
+<# } #>
+<# } #>
+<# } #>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static string GetFormat(string format, string memberName, string sourceFilePath, int sourceLineNumber)
+        {
+            var lastIndex = sourceFilePath.LastIndexOfAny(DirectorySeparatorChars);
+            if (lastIndex > 0) sourceFilePath = sourceFilePath.Substring(lastIndex + 1);
+            var match = ClassNameRegex.Match(sourceFilePath);
+            return match.Success
+                ? $"{match.Groups[1].Value}.{memberName}({sourceLineNumber}) - {format}"
+                : format;
+        }
+ 
+        public enum LogCallSite
+        {
+            Enabled = 0,
+            Disabled = 1
+        }
+    }
+}

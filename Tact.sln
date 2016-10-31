@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F3EDD686-646A-4EDD-B54B-8C32DF7F7906}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{077DC803-4FE4-4D00-9C99-A3A01E89502C}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.Core", "src\Tact.Core\Tact.Core.xproj", "{3AEC4A57-FE2E-4B87-9EB9-7A1FD3346E37}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3958FA43-9C0E-40A7-8BB1-52337DAD77C4}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.Core.Tests", "tests\Tact.Core.Tests\Tact.Core.Tests.xproj", "{33F16B6B-8E20-4655-B7AA-B502B71CFCBF}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.Tests.Console", "tests\Tact.Tests.Console\Tact.Tests.Console.xproj", "{4D1DAE9A-0020-4CEE-B482-0148F24C0E42}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3AEC4A57-FE2E-4B87-9EB9-7A1FD3346E37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AEC4A57-FE2E-4B87-9EB9-7A1FD3346E37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AEC4A57-FE2E-4B87-9EB9-7A1FD3346E37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AEC4A57-FE2E-4B87-9EB9-7A1FD3346E37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33F16B6B-8E20-4655-B7AA-B502B71CFCBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33F16B6B-8E20-4655-B7AA-B502B71CFCBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33F16B6B-8E20-4655-B7AA-B502B71CFCBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33F16B6B-8E20-4655-B7AA-B502B71CFCBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D1DAE9A-0020-4CEE-B482-0148F24C0E42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D1DAE9A-0020-4CEE-B482-0148F24C0E42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D1DAE9A-0020-4CEE-B482-0148F24C0E42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D1DAE9A-0020-4CEE-B482-0148F24C0E42}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3AEC4A57-FE2E-4B87-9EB9-7A1FD3346E37} = {F3EDD686-646A-4EDD-B54B-8C32DF7F7906}
+		{33F16B6B-8E20-4655-B7AA-B502B71CFCBF} = {3958FA43-9C0E-40A7-8BB1-52337DAD77C4}
+		{4D1DAE9A-0020-4CEE-B482-0148F24C0E42} = {3958FA43-9C0E-40A7-8BB1-52337DAD77C4}
+	EndGlobalSection
+EndGlobal
