@@ -1,6 +1,6 @@
 ﻿using System;
 using Tact.Practices;
-using Tact.Practices.Registration.Implementation;
+using Tact.Practices.LifetimeManagers.Implementation;
 
 namespace Tact
 {
@@ -29,8 +29,8 @@ namespace Tact
 
         public static void RegisterPerResolve(this IContainer container, Type type, Func<IResolver, object> factory)
         {
-            var registration = new PerResolveRegistration(type, container, factory);
-            container.Register(type, registration);
+            var lifetimeManager = new PerResolveLifetimeManager(type, container, factory);
+            container.Register(type, lifetimeManager);
         }
 
         public static void RegisterPerResolve<T>(this IContainer container, string key)
@@ -54,8 +54,8 @@ namespace Tact
 
         public static void RegisterPerResolve(this IContainer container, Type type, string key, Func<IResolver, object> factory)
         {
-            var registration = new PerResolveRegistration(type, container, factory);
-            container.Register(type, key, registration);
+            var lifetimeManager = new PerResolveLifetimeManager(type, container, factory);
+            container.Register(type, key, lifetimeManager);
         }
 
         public static void RegisterPerResolve<TFrom, TTo>(this IContainer container)
@@ -69,8 +69,8 @@ namespace Tact
         public static void RegisterPerResolve(this IContainer container, Type fromType, Type toType)
         {
             toType.EnsureSingleCostructor();
-            var registration = new PerResolveRegistration(toType, container);
-            container.Register(fromType, registration);
+            var lifetimeManager = new PerResolveLifetimeManager(toType, container);
+            container.Register(fromType, lifetimeManager);
         }
 
         public static void RegisterPerResolve<TFrom, TTo>(this IContainer container, string key)
@@ -84,8 +84,8 @@ namespace Tact
         public static void RegisterPerResolve(this IContainer container, Type fromType, Type toType, string key)
         {
             toType.EnsureSingleCostructor();
-            var registration = new PerResolveRegistration(toType, container);
-            container.Register(fromType, key, registration);
+            var lifetimeManager = new PerResolveLifetimeManager(toType, container);
+            container.Register(fromType, key, lifetimeManager);
         }
 
         #endregion
@@ -113,8 +113,8 @@ namespace Tact
 
         public static void RegisterPerScope(this IContainer container, Type type, Func<IResolver, object> factory)
         {
-            var registration = new PerScopeRegistration(type, container, factory);
-            container.Register(type, registration);
+            var lifetimeManager = new PerScopeLifetimeManager(type, container, factory);
+            container.Register(type, lifetimeManager);
         }
 
         public static void RegisterPerScope<T>(this IContainer container, string key)
@@ -138,8 +138,8 @@ namespace Tact
 
         public static void RegisterPerScope(this IContainer container, Type type, string key, Func<IResolver, object> factory)
         {
-            var registration = new PerScopeRegistration(type, container, factory);
-            container.Register(type, key, registration);
+            var lifetimeManager = new PerScopeLifetimeManager(type, container, factory);
+            container.Register(type, key, lifetimeManager);
         }
 
         public static void RegisterPerScope<TFrom, TTo>(this IContainer container)
@@ -153,8 +153,8 @@ namespace Tact
         public static void RegisterPerScope(this IContainer container, Type fromType, Type toType)
         {
             toType.EnsureSingleCostructor();
-            var registration = new PerScopeRegistration(toType, container);
-            container.Register(fromType, registration);
+            var lifetimeManager = new PerScopeLifetimeManager(toType, container);
+            container.Register(fromType, lifetimeManager);
         }
 
         public static void RegisterPerScope<TFrom, TTo>(this IContainer container, string key)
@@ -168,8 +168,8 @@ namespace Tact
         public static void RegisterPerScope(this IContainer container, Type fromType, Type toType, string key)
         {
             toType.EnsureSingleCostructor();
-            var registration = new PerScopeRegistration(toType, container);
-            container.Register(fromType, key, registration);
+            var lifetimeManager = new PerScopeLifetimeManager(toType, container);
+            container.Register(fromType, key, lifetimeManager);
         }
 
         #endregion
@@ -184,8 +184,8 @@ namespace Tact
 
         public static void RegisterSingleton(this IContainer container, Type type, object value)
         {
-            var registration = new InstanceRegistration(value, container);
-            container.Register(type, registration);
+            var lifetimeManager = new InstanceLifetimeManager(value, container);
+            container.Register(type, lifetimeManager);
         }
 
         public static void RegisterSingleton<T>(this IContainer container, string key, T value)
@@ -196,8 +196,8 @@ namespace Tact
 
         public static void RegisterSingleton(this IContainer container, Type type, string key, object value)
         {
-            var registration = new InstanceRegistration(value, container);
-            container.Register(type, key, registration);
+            var lifetimeManager = new InstanceLifetimeManager(value, container);
+            container.Register(type, key, lifetimeManager);
         }
 
         public static void RegisterSingleton<T>(this IContainer container)
@@ -221,8 +221,8 @@ namespace Tact
 
         public static void RegisterSingleton(this IContainer container, Type type, Func<IResolver, object> factory)
         {
-            var registration = new SingletonRegistration(type, container, factory);
-            container.Register(type, registration);
+            var lifetimeManager = new SingletonLifetimeManager(type, container, factory);
+            container.Register(type, lifetimeManager);
         }
 
         public static void RegisterSingleton<T>(this IContainer container, string key)
@@ -246,8 +246,8 @@ namespace Tact
 
         public static void RegisterSingleton(this IContainer container, Type type, string key, Func<IResolver, object> factory)
         {
-            var registration = new SingletonRegistration(type, container, factory);
-            container.Register(type, key, registration);
+            var lifetimeManager = new SingletonLifetimeManager(type, container, factory);
+            container.Register(type, key, lifetimeManager);
         }
 
         public static void RegisterSingleton<TFrom, TTo>(this IContainer container)
@@ -261,8 +261,8 @@ namespace Tact
         public static void RegisterSingleton(this IContainer container, Type fromType, Type toType)
         {
             toType.EnsureSingleCostructor();
-            var registration = new SingletonRegistration(toType, container);
-            container.Register(fromType, registration);
+            var lifetimeManager = new SingletonLifetimeManager(toType, container);
+            container.Register(fromType, lifetimeManager);
         }
 
         public static void RegisterSingleton<TFrom, TTo>(this IContainer container, string key)
@@ -276,8 +276,8 @@ namespace Tact
         public static void RegisterSingleton(this IContainer container, Type fromType, Type toType, string key)
         {
             toType.EnsureSingleCostructor();
-            var registration = new SingletonRegistration(toType, container);
-            container.Register(fromType, key, registration);
+            var lifetimeManager = new SingletonLifetimeManager(toType, container);
+            container.Register(fromType, key, lifetimeManager);
         }
 
         #endregion
@@ -305,8 +305,8 @@ namespace Tact
 
         public static void RegisterTransient(this IContainer container, Type type, Func<IResolver, object> factory)
         {
-            var registration = new TransientRegistration(type, container, factory);
-            container.Register(type, registration);
+            var lifetimeManager = new TransientLifetimeManager(type, container, factory);
+            container.Register(type, lifetimeManager);
         }
 
         public static void RegisterTransient<T>(this IContainer container, string key)
@@ -330,8 +330,8 @@ namespace Tact
 
         public static void RegisterTransient(this IContainer container, Type type, string key, Func<IResolver, object> factory)
         {
-            var registration = new TransientRegistration(type, container, factory);
-            container.Register(type, key, registration);
+            var lifetimeManager = new TransientLifetimeManager(type, container, factory);
+            container.Register(type, key, lifetimeManager);
         }
 
         public static void RegisterTransient<TFrom, TTo>(this IContainer container)
@@ -345,8 +345,8 @@ namespace Tact
         public static void RegisterTransient(this IContainer container, Type fromType, Type toType)
         {
             toType.EnsureSingleCostructor();
-            var registration = new TransientRegistration(toType, container);
-            container.Register(fromType, registration);
+            var lifetimeManager = new TransientLifetimeManager(toType, container);
+            container.Register(fromType, lifetimeManager);
         }
 
         public static void RegisterTransient<TFrom, TTo>(this IContainer container, string key)
@@ -360,8 +360,8 @@ namespace Tact
         public static void RegisterTransient(this IContainer container, Type fromType, Type toType, string key)
         {
             toType.EnsureSingleCostructor();
-            var registration = new TransientRegistration(toType, container);
-            container.Register(fromType, key, registration);
+            var lifetimeManager = new TransientLifetimeManager(toType, container);
+            container.Register(fromType, key, lifetimeManager);
         }
 
         #endregion

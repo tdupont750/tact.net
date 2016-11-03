@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Tact.Core.Tests.Practices
 {
-    public class PerScopeRegistrationTests
+    public class PerScopeLifetimeManagerTests
     {
         [Fact]
         public void RegisterPerScope()

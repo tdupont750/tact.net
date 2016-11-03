@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Tact.Practices.Registration.Implementation
+namespace Tact.Practices.LifetimeManagers.Implementation
 {
-    public class SingletonRegistration : IRegistration
+    public class SingletonLifetimeManager : ILifetimeManager
     {
         private readonly Type _toType;
         private readonly object _scope;
         private readonly Lazy<object> _instance;
 
-        public SingletonRegistration(Type toType, IContainer scope, Func<IResolver, object> factory = null)
+        public SingletonLifetimeManager(Type toType, IContainer scope, Func<IResolver, object> factory = null)
         {
             _toType = toType;
             _scope = scope;
             _instance = new Lazy<object>(() => factory?.Invoke(scope) ?? scope.CreateInstance(toType, new Stack<Type>()));
         }
 
-        public string Description => $"Singleton: {_toType.Name}";
+        public virtual string Description => $"Singleton: {_toType.Name}";
 
-        public virtual IRegistration Clone(IContainer scope)
+        public virtual ILifetimeManager Clone(IContainer scope)
         {
             return this;
         }

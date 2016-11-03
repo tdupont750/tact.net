@@ -1,11 +1,10 @@
-using Tact.Diagnostics;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices.Implementation;
 using Xunit;
 
 namespace Tact.Core.Tests.Practices
 {
-    public class PerResolveRegistrationTests
+    public class PerResolveLifetimeManagerTests
     {
         [Fact]
         public void RegisterPerResolve()

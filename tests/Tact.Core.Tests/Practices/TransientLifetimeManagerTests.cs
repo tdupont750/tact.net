@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Tact.Core.Tests.Practices
 {
-    public class TransientRegistrationTests
+    public class TransientLifetimeManagerTests
     {
         [Fact]
         public void RegisterTransient()

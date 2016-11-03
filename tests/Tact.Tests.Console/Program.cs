@@ -11,9 +11,9 @@ namespace Tact.Tests.Console
         {
             System.Console.WriteLine("Start...");
 
-            new PerResolveRegistrationTests().RegisterPerResolve();
+            new PerResolveLifetimeManagerTests().RegisterPerResolve();
             
-            new PerScopeRegistrationTests().RegisterPerScope();
+            new PerScopeLifetimeManagerTests().RegisterPerScope();
             
             new ResolutionHandlerTests().ClassRequired();
             new ResolutionHandlerTests().ConstructorRequired();
@@ -24,9 +24,9 @@ namespace Tact.Tests.Console
             new ResolutionHandlerTests().PreventRecursion();
             new ResolutionHandlerTests().ThrowOnFail();
             
-            new SingletonRegistrationTests().RegisterSingleton();
-            new SingletonRegistrationTests().RegisterSingletonInstance();
-            new TransientRegistrationTests().RegisterTransient();
+            new SingletonLifetimeManagerTests().RegisterSingleton();
+            new SingletonLifetimeManagerTests().RegisterSingletonInstance();
+            new TransientLifetimeManagerTests().RegisterTransient();
 
             new TaskExtensionTests().IgnoreCancellation().Wait();
             new TaskExtensionTests().IgnoreCancellationWithToken().Wait();

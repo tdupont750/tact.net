@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tact.Practices.Registration
+namespace Tact.Practices.LifetimeManagers
 {
-    public interface IRegistration
+    public interface ILifetimeManager
     {
         string Description { get; }
 
-        IRegistration Clone(IContainer scope);
+        ILifetimeManager Clone(IContainer scope);
 
         object Resolve(Stack<Type> stack);
 

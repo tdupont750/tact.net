@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Tact.Practices.Registration.Implementation
+namespace Tact.Practices.LifetimeManagers.Implementation
 {
-    public class InstanceRegistration : IRegistration
+    public class InstanceLifetimeManager : ILifetimeManager
     {
         private readonly object _scope;
         private readonly object _instance;
 
-        public InstanceRegistration(object instance, object scope)
+        public InstanceLifetimeManager(object instance, object scope)
         {
             _scope = scope;
             _instance = instance;
@@ -16,7 +16,7 @@ namespace Tact.Practices.Registration.Implementation
 
         public string Description => $"Instance: {_instance.GetType().Name}";
 
-        public IRegistration Clone(IContainer scope)
+        public ILifetimeManager Clone(IContainer scope)
         {
             return this;
         }

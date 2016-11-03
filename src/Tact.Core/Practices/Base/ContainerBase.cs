@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Tact;
 using Tact.Diagnostics;
-using Tact.Practices.Registration;
+using Tact.Practices.LifetimeManagers;
 using Tact.Practices.ResolutionHandlers;
 
 namespace Tact.Practices.Base
@@ -12,8 +11,8 @@ namespace Tact.Practices.Base
     public abstract class ContainerBase : IContainer
     {
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-        private readonly Dictionary<Type, IRegistration> _registrationMap = new Dictionary<Type, IRegistration>();
-        private readonly Dictionary<Type, Dictionary<string, IRegistration>> _multiRegistrationMap = new Dictionary<Type, Dictionary<string, IRegistration>>();
+        private readonly Dictionary<Type, ILifetimeManager> _lifetimeManagerMap = new Dictionary<Type, ILifetimeManager>();
+        private readonly Dictionary<Type, Dictionary<string, ILifetimeManager>> _multiRegistrationMap = new Dictionary<Type, Dictionary<string, ILifetimeManager>>();
         protected readonly ILog Log;
 
         private bool _isDisposed;
@@ -34,12 +33,12 @@ namespace Tact.Practices.Base
 
             using (EnterReadLock())
             {
-                foreach (var registration in _registrationMap.Values)
-                    registration.Dispose(this);
+                foreach (var lifetimeManager in _lifetimeManagerMap.Values)
+                    lifetimeManager.Dispose(this);
 
                 foreach (var registrations in _multiRegistrationMap.Values)
-                    foreach (var registration in registrations.Values)
-                        registration.Dispose(this);
+                    foreach (var lifetimeManager in registrations.Values)
+                        lifetimeManager.Dispose(this);
             }
         }
 
@@ -54,8 +53,8 @@ namespace Tact.Practices.Base
             using (EnterPush(type, stack))
             using (EnterReadLock())
             {
-                if (_registrationMap.ContainsKey(type))
-                    return _registrationMap[type].Resolve(stack);
+                if (_lifetimeManagerMap.ContainsKey(type))
+                    return _lifetimeManagerMap[type].Resolve(stack);
 
                 foreach (var handler in ResolutionHandlers)
                 {
@@ -82,9 +81,9 @@ namespace Tact.Practices.Base
                 if (_multiRegistrationMap.ContainsKey(type))
                 {
                     var registrations = _multiRegistrationMap[type];
-                    foreach (var registration in registrations)
-                        if (registration.Key == key)
-                            return registration.Value.Resolve(stack);
+                    foreach (var lifetimeManager in registrations)
+                        if (lifetimeManager.Key == key)
+                            return lifetimeManager.Value.Resolve(stack);
                 }
 
                 foreach (var resolutionHandler in ResolutionHandlers)
@@ -114,9 +113,9 @@ namespace Tact.Practices.Base
                 if (_multiRegistrationMap.ContainsKey(type))
                 {
                     var registrations = _multiRegistrationMap[type];
-                    foreach (var registration in registrations.Values)
+                    foreach (var lifetimeManager in registrations.Values)
                     {
-                        var instance = registration.Resolve(stack);
+                        var instance = lifetimeManager.Resolve(stack);
                         instances.Add(instance);
                     }
                 }
@@ -141,24 +140,24 @@ namespace Tact.Practices.Base
             return scope;
         }
 
-        public void Register(Type fromType, IRegistration registration)
+        public void Register(Type fromType, ILifetimeManager lifetimeManager)
         {
             using (EnterWriteLock())
             {
-                if (_registrationMap.ContainsKey(fromType))
+                if (_lifetimeManagerMap.ContainsKey(fromType))
                 {
-                    var previous = _registrationMap[fromType];
-                    Log.Debug("Type: {0} - {1} - Replaced {2}", fromType.Name, registration.Description,
+                    var previous = _lifetimeManagerMap[fromType];
+                    Log.Debug("Type: {0} - {1} - Replaced {2}", fromType.Name, lifetimeManager.Description,
                         previous.Description);
                 }
                 else
-                    Log.Debug("Type: {0} - {1}", fromType.Name, registration.Description);
+                    Log.Debug("Type: {0} - {1}", fromType.Name, lifetimeManager.Description);
 
-                _registrationMap[fromType] = registration;
+                _lifetimeManagerMap[fromType] = lifetimeManager;
             }
         }
 
-        public void Register(Type fromType, string key, IRegistration registration)
+        public void Register(Type fromType, string key, ILifetimeManager lifetimeManager)
         {
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Required", nameof(key));
@@ -167,15 +166,15 @@ namespace Tact.Practices.Base
             {
                 if (_multiRegistrationMap.ContainsKey(fromType))
                 {
-                    var previous = _registrationMap[fromType];
-                    Log.Debug("Type: {0} - Key: {1} - {2} - Replaced {3}", fromType.Name, key, registration.Description,
+                    var previous = _lifetimeManagerMap[fromType];
+                    Log.Debug("Type: {0} - Key: {1} - {2} - Replaced {3}", fromType.Name, key, lifetimeManager.Description,
                         previous.Description);
-                    _multiRegistrationMap[fromType][key] = registration;
+                    _multiRegistrationMap[fromType][key] = lifetimeManager;
                 }
                 else
                 {
-                    Log.Debug("Type: {0} - Key: {1} - {2}", fromType.Name, key, registration.Description);
-                    _multiRegistrationMap[fromType] = new Dictionary<string, IRegistration> {{key, registration}};
+                    Log.Debug("Type: {0} - Key: {1} - {2}", fromType.Name, key, lifetimeManager.Description);
+                    _multiRegistrationMap[fromType] = new Dictionary<string, ILifetimeManager> {{key, lifetimeManager}};
                 }
             }
         }
@@ -201,20 +200,20 @@ namespace Tact.Practices.Base
             using (source.EnterReadLock())
             using (target.EnterWriteLock())
             {
-                foreach (var pair in source._registrationMap)
+                foreach (var pair in source._lifetimeManagerMap)
                 {
                     var clone = pair.Value.Clone(target);
-                    target._registrationMap[pair.Key] = clone;
+                    target._lifetimeManagerMap[pair.Key] = clone;
                 }
 
                 foreach (var pair in source._multiRegistrationMap)
                 {
-                    var clones = new Dictionary<string, IRegistration>();
+                    var clones = new Dictionary<string, ILifetimeManager>();
 
-                    foreach (var registration in pair.Value)
+                    foreach (var lifetimeManager in pair.Value)
                     {
-                        var clone = registration.Value.Clone(target);
-                        clones[registration.Key] = clone;
+                        var clone = lifetimeManager.Value.Clone(target);
+                        clones[lifetimeManager.Key] = clone;
                     }
 
                     target._multiRegistrationMap[pair.Key] = clones;

@@ -7,9 +7,9 @@ namespace Tact.Practices
     {
         IResolver BeginScope();
 
-        object Resolve(Type serviceType);
-        object Resolve(Type serviceType, string key);
+        object Resolve(Type type);
+        object Resolve(Type type, string key);
 
-        IEnumerable<object> ResolveAll(Type serviceType);
+        IEnumerable<object> ResolveAll(Type type);
     }
 }

@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
 
-namespace Tact.Practices.Registration.Implementation
+namespace Tact.Practices.LifetimeManagers.Implementation
 {
-    public class PerResolveRegistration : IRegistration
+    public class PerResolveLifetimeManager : ILifetimeManager
     {
         private readonly Type _toType;
         private readonly IContainer _scope;
         private readonly Func<IResolver, object> _factory;
         private readonly List<Tuple<WeakReference<Stack<Type>>, WeakReference<object>>> _cache;
 
-        public PerResolveRegistration(Type toType, IContainer scope, Func<IResolver, object> factory = null)
+        public PerResolveLifetimeManager(Type toType, IContainer scope, Func<IResolver, object> factory = null)
         {
             _toType = toType;
             _scope = scope;
@@ -20,9 +20,9 @@ namespace Tact.Practices.Registration.Implementation
 
         public string Description => $"PerResolve: {_toType.Name}";
 
-        public IRegistration Clone(IContainer scope)
+        public ILifetimeManager Clone(IContainer scope)
         {
-            return new PerResolveRegistration(_toType, scope, _factory);
+            return new PerResolveLifetimeManager(_toType, scope, _factory);
         }
 
         public object Resolve(Stack<Type> stack)

@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Tact.Core.Tests.Practices
 {
-    public class SingletonRegistrationTests
+    public class SingletonLifetimeManagerTests
     {
         [Fact]
         public void RegisterSingletonInstance()
