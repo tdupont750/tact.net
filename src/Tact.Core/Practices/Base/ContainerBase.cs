@@ -182,7 +182,7 @@ namespace Tact.Practices.Base
 
         public object CreateInstance(Type type, Stack<Type> stack)
         {
-            var constructor = type.ValidateTypeForInstanceCreation();
+            var constructor = type.EnsureSingleCostructor();
             var parameterTypes = constructor.GetParameters().Select(p => p.ParameterType).ToArray();
             var arguments = new object[parameterTypes.Length];
             for (var i = 0; i < parameterTypes.Length; i++)

@@ -68,7 +68,7 @@ namespace Tact
 
         public static void RegisterPerResolve(this IContainer container, Type fromType, Type toType)
         {
-            toType.ValidateTypeForInstanceCreation();
+            toType.EnsureSingleCostructor();
             var registration = new PerResolveRegistration(toType, container);
             container.Register(fromType, registration);
         }
@@ -83,7 +83,7 @@ namespace Tact
 
         public static void RegisterPerResolve(this IContainer container, Type fromType, Type toType, string key)
         {
-            toType.ValidateTypeForInstanceCreation();
+            toType.EnsureSingleCostructor();
             var registration = new PerResolveRegistration(toType, container);
             container.Register(fromType, key, registration);
         }
@@ -152,7 +152,7 @@ namespace Tact
 
         public static void RegisterPerScope(this IContainer container, Type fromType, Type toType)
         {
-            toType.ValidateTypeForInstanceCreation();
+            toType.EnsureSingleCostructor();
             var registration = new PerScopeRegistration(toType, container);
             container.Register(fromType, registration);
         }
@@ -167,7 +167,7 @@ namespace Tact
 
         public static void RegisterPerScope(this IContainer container, Type fromType, Type toType, string key)
         {
-            toType.ValidateTypeForInstanceCreation();
+            toType.EnsureSingleCostructor();
             var registration = new PerScopeRegistration(toType, container);
             container.Register(fromType, key, registration);
         }
@@ -260,7 +260,7 @@ namespace Tact
 
         public static void RegisterSingleton(this IContainer container, Type fromType, Type toType)
         {
-            toType.ValidateTypeForInstanceCreation();
+            toType.EnsureSingleCostructor();
             var registration = new SingletonRegistration(toType, container);
             container.Register(fromType, registration);
         }
@@ -275,7 +275,7 @@ namespace Tact
 
         public static void RegisterSingleton(this IContainer container, Type fromType, Type toType, string key)
         {
-            toType.ValidateTypeForInstanceCreation();
+            toType.EnsureSingleCostructor();
             var registration = new SingletonRegistration(toType, container);
             container.Register(fromType, key, registration);
         }
@@ -344,7 +344,7 @@ namespace Tact
 
         public static void RegisterTransient(this IContainer container, Type fromType, Type toType)
         {
-            toType.ValidateTypeForInstanceCreation();
+            toType.EnsureSingleCostructor();
             var registration = new TransientRegistration(toType, container);
             container.Register(fromType, registration);
         }
@@ -359,7 +359,7 @@ namespace Tact
 
         public static void RegisterTransient(this IContainer container, Type fromType, Type toType, string key)
         {
-            toType.ValidateTypeForInstanceCreation();
+            toType.EnsureSingleCostructor();
             var registration = new TransientRegistration(toType, container);
             container.Register(fromType, key, registration);
         }

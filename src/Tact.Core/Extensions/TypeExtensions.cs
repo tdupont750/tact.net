@@ -8,7 +8,7 @@ namespace Tact
         private const string ClassRequired = "TTo must be a class";
         private const string ConstructorRequired = "There must be a single public constructor defined";
 
-        public static ConstructorInfo ValidateTypeForInstanceCreation(this Type type)
+        public static ConstructorInfo EnsureSingleCostructor(this Type type)
         {
             var typeInfo = type.GetTypeInfo();
             if (!typeInfo.IsClass)
