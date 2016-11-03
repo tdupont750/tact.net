@@ -1,11 +1,49 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using Tact.Practices;
+using Tact.Practices.LifetimeManagers;
 using Tact.Practices.LifetimeManagers.Implementation;
 
 namespace Tact
 {
     public static class ContainerExtensions
     {
+        #region RegisterByAttribute
+
+        public static void RegisterByAttribute(this IContainer container, ICollection<Assembly> assemblies)
+        {
+            foreach (var assembly in assemblies)
+                container.RegisterByAttribute(assembly);
+        }
+
+        public static void RegisterByAttribute(this IContainer container, Assembly assembly)
+        {
+            var types = assembly.GetTypes();
+            container.RegisterByAttribute(types);
+        }
+
+        public static void RegisterByAttribute(this IContainer container, ICollection<Type> types)
+        {
+            foreach (var type in types)
+                container.RegisterByAttribute(type);
+        }
+
+
+        public static void RegisterByAttribute(this IContainer container, Type type)
+        {
+            var attribute = type
+                .GetTypeInfo()
+                .GetCustomAttributes()
+                .OfType<IRegisterAttribute>()
+                .SingleOrDefault();
+
+            attribute?.Reigster(container, type);
+        }
+
+        #endregion
+
         #region Register PerResolve
 
         public static void RegisterPerResolve<T>(this IContainer container)
