@@ -13,12 +13,12 @@ namespace Tact
                 .ContinueWith(t =>
                 {
                     if (t.IsCanceled && token.IsCancellationRequested)
-                        return Task.FromResult(true);
+                        return Task.CompletedTask;
 
                     if (t.IsFaulted
                         && token.IsCancellationRequested
                         && t.Exception.InnerExceptions.All(e => e is TaskCanceledException))
-                        return Task.FromResult(true);
+                        return Task.CompletedTask;
 
                     return t;
                 })
@@ -31,11 +31,11 @@ namespace Tact
                 .ContinueWith(t =>
                 {
                     if (t.IsCanceled)
-                        return Task.FromResult(true);
+                        return Task.CompletedTask;
 
                     if (t.IsFaulted
                         && t.Exception.InnerExceptions.All(e => e is TaskCanceledException))
-                        return Task.FromResult(true);
+                        return Task.CompletedTask;
 
                     return t;
                 })
@@ -49,12 +49,12 @@ namespace Tact
                 .ContinueWith(t =>
                 {
                     if (t.IsCanceled && token.IsCancellationRequested)
-                        return Task.FromResult(default(T));
+                        return GenericTask<T>.CompletedTask;
 
                     if (t.IsFaulted
                         && token.IsCancellationRequested
                         && t.Exception.InnerExceptions.All(e => e is TaskCanceledException))
-                        return Task.FromResult(default(T));
+                        return GenericTask<T>.CompletedTask;
 
                     return t;
                 })
@@ -67,15 +67,20 @@ namespace Tact
                 .ContinueWith(t =>
                 {
                     if (t.IsCanceled)
-                        return Task.FromResult(default(T));
+                        return GenericTask<T>.CompletedTask;
 
                     if (t.IsFaulted
                         && t.Exception.InnerExceptions.All(e => e is TaskCanceledException))
-                        return Task.FromResult(default(T));
+                        return GenericTask<T>.CompletedTask;
 
                     return t;
                 })
                 .Unwrap();
+        }
+
+        private static class GenericTask<T>
+        {
+            public static readonly Task<T> CompletedTask = Task.FromResult(default(T));
         }
     }
 }
