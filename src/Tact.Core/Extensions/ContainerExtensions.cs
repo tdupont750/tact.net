@@ -56,33 +56,58 @@ namespace Tact
 
         public static void RegisterByAttribute(this IContainer container, params Assembly[] assemblies)
         {
-            container.RegisterByAttribute<IRegisterAttribute>(assemblies);
+            container.RegisterByAttribute<IRegisterAttribute, IRegisterConditionAttribute>(assemblies);
         }
 
         public static void RegisterByAttribute(this IContainer container, params Type[] types)
         {
-            container.RegisterByAttribute<IRegisterAttribute>(types);
+            container.RegisterByAttribute<IRegisterAttribute, IRegisterConditionAttribute>(types);
         }
 
         public static void RegisterByAttribute<T>(this IContainer container, params Assembly[] assemblies)
             where T : IRegisterAttribute
         {
-            foreach (var assembly in assemblies)
-            {
-                var types = assembly.GetTypes();
-                container.RegisterByAttribute<T>(types);
-            }
+            container.RegisterByAttribute<T, IRegisterConditionAttribute>(assemblies);
         }
 
         public static void RegisterByAttribute<T>(this IContainer container, params Type[] types)
             where T : IRegisterAttribute
         {
+            container.RegisterByAttribute<T, IRegisterConditionAttribute>(types);
+        }
+
+        public static void RegisterByAttribute<TRegister, TCondition>(this IContainer container, params Assembly[] assemblies)
+            where TRegister : IRegisterAttribute
+            where TCondition : IRegisterConditionAttribute
+        {
+            foreach (var assembly in assemblies)
+            {
+                var types = assembly.GetTypes();
+                container.RegisterByAttribute<TRegister, TCondition>(types);
+            }
+        }
+
+        public static void RegisterByAttribute<TRegister, TCondition>(this IContainer container, params Type[] types)
+            where TRegister : IRegisterAttribute
+            where TCondition : IRegisterConditionAttribute
+        {
             foreach (var type in types)
             {
+                var conditions = type
+                    .GetTypeInfo()
+                    .GetCustomAttributes()
+                    .OfType<TCondition>()
+                    .ToArray();
+
+                var shouldRegister = conditions.All(condition => condition.ShouldRegister(container, type));
+
+                if (!shouldRegister)
+                    continue;
+
                 var attribute = type
                     .GetTypeInfo()
                     .GetCustomAttributes()
-                    .OfType<T>()
+                    .OfType<TRegister>()
                     .SingleOrDefault();
 
                 attribute?.Register(container, type);

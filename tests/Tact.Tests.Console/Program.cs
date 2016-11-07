@@ -49,6 +49,9 @@ namespace Tact.Tests.Console
 
             new RegisterByAttributesTests().RegisterByAttribute();
 
+            new RegisterConditionTests().ShouldRegisterFalse();
+            new RegisterConditionTests().ShouldRegisterTrue();
+
             System.Console.WriteLine("...Complete");
         }
     }
