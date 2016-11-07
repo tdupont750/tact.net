@@ -1,5 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿using Tact.Core.Tests.ComponentModel.DataAnnotations;
 using Tact.Core.Tests.Extensions;
 using Tact.Core.Tests.Practices;
 
@@ -36,6 +35,19 @@ namespace Tact.Tests.Console
             new TaskExtensionTests().GenericIgnoreCancellationWithToken().Wait();
             new TaskExtensionTests().GenericIgnoreCancellationWithInvalidToken().Wait();
             new TaskExtensionTests().GenericIgnoreCancellationWithException().Wait();
+
+            new RequireNonDefaultTests().AllErrors();
+            new RequireNonDefaultTests().NoErrors();
+            new RequireNonDefaultTests().Strings();
+            new RequireNonDefaultTests().NoAttributes();
+
+            new IsEnabledAttributeTests().ValidIsEnabled();
+            new IsEnabledAttributeTests().InvalidIsEnabled();
+            new IsEnabledAttributeTests().ValidNotEnabled();
+            new IsEnabledAttributeTests().InvalidNotEnabled();
+            new IsEnabledAttributeTests().InvalidIsEnabledModelTest();
+
+            new RegisterByAttributesTests().RegisterByAttribute();
 
             System.Console.WriteLine("...Complete");
         }

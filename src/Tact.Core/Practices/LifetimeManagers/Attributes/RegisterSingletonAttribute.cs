@@ -19,7 +19,7 @@ namespace Tact.Practices.LifetimeManagers.Attributes
             _fromType = fromType;
         }
 
-        public void Reigster(IContainer container, Type toType)
+        public void Register(IContainer container, Type toType)
         {
             if (string.IsNullOrWhiteSpace(_key))
                 container.RegisterSingleton(_fromType, toType);

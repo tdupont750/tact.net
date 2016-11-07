@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Reflection;
 
 namespace Tact
@@ -8,17 +9,45 @@ namespace Tact
         private const string ClassRequired = "TTo must be a class";
         private const string ConstructorRequired = "There must be a single public constructor defined";
 
+        private static readonly ConcurrentDictionary<Type, Tuple<Result, ConstructorInfo>> ResultMap =
+            new ConcurrentDictionary<Type, Tuple<Result, ConstructorInfo>>();
+
         public static ConstructorInfo EnsureSingleCostructor(this Type type)
         {
-            var typeInfo = type.GetTypeInfo();
-            if (!typeInfo.IsClass)
-                throw new ArgumentException(ClassRequired);
+            var result = ResultMap.GetOrAdd(type, t =>
+            {
+                var typeInfo = type.GetTypeInfo();
+                if (!typeInfo.IsClass)
+                    return Tuple.Create(Result.ClassRequired, (ConstructorInfo) null);
 
-            var constuctors = typeInfo.GetConstructors();
-            if (constuctors.Length != 1)
-                throw new ArgumentException(ConstructorRequired);
+                var constuctors = typeInfo.GetConstructors();
+                if (constuctors.Length != 1)
+                    return Tuple.Create(Result.ConstructorRequired, (ConstructorInfo)null);
 
-            return constuctors[0];
+                return Tuple.Create(Result.Valid, constuctors[0]);
+            });
+
+            switch (result.Item1)
+            {
+                case Result.Valid:
+                    return result.Item2;
+
+                case Result.ClassRequired:
+                    throw new ArgumentException(ClassRequired);
+
+                case Result.ConstructorRequired:
+                    throw new ArgumentException(ConstructorRequired);
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private enum Result
+        {
+            Valid,
+            ClassRequired,
+            ConstructorRequired
         }
     }
 }

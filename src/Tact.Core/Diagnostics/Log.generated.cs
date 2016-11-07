@@ -19,13 +19,19 @@ namespace Tact
             Error = 4,
             Fatal = 5,
         }
+
+        public interface ILog
+        {
+            bool IsEnabled(LogLevel level);
+            void Log(LogLevel level, string message);
+            void Log(LogLevel level, string format, params object[] args);
+            void Log(LogLevel level, Exception ex, string message);
+            void Log(LogLevel level, Exception ex, string format, params object[] args);
+        }
     }
 
     public static class LogExtensions
-    {
-        private static readonly char[] DirectorySeparatorChars = {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar};
-        private static readonly Regex ClassNameRegex = new Regex(@"([\w]+)\.[\w]+$", RegexOptions.Compiled);
- 
+    { 
         public static void Trace(
             this ILog log,
             string message,
@@ -1919,12 +1925,7 @@ namespace Tact
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string GetFormat(string format, string memberName, string sourceFilePath, int sourceLineNumber)
         {
-            var lastIndex = sourceFilePath.LastIndexOfAny(DirectorySeparatorChars);
-            if (lastIndex > 0) sourceFilePath = sourceFilePath.Substring(lastIndex + 1);
-            var match = ClassNameRegex.Match(sourceFilePath);
-            return match.Success
-                ? $"{match.Groups[1].Value}.{memberName}({sourceLineNumber}) - {format}"
-                : format;
+            return $"{Path.GetFileName(sourceFilePath)}.{memberName}({sourceLineNumber}) - {format}";
         }
  
         public enum LogCallSite

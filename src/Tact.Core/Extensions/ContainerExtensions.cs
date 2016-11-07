@@ -2,44 +2,91 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Tact.Configuration;
+using Tact.Configuration.Attributes;
 using Tact.Practices;
 using Tact.Practices.LifetimeManagers;
+using Tact.Practices.LifetimeManagers.Attributes;
 using Tact.Practices.LifetimeManagers.Implementation;
 
 namespace Tact
 {
     public static class ContainerExtensions
     {
-        #region RegisterByAttribute
+        #region RegisterConfigurationByAttribute
 
-        public static void RegisterByAttribute(this IContainer container, ICollection<Assembly> assemblies)
+        public static void RegisterConfigurationByAttribute(this IContainer container, IConfigurationFactory configurationFactory, params Assembly[] assemblies)
+        {
+            container.RegisterConfigurationByAttribute<IRegisterConfigurationAttribute>(configurationFactory, assemblies);
+        }
+
+        public static void RegisterConfigurationByAttribute(this IContainer container, IConfigurationFactory configurationFactory, params Type[] types)
+        {
+            container.RegisterConfigurationByAttribute<IRegisterConfigurationAttribute>(configurationFactory, types);
+        }
+
+        public static void RegisterConfigurationByAttribute<T>(this IContainer container, IConfigurationFactory configurationFactory, params Assembly[] assemblies)
+            where T : IRegisterConfigurationAttribute
         {
             foreach (var assembly in assemblies)
-                container.RegisterByAttribute(assembly);
+            {
+                var types = assembly.GetTypes();
+                container.RegisterConfigurationByAttribute<T>(configurationFactory, types);
+            }
         }
 
-        public static void RegisterByAttribute(this IContainer container, Assembly assembly)
-        {
-            var types = assembly.GetTypes();
-            container.RegisterByAttribute(types);
-        }
-
-        public static void RegisterByAttribute(this IContainer container, ICollection<Type> types)
+        public static void RegisterConfigurationByAttribute<T>(this IContainer container, IConfigurationFactory configurationFactory, params Type[] types)
+            where T : IRegisterConfigurationAttribute
         {
             foreach (var type in types)
-                container.RegisterByAttribute(type);
+            {
+                var attribute = type
+                    .GetTypeInfo()
+                    .GetCustomAttributes()
+                    .OfType<T>()
+                    .SingleOrDefault();
+
+                attribute?.Register(container, configurationFactory, type);
+            }
         }
 
+        #endregion
 
-        public static void RegisterByAttribute(this IContainer container, Type type)
+        #region RegisterByAttribute
+
+        public static void RegisterByAttribute(this IContainer container, params Assembly[] assemblies)
         {
-            var attribute = type
-                .GetTypeInfo()
-                .GetCustomAttributes()
-                .OfType<IRegisterAttribute>()
-                .SingleOrDefault();
+            container.RegisterByAttribute<IRegisterAttribute>(assemblies);
+        }
 
-            attribute?.Reigster(container, type);
+        public static void RegisterByAttribute(this IContainer container, params Type[] types)
+        {
+            container.RegisterByAttribute<IRegisterAttribute>(types);
+        }
+
+        public static void RegisterByAttribute<T>(this IContainer container, params Assembly[] assemblies)
+            where T : IRegisterAttribute
+        {
+            foreach (var assembly in assemblies)
+            {
+                var types = assembly.GetTypes();
+                container.RegisterByAttribute<T>(types);
+            }
+        }
+
+        public static void RegisterByAttribute<T>(this IContainer container, params Type[] types)
+            where T : IRegisterAttribute
+        {
+            foreach (var type in types)
+            {
+                var attribute = type
+                    .GetTypeInfo()
+                    .GetCustomAttributes()
+                    .OfType<T>()
+                    .SingleOrDefault();
+
+                attribute?.Register(container, type);
+            }
         }
 
         #endregion
