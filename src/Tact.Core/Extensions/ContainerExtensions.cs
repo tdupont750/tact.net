@@ -13,29 +13,68 @@ namespace Tact
 {
     public static class ContainerExtensions
     {
-        #region RegisterConfigurationByAttribute
+        #region InitializeByAttribute
 
-        public static void RegisterConfigurationByAttribute(this IContainer container, IConfigurationFactory configurationFactory, params Assembly[] assemblies)
+        public static void InitializeByAttribute(this IContainer container, params Assembly[] assemblies)
         {
-            container.RegisterConfigurationByAttribute<IRegisterConfigurationAttribute>(configurationFactory, assemblies);
+            container.InitializeByAttribute<IInitializeAttribute>(assemblies);
         }
 
-        public static void RegisterConfigurationByAttribute(this IContainer container, IConfigurationFactory configurationFactory, params Type[] types)
+        public static void InitializeByAttribute(this IContainer container, params Type[] types)
         {
-            container.RegisterConfigurationByAttribute<IRegisterConfigurationAttribute>(configurationFactory, types);
+            container.InitializeByAttribute<IInitializeAttribute>(types);
         }
 
-        public static void RegisterConfigurationByAttribute<T>(this IContainer container, IConfigurationFactory configurationFactory, params Assembly[] assemblies)
+        public static void InitializeByAttribute<T>(this IContainer container, params Assembly[] assemblies)
+            where T : IInitializeAttribute
+        {
+            foreach (var assembly in assemblies)
+            {
+                var types = assembly.GetTypes();
+                container.InitializeByAttribute<T>(types);
+            }
+        }
+
+        public static void InitializeByAttribute<T>(this IContainer container, params Type[] types)
+            where T : IInitializeAttribute
+        {
+            foreach (var type in types)
+            {
+                var attribute = type
+                    .GetTypeInfo()
+                    .GetCustomAttributes()
+                    .OfType<T>()
+                    .SingleOrDefault();
+
+                attribute?.Initialize(container);
+            }
+        }
+
+        #endregion
+
+        #region ConfigureByAttribute
+
+        public static void ConfigureByAttribute(this IContainer container, IConfigurationFactory configurationFactory, params Assembly[] assemblies)
+        {
+            container.ConfigureByAttribute<IRegisterConfigurationAttribute>(configurationFactory, assemblies);
+        }
+
+        public static void ConfigureByAttribute(this IContainer container, IConfigurationFactory configurationFactory, params Type[] types)
+        {
+            container.ConfigureByAttribute<IRegisterConfigurationAttribute>(configurationFactory, types);
+        }
+
+        public static void ConfigureByAttribute<T>(this IContainer container, IConfigurationFactory configurationFactory, params Assembly[] assemblies)
             where T : IRegisterConfigurationAttribute
         {
             foreach (var assembly in assemblies)
             {
                 var types = assembly.GetTypes();
-                container.RegisterConfigurationByAttribute<T>(configurationFactory, types);
+                container.ConfigureByAttribute<T>(configurationFactory, types);
             }
         }
 
-        public static void RegisterConfigurationByAttribute<T>(this IContainer container, IConfigurationFactory configurationFactory, params Type[] types)
+        public static void ConfigureByAttribute<T>(this IContainer container, IConfigurationFactory configurationFactory, params Type[] types)
             where T : IRegisterConfigurationAttribute
         {
             foreach (var type in types)

@@ -21,7 +21,7 @@ namespace Tact.Core.Tests.Practices
                 var configurationFactory = new TestConfigurationFactory(true);
 
                 var types = new[] { typeof(TestConfig), typeof(Test) };
-                container.RegisterConfigurationByAttribute(configurationFactory, types);
+                container.ConfigureByAttribute(configurationFactory, types);
                 container.RegisterByAttribute(types);
 
                 container.Resolve<ITest>();
@@ -37,7 +37,7 @@ namespace Tact.Core.Tests.Practices
                 var configurationFactory = new TestConfigurationFactory(false);
 
                 var types = new[] { typeof(TestConfig), typeof(Test) };
-                container.RegisterConfigurationByAttribute(configurationFactory, types);
+                container.ConfigureByAttribute(configurationFactory, types);
                 container.RegisterByAttribute(types);
 
                 Assert.Throws<InvalidOperationException>(() => container.Resolve<ITest>());

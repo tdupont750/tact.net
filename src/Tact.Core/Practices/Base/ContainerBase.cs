@@ -165,17 +165,11 @@ namespace Tact.Practices.Base
             using (EnterWriteLock())
             {
                 if (_multiRegistrationMap.ContainsKey(fromType))
-                {
-                    var previous = _lifetimeManagerMap[fromType];
-                    Log.Debug("Type: {0} - Key: {1} - {2} - Replaced {3}", fromType.Name, key, lifetimeManager.Description,
-                        previous.Description);
                     _multiRegistrationMap[fromType][key] = lifetimeManager;
-                }
                 else
-                {
-                    Log.Debug("Type: {0} - Key: {1} - {2}", fromType.Name, key, lifetimeManager.Description);
                     _multiRegistrationMap[fromType] = new Dictionary<string, ILifetimeManager> {{key, lifetimeManager}};
-                }
+
+                Log.Debug("Type: {0} - Key: {1} - {2}", fromType.Name, key, lifetimeManager.Description);
             }
         }
 

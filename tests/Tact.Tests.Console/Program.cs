@@ -1,6 +1,15 @@
-﻿using Tact.Core.Tests.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.Reflection;
+using Tact.Core.Tests.ComponentModel.DataAnnotations;
 using Tact.Core.Tests.Extensions;
 using Tact.Core.Tests.Practices;
+using Tact.Diagnostics.Implementation;
+using Tact.Practices;
+using Tact.Practices.Implementation;
+using Tact.Tests.Console.Configuration;
+using Tact.Tests.Console.Services;
+using Tact.Tests.Console.Services.Implementation;
+using Xunit;
 
 namespace Tact.Tests.Console
 {
@@ -8,12 +17,63 @@ namespace Tact.Tests.Console
     {
         public static void Main(string[] args)
         {
+            Demo();
+            RunTests();
+        }
+
+        private static void Demo()
+        {
+            var expectedThings = new List<int> {1, 2};
+
+            IDemoService demoService;
+            using (var resolver = CreateResolver())
+            {
+                Assert.Equal("Hello world!", DemoService.StaticString);
+                demoService = resolver.Resolve<IDemoService>();
+
+                var things = demoService.DemoAllOfTheThings();
+                Assert.Equal(expectedThings, things);
+
+                IDemoService scopeDemoService;
+                using (var scope = resolver.BeginScope())
+                {
+                    scopeDemoService = scope.Resolve<IDemoService>();
+                    Assert.NotEqual(demoService.Id, scopeDemoService.Id);
+
+                    var scopeThings = scopeDemoService.DemoAllOfTheThings();
+                    Assert.Equal(expectedThings, scopeThings);
+                }
+
+                Assert.False(demoService.IsDisposed);
+                Assert.True(scopeDemoService.IsDisposed);
+            }
+
+            Assert.True(demoService.IsDisposed);
+        }
+
+        private static IResolver CreateResolver()
+        {
+            var logger = new InMemoryLog();
+            var container = new Container(logger);
+
+            var assembly = Assembly.GetEntryAssembly();
+            var configFactory = new ConfigurationFactory();
+
+            container.ConfigureByAttribute(configFactory, assembly);
+            container.RegisterByAttribute(assembly);
+            container.InitializeByAttribute(assembly);
+
+            return container;
+        }
+
+        private static void RunTests()
+        {
             System.Console.WriteLine("Start...");
 
             new PerResolveLifetimeManagerTests().RegisterPerResolve();
-            
+
             new PerScopeLifetimeManagerTests().RegisterPerScope();
-            
+
             new ResolutionHandlerTests().ClassRequired();
             new ResolutionHandlerTests().ConstructorRequired();
             new ResolutionHandlerTests().DoNotThrowOnFail();
@@ -22,7 +82,7 @@ namespace Tact.Tests.Console
             new ResolutionHandlerTests().LazyResolve();
             new ResolutionHandlerTests().PreventRecursion();
             new ResolutionHandlerTests().ThrowOnFail();
-            
+
             new SingletonLifetimeManagerTests().RegisterSingleton();
             new SingletonLifetimeManagerTests().RegisterSingletonInstance();
             new TransientLifetimeManagerTests().RegisterTransient();
