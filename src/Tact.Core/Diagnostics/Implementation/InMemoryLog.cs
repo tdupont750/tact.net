@@ -14,7 +14,7 @@ namespace Tact.Diagnostics.Implementation
             _maxQueueCount = maxQueueCount;
         }
 
-        public  ConcurrentQueue<Tuple<LogLevel, Exception, string>> Logs { get; } = new ConcurrentQueue<Tuple<LogLevel, Exception, string>>();
+        public  ConcurrentQueue<Tuple<LogLevel, string, Exception>> Logs { get; } = new ConcurrentQueue<Tuple<LogLevel, string, Exception>>();
 
         public bool IsEnabled(LogLevel level)
         {
@@ -25,34 +25,34 @@ namespace Tact.Diagnostics.Implementation
         {
             if (!IsEnabled(level)) return;
             EnsureCount();
-            Logs.Enqueue(Tuple.Create(level, (Exception) null, message));
+            Logs.Enqueue(Tuple.Create(level, message, (Exception)null));
         }
 
         public void Log(LogLevel level, string format, params object[] args)
         {
             if (!IsEnabled(level)) return;
             EnsureCount();
-            Logs.Enqueue(Tuple.Create(level, (Exception) null, string.Format(format, args)));
+            Logs.Enqueue(Tuple.Create(level, string.Format(format, args), (Exception)null));
         }
 
         public void Log(LogLevel level, Exception ex, string message)
         {
             if (!IsEnabled(level)) return;
             EnsureCount();
-            Logs.Enqueue(Tuple.Create(level, ex, message));
+            Logs.Enqueue(Tuple.Create(level, message, ex));
         }
 
         public void Log(LogLevel level, Exception ex, string format, params object[] args)
         {
             if (!IsEnabled(level)) return;
             EnsureCount();
-            Logs.Enqueue(Tuple.Create(level, ex, string.Format(format, args)));
+            Logs.Enqueue(Tuple.Create(level, string.Format(format, args), ex));
         }
 
         private void EnsureCount()
         {
             if (Logs.Count < _maxQueueCount) return;
-            Tuple<LogLevel, Exception, string> tuple;
+            Tuple<LogLevel, string, Exception> tuple;
             Logs.TryDequeue(out tuple);
         }
     }

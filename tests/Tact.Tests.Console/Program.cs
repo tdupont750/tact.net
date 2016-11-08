@@ -62,6 +62,8 @@ namespace Tact.Tests.Console
             container.ConfigureByAttribute(configFactory, assembly);
             container.RegisterByAttribute(assembly);
             container.InitializeByAttribute(assembly);
+            
+            Assert.Equal(11, logger.Logs.Count);
 
             return container;
         }

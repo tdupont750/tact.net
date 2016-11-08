@@ -15,7 +15,7 @@ namespace Tact.Core.Tests.Practices
             using (var resolver = new Container(new InMemoryLog()))
             {
                 a = new One();
-                resolver.RegisterSingleton(a);
+                resolver.RegisterInstance(a);
 
                 b = resolver.Resolve<IOne>();
 

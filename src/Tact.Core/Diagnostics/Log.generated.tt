@@ -8,7 +8,6 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
  
 // ReSharper disable once CheckNamespace
 namespace Tact
@@ -49,7 +48,7 @@ namespace Tact
 <# for(var i = 0; i < argCount; i++) { #>
             object arg<#= i #>,
 <# } #>
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -65,7 +64,7 @@ namespace Tact
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string GetFormat(string format, string memberName, string sourceFilePath, int sourceLineNumber)
         {
-            return $"{Path.GetFileName(sourceFilePath)}.{memberName}({sourceLineNumber}) - {format}";
+            return $"{Path.GetFileNameWithoutExtension(sourceFilePath)}.{memberName}({sourceLineNumber}) - {format}";
         }
  
         public enum LogCallSite

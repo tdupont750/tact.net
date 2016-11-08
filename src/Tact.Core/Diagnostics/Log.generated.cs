@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
  
 // ReSharper disable once CheckNamespace
 namespace Tact
@@ -35,7 +34,7 @@ namespace Tact
         public static void Trace(
             this ILog log,
             string message,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -49,7 +48,7 @@ namespace Tact
             this ILog log,
             Exception ex,
             string message,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -63,7 +62,7 @@ namespace Tact
             this ILog log,
             string format,
             object arg0,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -78,7 +77,7 @@ namespace Tact
             Exception ex,
             string format,
             object arg0,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -93,7 +92,7 @@ namespace Tact
             string format,
             object arg0,
             object arg1,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -109,7 +108,7 @@ namespace Tact
             string format,
             object arg0,
             object arg1,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -125,7 +124,7 @@ namespace Tact
             object arg0,
             object arg1,
             object arg2,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -142,7 +141,7 @@ namespace Tact
             object arg0,
             object arg1,
             object arg2,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -159,7 +158,7 @@ namespace Tact
             object arg1,
             object arg2,
             object arg3,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -177,7 +176,7 @@ namespace Tact
             object arg1,
             object arg2,
             object arg3,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -195,7 +194,7 @@ namespace Tact
             object arg2,
             object arg3,
             object arg4,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -214,7 +213,7 @@ namespace Tact
             object arg2,
             object arg3,
             object arg4,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -233,7 +232,7 @@ namespace Tact
             object arg3,
             object arg4,
             object arg5,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -253,7 +252,7 @@ namespace Tact
             object arg3,
             object arg4,
             object arg5,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -273,7 +272,7 @@ namespace Tact
             object arg4,
             object arg5,
             object arg6,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -294,7 +293,7 @@ namespace Tact
             object arg4,
             object arg5,
             object arg6,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -315,7 +314,7 @@ namespace Tact
             object arg5,
             object arg6,
             object arg7,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -337,7 +336,7 @@ namespace Tact
             object arg5,
             object arg6,
             object arg7,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -350,7 +349,7 @@ namespace Tact
         public static void Debug(
             this ILog log,
             string message,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -364,7 +363,7 @@ namespace Tact
             this ILog log,
             Exception ex,
             string message,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -378,7 +377,7 @@ namespace Tact
             this ILog log,
             string format,
             object arg0,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -393,7 +392,7 @@ namespace Tact
             Exception ex,
             string format,
             object arg0,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -408,7 +407,7 @@ namespace Tact
             string format,
             object arg0,
             object arg1,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -424,7 +423,7 @@ namespace Tact
             string format,
             object arg0,
             object arg1,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -440,7 +439,7 @@ namespace Tact
             object arg0,
             object arg1,
             object arg2,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -457,7 +456,7 @@ namespace Tact
             object arg0,
             object arg1,
             object arg2,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -474,7 +473,7 @@ namespace Tact
             object arg1,
             object arg2,
             object arg3,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -492,7 +491,7 @@ namespace Tact
             object arg1,
             object arg2,
             object arg3,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -510,7 +509,7 @@ namespace Tact
             object arg2,
             object arg3,
             object arg4,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -529,7 +528,7 @@ namespace Tact
             object arg2,
             object arg3,
             object arg4,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -548,7 +547,7 @@ namespace Tact
             object arg3,
             object arg4,
             object arg5,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -568,7 +567,7 @@ namespace Tact
             object arg3,
             object arg4,
             object arg5,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -588,7 +587,7 @@ namespace Tact
             object arg4,
             object arg5,
             object arg6,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -609,7 +608,7 @@ namespace Tact
             object arg4,
             object arg5,
             object arg6,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -630,7 +629,7 @@ namespace Tact
             object arg5,
             object arg6,
             object arg7,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -652,7 +651,7 @@ namespace Tact
             object arg5,
             object arg6,
             object arg7,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -665,7 +664,7 @@ namespace Tact
         public static void Info(
             this ILog log,
             string message,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -679,7 +678,7 @@ namespace Tact
             this ILog log,
             Exception ex,
             string message,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -693,7 +692,7 @@ namespace Tact
             this ILog log,
             string format,
             object arg0,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -708,7 +707,7 @@ namespace Tact
             Exception ex,
             string format,
             object arg0,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -723,7 +722,7 @@ namespace Tact
             string format,
             object arg0,
             object arg1,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -739,7 +738,7 @@ namespace Tact
             string format,
             object arg0,
             object arg1,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -755,7 +754,7 @@ namespace Tact
             object arg0,
             object arg1,
             object arg2,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -772,7 +771,7 @@ namespace Tact
             object arg0,
             object arg1,
             object arg2,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -789,7 +788,7 @@ namespace Tact
             object arg1,
             object arg2,
             object arg3,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -807,7 +806,7 @@ namespace Tact
             object arg1,
             object arg2,
             object arg3,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -825,7 +824,7 @@ namespace Tact
             object arg2,
             object arg3,
             object arg4,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -844,7 +843,7 @@ namespace Tact
             object arg2,
             object arg3,
             object arg4,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -863,7 +862,7 @@ namespace Tact
             object arg3,
             object arg4,
             object arg5,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -883,7 +882,7 @@ namespace Tact
             object arg3,
             object arg4,
             object arg5,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -903,7 +902,7 @@ namespace Tact
             object arg4,
             object arg5,
             object arg6,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -924,7 +923,7 @@ namespace Tact
             object arg4,
             object arg5,
             object arg6,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -945,7 +944,7 @@ namespace Tact
             object arg5,
             object arg6,
             object arg7,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -967,7 +966,7 @@ namespace Tact
             object arg5,
             object arg6,
             object arg7,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -980,7 +979,7 @@ namespace Tact
         public static void Warn(
             this ILog log,
             string message,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -994,7 +993,7 @@ namespace Tact
             this ILog log,
             Exception ex,
             string message,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1008,7 +1007,7 @@ namespace Tact
             this ILog log,
             string format,
             object arg0,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1023,7 +1022,7 @@ namespace Tact
             Exception ex,
             string format,
             object arg0,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1038,7 +1037,7 @@ namespace Tact
             string format,
             object arg0,
             object arg1,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1054,7 +1053,7 @@ namespace Tact
             string format,
             object arg0,
             object arg1,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1070,7 +1069,7 @@ namespace Tact
             object arg0,
             object arg1,
             object arg2,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1087,7 +1086,7 @@ namespace Tact
             object arg0,
             object arg1,
             object arg2,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1104,7 +1103,7 @@ namespace Tact
             object arg1,
             object arg2,
             object arg3,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1122,7 +1121,7 @@ namespace Tact
             object arg1,
             object arg2,
             object arg3,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1140,7 +1139,7 @@ namespace Tact
             object arg2,
             object arg3,
             object arg4,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1159,7 +1158,7 @@ namespace Tact
             object arg2,
             object arg3,
             object arg4,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1178,7 +1177,7 @@ namespace Tact
             object arg3,
             object arg4,
             object arg5,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1198,7 +1197,7 @@ namespace Tact
             object arg3,
             object arg4,
             object arg5,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1218,7 +1217,7 @@ namespace Tact
             object arg4,
             object arg5,
             object arg6,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1239,7 +1238,7 @@ namespace Tact
             object arg4,
             object arg5,
             object arg6,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1260,7 +1259,7 @@ namespace Tact
             object arg5,
             object arg6,
             object arg7,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1282,7 +1281,7 @@ namespace Tact
             object arg5,
             object arg6,
             object arg7,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1295,7 +1294,7 @@ namespace Tact
         public static void Error(
             this ILog log,
             string message,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1309,7 +1308,7 @@ namespace Tact
             this ILog log,
             Exception ex,
             string message,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1323,7 +1322,7 @@ namespace Tact
             this ILog log,
             string format,
             object arg0,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1338,7 +1337,7 @@ namespace Tact
             Exception ex,
             string format,
             object arg0,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1353,7 +1352,7 @@ namespace Tact
             string format,
             object arg0,
             object arg1,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1369,7 +1368,7 @@ namespace Tact
             string format,
             object arg0,
             object arg1,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1385,7 +1384,7 @@ namespace Tact
             object arg0,
             object arg1,
             object arg2,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1402,7 +1401,7 @@ namespace Tact
             object arg0,
             object arg1,
             object arg2,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1419,7 +1418,7 @@ namespace Tact
             object arg1,
             object arg2,
             object arg3,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1437,7 +1436,7 @@ namespace Tact
             object arg1,
             object arg2,
             object arg3,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1455,7 +1454,7 @@ namespace Tact
             object arg2,
             object arg3,
             object arg4,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1474,7 +1473,7 @@ namespace Tact
             object arg2,
             object arg3,
             object arg4,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1493,7 +1492,7 @@ namespace Tact
             object arg3,
             object arg4,
             object arg5,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1513,7 +1512,7 @@ namespace Tact
             object arg3,
             object arg4,
             object arg5,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1533,7 +1532,7 @@ namespace Tact
             object arg4,
             object arg5,
             object arg6,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1554,7 +1553,7 @@ namespace Tact
             object arg4,
             object arg5,
             object arg6,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1575,7 +1574,7 @@ namespace Tact
             object arg5,
             object arg6,
             object arg7,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1597,7 +1596,7 @@ namespace Tact
             object arg5,
             object arg6,
             object arg7,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1610,7 +1609,7 @@ namespace Tact
         public static void Fatal(
             this ILog log,
             string message,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1624,7 +1623,7 @@ namespace Tact
             this ILog log,
             Exception ex,
             string message,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1638,7 +1637,7 @@ namespace Tact
             this ILog log,
             string format,
             object arg0,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1653,7 +1652,7 @@ namespace Tact
             Exception ex,
             string format,
             object arg0,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1668,7 +1667,7 @@ namespace Tact
             string format,
             object arg0,
             object arg1,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1684,7 +1683,7 @@ namespace Tact
             string format,
             object arg0,
             object arg1,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1700,7 +1699,7 @@ namespace Tact
             object arg0,
             object arg1,
             object arg2,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1717,7 +1716,7 @@ namespace Tact
             object arg0,
             object arg1,
             object arg2,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1734,7 +1733,7 @@ namespace Tact
             object arg1,
             object arg2,
             object arg3,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1752,7 +1751,7 @@ namespace Tact
             object arg1,
             object arg2,
             object arg3,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1770,7 +1769,7 @@ namespace Tact
             object arg2,
             object arg3,
             object arg4,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1789,7 +1788,7 @@ namespace Tact
             object arg2,
             object arg3,
             object arg4,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1808,7 +1807,7 @@ namespace Tact
             object arg3,
             object arg4,
             object arg5,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1828,7 +1827,7 @@ namespace Tact
             object arg3,
             object arg4,
             object arg5,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1848,7 +1847,7 @@ namespace Tact
             object arg4,
             object arg5,
             object arg6,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1869,7 +1868,7 @@ namespace Tact
             object arg4,
             object arg5,
             object arg6,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1890,7 +1889,7 @@ namespace Tact
             object arg5,
             object arg6,
             object arg7,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1912,7 +1911,7 @@ namespace Tact
             object arg5,
             object arg6,
             object arg7,
-            LogCallSite logCallSite = default(LogCallSite),
+            LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
@@ -1925,7 +1924,7 @@ namespace Tact
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string GetFormat(string format, string memberName, string sourceFilePath, int sourceLineNumber)
         {
-            return $"{Path.GetFileName(sourceFilePath)}.{memberName}({sourceLineNumber}) - {format}";
+            return $"{Path.GetFileNameWithoutExtension(sourceFilePath)}.{memberName}({sourceLineNumber}) - {format}";
         }
  
         public enum LogCallSite

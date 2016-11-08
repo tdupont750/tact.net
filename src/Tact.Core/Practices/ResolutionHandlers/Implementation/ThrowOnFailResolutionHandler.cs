@@ -8,10 +8,15 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
         public bool TryGetService(
             IContainer container, 
             Type type, 
-            Stack<Type> stack, 
+            Stack<Type> stack,
+            bool canThrow,
             out object result)
         {
-            throw new InvalidOperationException("No matching registrations found");
+            if (canThrow)
+                throw new InvalidOperationException("No matching registrations found");
+
+            result = null;
+            return false;
         }
     }
 }

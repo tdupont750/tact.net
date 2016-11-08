@@ -22,6 +22,7 @@ namespace Tact.Practices.Base
         protected ContainerBase(ILog log)
         {
             Log = log;
+            this.RegisterInstance(log);
         }
 
         public void Dispose()
@@ -45,56 +46,53 @@ namespace Tact.Practices.Base
         public object Resolve(Type type)
         {
             var stack = new Stack<Type>();
-            return Resolve(type, stack);
+            object result;
+            TryResolve(type, stack, true, out result);
+            return result;
+        }
+
+        public bool TryResolve(Type type, out object result)
+        {
+            var stack = new Stack<Type>();
+            return TryResolve(type, stack, false, out result);
         }
 
         public object Resolve(Type type, Stack<Type> stack)
         {
-            using (EnterPush(type, stack))
-            using (EnterReadLock())
-            {
-                if (_lifetimeManagerMap.ContainsKey(type))
-                    return _lifetimeManagerMap[type].Resolve(stack);
+            object result;
+            TryResolve(type, stack, true, out result);
+            return result;
+        }
 
-                foreach (var handler in ResolutionHandlers)
-                {
-                    object result;
-                    if (handler.TryGetService(this, type, stack, out result))
-                        return result;
-                }
-
-                return null;
-            }
+        public bool TryResolve(Type type, Stack<Type> stack, out object result)
+        {
+            return TryResolve(type, stack, false, out result);
         }
 
         public object Resolve(Type type, string key)
         {
             var stack = new Stack<Type>();
-            return Resolve(type, key, stack);
+            object result;
+            TryResolve(type, key, stack, true, out result);
+            return result;
+        }
+
+        public bool TryResolve(Type type, string key, out object result)
+        {
+            var stack = new Stack<Type>();
+            return TryResolve(type, key, stack, false, out result);
         }
 
         public object Resolve(Type type, string key, Stack<Type> stack)
         {
-            using (EnterPush(type, stack))
-            using (EnterReadLock())
-            {
-                if (_multiRegistrationMap.ContainsKey(type))
-                {
-                    var registrations = _multiRegistrationMap[type];
-                    foreach (var lifetimeManager in registrations)
-                        if (lifetimeManager.Key == key)
-                            return lifetimeManager.Value.Resolve(stack);
-                }
+            object result;
+            TryResolve(type, key, stack, true, out result);
+            return result;
+        }
 
-                foreach (var resolutionHandler in ResolutionHandlers)
-                {
-                    object instance;
-                    if (resolutionHandler.TryGetService(this, type, stack, out instance))
-                        return instance;
-                }
-            }
-
-            return null;
+        public bool TryResolve(Type type, string key, Stack<Type> stack, out object result)
+        {
+            return TryResolve(type, key, stack, false, out result);
         }
 
         public IEnumerable<object> ResolveAll(Type type)
@@ -124,7 +122,7 @@ namespace Tact.Practices.Base
                     foreach (var resolutionHandler in ResolutionHandlers)
                     {
                         object instance;
-                        if (resolutionHandler.TryGetService(this, type, stack, out instance))
+                        if (resolutionHandler.TryGetService(this, type, stack, false, out instance))
                             instances.Add(instance);
                     }
                 }
@@ -188,7 +186,56 @@ namespace Tact.Practices.Base
         }
 
         protected abstract ContainerBase CreateScope();
-        
+
+        private bool TryResolve(Type type, Stack<Type> stack, bool canThrow, out object result)
+        {
+            using (EnterPush(type, stack))
+            using (EnterReadLock())
+            {
+                if (_lifetimeManagerMap.ContainsKey(type))
+                {
+                    result = _lifetimeManagerMap[type].Resolve(stack);
+                    return true;
+                }
+
+                foreach (var handler in ResolutionHandlers)
+                {
+                    if (handler.TryGetService(this, type, stack, canThrow, out result))
+                        return true;
+                }
+
+                result = null;
+                return false;
+            }
+        }
+
+        private bool TryResolve(Type type, string key, Stack<Type> stack, bool canThrow, out object result)
+        {
+            using (EnterPush(type, stack))
+            using (EnterReadLock())
+            {
+                if (_multiRegistrationMap.ContainsKey(type))
+                {
+                    var registrations = _multiRegistrationMap[type];
+                    foreach (var lifetimeManager in registrations)
+                        if (lifetimeManager.Key == key)
+                        {
+                            result = lifetimeManager.Value.Resolve(stack);
+                            return true;
+                        }
+                }
+
+                foreach (var resolutionHandler in ResolutionHandlers)
+                {
+                    if (resolutionHandler.TryGetService(this, type, stack, canThrow, out result))
+                        return true;
+                }
+            }
+
+            result = null;
+            return false;
+        }
+
         private static void InitializeScope(ContainerBase source, ContainerBase target)
         {
             using (source.EnterReadLock())

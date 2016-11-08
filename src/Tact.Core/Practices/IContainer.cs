@@ -14,6 +14,9 @@ namespace Tact.Practices
         object Resolve(Type type, Stack<Type> stack);
         object Resolve(Type type, string name, Stack<Type> stack);
 
+        bool TryResolve(Type type, Stack<Type> stack, out object result);
+        bool TryResolve(Type type, string name, Stack<Type> stack, out object result);
+
         IEnumerable<object> ResolveAll(Type type, Stack<Type> stack);
     }
 }

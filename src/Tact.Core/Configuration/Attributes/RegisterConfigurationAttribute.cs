@@ -11,7 +11,7 @@ namespace Tact.Configuration.Attributes
         {
             var instance = configurationFactory.CreateObject(type);
             ModelValidation.Validate(instance);
-            container.RegisterSingleton(type, instance);
+            container.RegisterInstance(type, instance);
         }
     }
 }

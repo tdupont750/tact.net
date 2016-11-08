@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Tact.Configuration;
 using Tact.Configuration.Attributes;
+using Tact.Diagnostics;
 using Tact.Practices;
 using Tact.Practices.LifetimeManagers;
 using Tact.Practices.LifetimeManagers.Attributes;
@@ -13,7 +14,7 @@ namespace Tact
 {
     public static class ContainerExtensions
     {
-        #region InitializeByAttribute
+        #region Initialize By Attribute
 
         public static void InitializeByAttribute(this IContainer container, params Assembly[] assemblies)
         {
@@ -38,6 +39,9 @@ namespace Tact
         public static void InitializeByAttribute<T>(this IContainer container, params Type[] types)
             where T : IInitializeAttribute
         {
+            ILog logger;
+            container.TryResolve(out logger);
+
             foreach (var type in types)
             {
                 var attribute = type
@@ -46,13 +50,17 @@ namespace Tact
                     .OfType<T>()
                     .SingleOrDefault();
 
-                attribute?.Initialize(container);
+                if (attribute == null)
+                    continue;
+                
+                logger?.Debug("Type: {0} - Attribute: {1}", type.Name, attribute.GetType().Name);
+                attribute.Initialize(container);
             }
         }
 
         #endregion
 
-        #region ConfigureByAttribute
+        #region Configure By Attribute
 
         public static void ConfigureByAttribute(this IContainer container, IConfigurationFactory configurationFactory, params Assembly[] assemblies)
         {
@@ -77,6 +85,9 @@ namespace Tact
         public static void ConfigureByAttribute<T>(this IContainer container, IConfigurationFactory configurationFactory, params Type[] types)
             where T : IRegisterConfigurationAttribute
         {
+            ILog logger;
+            container.TryResolve(out logger);
+
             foreach (var type in types)
             {
                 var attribute = type
@@ -84,14 +95,18 @@ namespace Tact
                     .GetCustomAttributes()
                     .OfType<T>()
                     .SingleOrDefault();
+                
+                if (attribute == null)
+                    continue;
 
-                attribute?.Register(container, configurationFactory, type);
+                logger?.Debug("Type: {0} - Attribute: {1}", type.Name, attribute.GetType().Name);
+                attribute.Register(container, configurationFactory, type);
             }
         }
 
         #endregion
 
-        #region RegisterByAttribute
+        #region Register By Attribute
 
         public static void RegisterByAttribute(this IContainer container, params Assembly[] assemblies)
         {
@@ -130,8 +145,20 @@ namespace Tact
             where TRegister : IRegisterAttribute
             where TCondition : IRegisterConditionAttribute
         {
+            ILog logger;
+            container.TryResolve(out logger);
+
             foreach (var type in types)
             {
+                var attribute = type
+                    .GetTypeInfo()
+                    .GetCustomAttributes()
+                    .OfType<TRegister>()
+                    .SingleOrDefault();
+
+                if (attribute == null)
+                    continue;
+
                 var conditions = type
                     .GetTypeInfo()
                     .GetCustomAttributes()
@@ -140,22 +167,19 @@ namespace Tact
 
                 var shouldRegister = conditions.All(condition => condition.ShouldRegister(container, type));
 
+                logger?.Debug("Type: {0} - Attribute: {1} - Conditions: {2} - ShouldRegister: {3}", type.Name,
+                    attribute.GetType().Name, conditions.Length, shouldRegister);
+
                 if (!shouldRegister)
                     continue;
 
-                var attribute = type
-                    .GetTypeInfo()
-                    .GetCustomAttributes()
-                    .OfType<TRegister>()
-                    .SingleOrDefault();
-
-                attribute?.Register(container, type);
+                attribute.Register(container, type);
             }
         }
 
         #endregion
 
-        #region Register PerResolve
+        #region Register Per Resolve
 
         public static void RegisterPerResolve<T>(this IContainer container)
             where T : class
@@ -239,7 +263,7 @@ namespace Tact
 
         #endregion
 
-        #region Register PerScope
+        #region Register Per Scope
 
         public static void RegisterPerScope<T>(this IContainer container)
             where T : class
@@ -323,31 +347,35 @@ namespace Tact
 
         #endregion
 
-        #region Register Singleton
-
-        public static void RegisterSingleton<T>(this IContainer container, T value)
+        #region Register Instance
+        
+        public static void RegisterInstance<T>(this IContainer container, T value)
         {
             var type = typeof(T);
-            container.RegisterSingleton(type, value);
+            container.RegisterInstance(type, value);
         }
 
-        public static void RegisterSingleton(this IContainer container, Type type, object value)
+        public static void RegisterInstance(this IContainer container, Type type, object value)
         {
             var lifetimeManager = new InstanceLifetimeManager(value, container);
             container.Register(type, lifetimeManager);
         }
 
-        public static void RegisterSingleton<T>(this IContainer container, string key, T value)
+        public static void RegisterInstance<T>(this IContainer container, string key, T value)
         {
             var type = typeof(T);
-            container.RegisterSingleton(type, key, value);
+            container.RegisterInstance(type, key, value);
         }
 
-        public static void RegisterSingleton(this IContainer container, Type type, string key, object value)
+        public static void RegisterInstance(this IContainer container, Type type, string key, object value)
         {
             var lifetimeManager = new InstanceLifetimeManager(value, container);
             container.Register(type, key, lifetimeManager);
         }
+
+        #endregion
+
+        #region Register Singleton
 
         public static void RegisterSingleton<T>(this IContainer container)
             where T : class

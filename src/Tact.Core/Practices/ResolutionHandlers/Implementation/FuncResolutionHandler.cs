@@ -23,7 +23,8 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
         public bool TryGetService(
             IContainer container, 
             Type type, 
-            Stack<Type> stack, 
+            Stack<Type> stack,
+            bool canThrow,
             out object result)
         {
             if (!type.FullName.StartsWith(FuncPrefix))
