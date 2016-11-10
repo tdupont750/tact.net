@@ -1,4 +1,6 @@
-﻿using Tact.ComponentModel;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Tact.ComponentModel.DataAnnotations;
 using Xunit;
 
@@ -10,8 +12,12 @@ namespace Tact.Core.Tests.ComponentModel.DataAnnotations
         public void AllErrors()
         {
             var model = new TestModel();
-            var ex = Assert.Throws<ModelValidationException>(() => ModelValidation.Validate(model));
-            Assert.Equal(4, ex.Errors.Count);
+            var ex = Assert.Throws<AggregateException>(() =>
+            {
+                var validationContext = new ValidationContext(model);
+                validationContext.ValidateObject();
+            });
+            Assert.Equal(4, ex.InnerExceptions.Count);
         }
 
         [Fact]
@@ -25,29 +31,40 @@ namespace Tact.Core.Tests.ComponentModel.DataAnnotations
                 Object = new object()
             };
 
-             ModelValidation.Validate(model);
+            var validationContext = new ValidationContext(model);
+            validationContext.ValidateObject();
         }
 
         [Fact]
         public void Strings()
         {
             var model = new StringModel();
-            var ex = Assert.Throws<ModelValidationException>(() => ModelValidation.Validate(model));
-            Assert.Equal(1, ex.Errors.Count);
+            var ex1 = Assert.Throws<AggregateException>(() =>
+            {
+                var validationContext1 = new ValidationContext(model);
+                validationContext1.ValidateObject();
+            });
+            Assert.Equal(1, ex1.InnerExceptions.Count);
 
             model.String = string.Empty;
-            ex = Assert.Throws<ModelValidationException>(() => ModelValidation.Validate(model));
-            Assert.Equal(1, ex.Errors.Count);
+            var ex2 = Assert.Throws<AggregateException>(() =>
+            {
+                var validationContext2 = new ValidationContext(model);
+                validationContext2.ValidateObject();
+            });
+            Assert.Equal(1, ex2.InnerExceptions.Count);
 
             model.String = "Test";
-            ModelValidation.Validate(model);
+            var validationContext3 = new ValidationContext(model);
+            validationContext3.ValidateObject();
         }
 
         [Fact]
         public void NoAttributes()
         {
             var model = new NoAttributesModel();
-            ModelValidation.Validate(model);
+            var validationContext = new ValidationContext(model);
+            validationContext.ValidateObject();
         }
 
         public class NoAttributesModel

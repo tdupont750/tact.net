@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 using Tact.Core.Tests.ComponentModel.DataAnnotations;
 using Tact.Core.Tests.Extensions;
 using Tact.Core.Tests.Practices;
@@ -53,13 +54,24 @@ namespace Tact.Tests.Console
 
         private static IResolver CreateResolver()
         {
+            var map = new Dictionary<string, string>
+            {
+                {"DemoConfig:IsEnable", "true" },
+                {"DemoConfig:SomeString", "Hello world!" },
+                {"DemoConfig:Thing1", "1" },
+                {"DemoConfig:Thing2", "true" },
+                {"DemoConfig:Thing3", "false" },
+            };
+            var configBuilder = new ConfigurationBuilder();
+            configBuilder.AddInMemoryCollection(map);
+            var config = configBuilder.Build();
+
             var logger = new InMemoryLog();
             var container = new Container(logger);
 
             var assembly = Assembly.GetEntryAssembly();
-            var configFactory = new ConfigurationFactory();
 
-            container.ConfigureByAttribute(configFactory, assembly);
+            container.ConfigureByAttribute(config, assembly);
             container.RegisterByAttribute(assembly);
             container.InitializeByAttribute(assembly);
             

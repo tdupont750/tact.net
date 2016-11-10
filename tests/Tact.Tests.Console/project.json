@@ -10,7 +10,10 @@
       "version": "1.0.1"
     },
     "Tact.Core": "1.0.0-*",
-    "Tact.Core.Tests": "1.0.0-*"
+    "Tact.Core.Tests": "1.0.0-*",
+    "xunit": "2.2.0-beta4-build3444",
+    "xunit.core": "2.2.0-beta4-build3444",
+    "xunit.runner.console": "2.2.0-beta4-build3444"
   },
 
   "frameworks": {

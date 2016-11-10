@@ -6,7 +6,7 @@ namespace Tact.Tests.Console.Configuration
     [RegisterConfiguration]
     public class DemoConfig
     {
-        [IsEnabled]
+        [IsValidationEnabled]
         public bool IsEnable { get; set; }
 
         [RequireNonDefault]

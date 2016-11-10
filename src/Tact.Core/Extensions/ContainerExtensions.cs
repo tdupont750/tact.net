@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Tact.Configuration;
-using Tact.Configuration.Attributes;
 using Tact.Diagnostics;
 using Tact.Practices;
 using Tact.Practices.LifetimeManagers;
@@ -55,52 +54,6 @@ namespace Tact
                 
                 logger?.Debug("Type: {0} - Attribute: {1}", type.Name, attribute.GetType().Name);
                 attribute.Initialize(container);
-            }
-        }
-
-        #endregion
-
-        #region Configure By Attribute
-
-        public static void ConfigureByAttribute(this IContainer container, IConfigurationFactory configurationFactory, params Assembly[] assemblies)
-        {
-            container.ConfigureByAttribute<IRegisterConfigurationAttribute>(configurationFactory, assemblies);
-        }
-
-        public static void ConfigureByAttribute(this IContainer container, IConfigurationFactory configurationFactory, params Type[] types)
-        {
-            container.ConfigureByAttribute<IRegisterConfigurationAttribute>(configurationFactory, types);
-        }
-
-        public static void ConfigureByAttribute<T>(this IContainer container, IConfigurationFactory configurationFactory, params Assembly[] assemblies)
-            where T : IRegisterConfigurationAttribute
-        {
-            foreach (var assembly in assemblies)
-            {
-                var types = assembly.GetTypes();
-                container.ConfigureByAttribute<T>(configurationFactory, types);
-            }
-        }
-
-        public static void ConfigureByAttribute<T>(this IContainer container, IConfigurationFactory configurationFactory, params Type[] types)
-            where T : IRegisterConfigurationAttribute
-        {
-            ILog logger;
-            container.TryResolve(out logger);
-
-            foreach (var type in types)
-            {
-                var attribute = type
-                    .GetTypeInfo()
-                    .GetCustomAttributes()
-                    .OfType<T>()
-                    .SingleOrDefault();
-                
-                if (attribute == null)
-                    continue;
-
-                logger?.Debug("Type: {0} - Attribute: {1}", type.Name, attribute.GetType().Name);
-                attribute.Register(container, configurationFactory, type);
             }
         }
 

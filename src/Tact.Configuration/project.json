@@ -3,10 +3,10 @@
 
   "dependencies": {
     "Microsoft.Extensions.Configuration": "1.0.0",
+    "Microsoft.Extensions.Configuration.Binder": "1.0.0",
     "NETStandard.Library": "1.6.0",
-    "Tact.Configuration": "1.0.0-*",
-    "Tact.Core": "1.0.0-*",
-    "xunit": "2.2.0-beta3-build3402"
+    "System.ComponentModel.Annotations": "4.1.0",
+    "Tact.Core": "1.0.0-*"
   },
 
   "frameworks": {

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 using Tact.Configuration;
 using Tact.Configuration.Attributes;
 using Tact.Diagnostics.Implementation;
@@ -18,10 +20,16 @@ namespace Tact.Core.Tests.Practices
             var logger = new InMemoryLog();
             using (var container = new Container(logger))
             {
-                var configurationFactory = new TestConfigurationFactory(true);
+                var map = new Dictionary<string, string>
+                {
+                    {"TestConfig:ShouldRegister", "true"}
+                };
+                var configBuilder = new ConfigurationBuilder();
+                configBuilder.AddInMemoryCollection(map);
+                var config = configBuilder.Build();
 
                 var types = new[] { typeof(TestConfig), typeof(Test) };
-                container.ConfigureByAttribute(configurationFactory, types);
+                container.ConfigureByAttribute(config, types);
                 container.RegisterByAttribute(types);
 
                 container.Resolve<ITest>();
@@ -34,31 +42,19 @@ namespace Tact.Core.Tests.Practices
             var logger = new InMemoryLog();
             using (var container = new Container(logger))
             {
-                var configurationFactory = new TestConfigurationFactory(false);
+                var map = new Dictionary<string, string>
+                {
+                    {"TestConfig.ShouldRegister", "false"}
+                };
+                var configBuilder = new ConfigurationBuilder();
+                configBuilder.AddInMemoryCollection(map);
+                var config = configBuilder.Build();
 
                 var types = new[] { typeof(TestConfig), typeof(Test) };
-                container.ConfigureByAttribute(configurationFactory, types);
+                container.ConfigureByAttribute(config, types);
                 container.RegisterByAttribute(types);
 
                 Assert.Throws<InvalidOperationException>(() => container.Resolve<ITest>());
-            }
-        }
-
-        public class TestConfigurationFactory : IConfigurationFactory
-        {
-            private readonly bool _shouldRegister;
-
-            public TestConfigurationFactory(bool shouldRegister)
-            {
-                _shouldRegister = shouldRegister;
-            }
-
-            public object CreateObject(Type type)
-            {
-                return new TestConfig
-                {
-                    ShouldRegister = _shouldRegister
-                };
             }
         }
 
