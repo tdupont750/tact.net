@@ -7,9 +7,7 @@ using Tact.Core.Tests.Practices;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices;
 using Tact.Practices.Implementation;
-using Tact.Tests.Console.Configuration;
 using Tact.Tests.Console.Services;
-using Tact.Tests.Console.Services.Implementation;
 using Xunit;
 
 namespace Tact.Tests.Console
@@ -29,7 +27,7 @@ namespace Tact.Tests.Console
             IDemoService demoService;
             using (var resolver = CreateResolver())
             {
-                Assert.Equal("Hello world!", DemoService.StaticString);
+                Assert.Equal("Hello world!", StaticHelper.StaticString);
                 demoService = resolver.Resolve<IDemoService>();
 
                 var things = demoService.DemoAllOfTheThings();
@@ -54,16 +52,8 @@ namespace Tact.Tests.Console
 
         private static IResolver CreateResolver()
         {
-            var map = new Dictionary<string, string>
-            {
-                {"DemoConfig:IsEnable", "true" },
-                {"DemoConfig:SomeString", "Hello world!" },
-                {"DemoConfig:Thing1", "1" },
-                {"DemoConfig:Thing2", "true" },
-                {"DemoConfig:Thing3", "false" },
-            };
             var configBuilder = new ConfigurationBuilder();
-            configBuilder.AddInMemoryCollection(map);
+            configBuilder.AddJsonFile("AppSettings.json");
             var config = configBuilder.Build();
 
             var logger = new InMemoryLog();
@@ -99,7 +89,12 @@ namespace Tact.Tests.Console
 
             new SingletonLifetimeManagerTests().RegisterSingleton();
             new SingletonLifetimeManagerTests().RegisterSingletonInstance();
+
             new TransientLifetimeManagerTests().RegisterTransient();
+
+            new ProxyLifetimeManagerTests().PerScopeProxy();
+            new ProxyLifetimeManagerTests().SingletonProxy();
+            new ProxyLifetimeManagerTests().KeyProxy();
 
             new TaskExtensionTests().IgnoreCancellation().Wait();
             new TaskExtensionTests().IgnoreCancellationWithToken().Wait();

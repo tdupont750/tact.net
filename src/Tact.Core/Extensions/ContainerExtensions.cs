@@ -411,12 +411,12 @@ namespace Tact
 
         public static void RegisterProxy(this IContainer container, Type fromType, Type toType, string fromKey = null, string toKey = null)
         {
-            var lifetimeManager = new ProxyLifetimeManager(toType, toKey, container);
+            var lifetimeManager = new ProxyLifetimeManager(toType, fromKey, container);
 
-            if (string.IsNullOrWhiteSpace(fromKey))
+            if (string.IsNullOrWhiteSpace(toKey))
                 container.Register(fromType, lifetimeManager);
             else
-                container.Register(fromType, fromKey, lifetimeManager);
+                container.Register(fromType, toKey, lifetimeManager);
         }
 
         #endregion
