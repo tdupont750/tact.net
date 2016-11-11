@@ -8,23 +8,15 @@ namespace Tact.Practices.LifetimeManagers.Attributes
         private readonly Type _fromType;
         private readonly string _key;
 
-        public RegisterSingletonAttribute(Type fromType, string key)
-            : this(fromType)
-        {
-            _key = key;
-        }
-
-        public RegisterSingletonAttribute(Type fromType)
+        public RegisterSingletonAttribute(Type fromType, string key = null)
         {
             _fromType = fromType;
+            _key = key;
         }
-
+        
         public void Register(IContainer container, Type toType)
         {
-            if (string.IsNullOrWhiteSpace(_key))
-                container.RegisterSingleton(_fromType, toType);
-            else
-                container.RegisterSingleton(_fromType, toType, _key);
+            container.RegisterSingleton(_fromType, toType, _key);
         }
     }
 }

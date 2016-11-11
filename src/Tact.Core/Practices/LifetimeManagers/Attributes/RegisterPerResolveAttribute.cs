@@ -8,23 +8,15 @@ namespace Tact.Practices.LifetimeManagers.Attributes
         private readonly Type _fromType;
         private readonly string _key;
 
-        public RegisterPerResolveAttribute(Type fromType, string key)
-            : this(fromType)
-        {
-            _key = key;
-        }
-
-        public RegisterPerResolveAttribute(Type fromType)
+        public RegisterPerResolveAttribute(Type fromType, string key = null)
         {
             _fromType = fromType;
+            _key = key;
         }
 
         public void Register(IContainer container, Type toType)
         {
-            if (string.IsNullOrWhiteSpace(_key))
-                container.RegisterPerResolve(_fromType, toType);
-            else
-                container.RegisterPerResolve(_fromType, toType, _key);
+            container.RegisterPerResolve(_fromType, toType, _key);
         }
     }
 }
