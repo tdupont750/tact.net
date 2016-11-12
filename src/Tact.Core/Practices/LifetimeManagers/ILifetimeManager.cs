@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Tact.Practices.LifetimeManagers
 {
@@ -11,6 +13,6 @@ namespace Tact.Practices.LifetimeManagers
 
         object Resolve(Stack<Type> stack);
 
-        void Dispose(IContainer scope);
+        Task DisposeAsync(IContainer scope, CancellationToken cancelToken = default(CancellationToken));
     }
 }

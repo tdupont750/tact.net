@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+using Tact.Threading;
 
 namespace Tact.Practices.LifetimeManagers.Implementation
 {
@@ -28,20 +31,19 @@ namespace Tact.Practices.LifetimeManagers.Implementation
             return _instance.Value;
         }
 
-        public void Dispose(IContainer scope)
+        public Task DisposeAsync(IContainer scope, CancellationToken cancelToken)
         {
             if (!_instance.IsValueCreated)
-                return;
+                return Task.CompletedTask;
 
             if (!ReferenceEquals(_scope, scope))
-                return;
+                return Task.CompletedTask;
 
             var instance = _instance.Value;
             if (ReferenceEquals(instance, scope))
-                return;
+                return Task.CompletedTask;
 
-            var disposable = _instance.Value as IDisposable;
-            disposable?.Dispose();
+            return Disposable.Async(_instance.Value, cancelToken);
         }
     }
 }

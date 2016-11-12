@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Tact.Diagnostics;
 using Tact.Practices.LifetimeManagers;
 using Tact.Practices.ResolutionHandlers;
@@ -15,7 +16,7 @@ namespace Tact.Practices.Base
         private readonly Dictionary<Type, Dictionary<string, ILifetimeManager>> _multiRegistrationMap = new Dictionary<Type, Dictionary<string, ILifetimeManager>>();
         protected readonly ILog Log;
 
-        private bool _isDisposed;
+        private int _isDisposed;
 
         protected abstract IList<IResolutionHandler> ResolutionHandlers { get; }
 
@@ -27,20 +28,25 @@ namespace Tact.Practices.Base
 
         public void Dispose()
         {
-            if (_isDisposed)
-                return;
+            DisposeAsync(CancellationToken.None).Wait();
+        }
 
-            _isDisposed = true;
+        public Task DisposeAsync(CancellationToken cancelToken)
+        {
+            var isDisposed = Interlocked.Increment(ref _isDisposed);
+            if (isDisposed != 1) return Task.CompletedTask;
+
+            ILifetimeManager[] lifetimeManagers;
 
             using (EnterReadLock())
             {
-                foreach (var lifetimeManager in _lifetimeManagerMap.Values)
-                    lifetimeManager.Dispose(this);
-
-                foreach (var registrations in _multiRegistrationMap.Values)
-                    foreach (var lifetimeManager in registrations.Values)
-                        lifetimeManager.Dispose(this);
+                lifetimeManagers = _multiRegistrationMap.Values
+                    .SelectMany(v => v.Values)
+                    .Concat(_lifetimeManagerMap.Values)
+                    .ToArray();
             }
+
+            return lifetimeManagers.WhenAll((manager, token) => manager.DisposeAsync(this, cancelToken), cancelToken);
         }
 
         public object Resolve(Type type)

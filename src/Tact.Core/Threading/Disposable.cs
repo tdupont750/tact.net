@@ -12,13 +12,13 @@ namespace Tact.Threading
             CancellationToken cancelToken = default(CancellationToken),
             int? maxParallelization = null)
         {
-            return disposables.WhenAll((o, token) => Async(0, token, true), cancelToken, maxParallelization);
+            return disposables.WhenAll((o, token) => Async(o, token), cancelToken, maxParallelization);
         }
 
         public static Task Async(
             object disposable,
             CancellationToken cancelToken = default(CancellationToken),
-            bool runStandardDisposeAsync = false)
+            bool runStandardDisposeAsync = true)
         {
             var asyncDisposable = disposable as IAsyncDisposable;
             if (asyncDisposable != null)

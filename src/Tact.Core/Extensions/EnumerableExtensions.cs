@@ -55,7 +55,7 @@ namespace Tact
                 await Task.WhenAll(tasks).ConfigureAwait(false);
             }
 
-            if (exceptions != null)
+            if (exceptions.Count > 0)
                 throw new AggregateException(exceptions);
         }
 

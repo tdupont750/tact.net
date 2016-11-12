@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Tact.Practices.LifetimeManagers.Implementation
 {
@@ -28,9 +30,10 @@ namespace Tact.Practices.LifetimeManagers.Implementation
             return _factory?.Invoke(_scope) ?? _scope.CreateInstance(_toType, stack);
         }
 
-        public void Dispose(IContainer scope)
+        public Task DisposeAsync(IContainer scope, CancellationToken cancelToken)
         {
             // Nothing to do dispose
+            return Task.CompletedTask;
         }
     }
 }
