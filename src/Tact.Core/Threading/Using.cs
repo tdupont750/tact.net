@@ -6,10 +6,18 @@ namespace Tact.Threading
 {
     public static class Using
     {
+        public static Task<TOutput> Async<TInput, TOutput>(
+            TInput disposable,
+            Func<TInput, Task<TOutput>> func)
+            where TInput : IAsyncDisposable
+        {
+            return Async(disposable, CancellationToken.None, (arg, token) => func(arg));
+        }
+
         public static async Task<TOutput> Async<TInput, TOutput>(
             TInput disposable,
-            Func<TInput, CancellationToken, Task<TOutput>> func,
-            CancellationToken cancelToken = default(CancellationToken))
+            CancellationToken cancelToken,
+            Func<TInput, CancellationToken, Task<TOutput>> func)
             where TInput : IAsyncDisposable
         {
             try
@@ -22,10 +30,18 @@ namespace Tact.Threading
             }
         }
 
+        public static Task Async<T>(
+            T disposable,
+            Func<T, Task> func)
+            where T : IAsyncDisposable
+        {
+            return Async(disposable, CancellationToken.None, (arg, token) => func(arg));
+        }
+
         public static async Task Async<T>(
             T disposable,
-            Func<T, CancellationToken, Task> func,
-            CancellationToken cancelToken = default(CancellationToken))
+            CancellationToken cancelToken,
+            Func<T, CancellationToken, Task> func)
             where T : IAsyncDisposable
         {
             try

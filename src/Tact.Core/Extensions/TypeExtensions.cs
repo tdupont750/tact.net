@@ -33,10 +33,10 @@ namespace Tact
                     return result.Item2;
 
                 case Result.ClassRequired:
-                    throw new ArgumentException(ClassRequired);
+                    throw new InvalidOperationException(ClassRequired);
 
                 case Result.ConstructorRequired:
-                    throw new ArgumentException(ConstructorRequired);
+                    throw new InvalidOperationException(ConstructorRequired);
 
                 default:
                     throw new ArgumentOutOfRangeException();

@@ -8,32 +8,48 @@ namespace Tact
 {
     public static class EnumerableExtensions
     {
+        public static Task<IEnumerable<TOutput>> WhenAll<TInput, TOutput>(
+            this IEnumerable<TInput> enumerable,
+            Func<TInput, Task<TOutput>> func,
+            int? maxParallelization = null)
+        {
+            return enumerable.WhenAll(CancellationToken.None, (input, token) => func(input), maxParallelization);
+        }
+
         public static async Task<IEnumerable<TOutput>> WhenAll<TInput, TOutput>(
             this IEnumerable<TInput> enumerable,
+            CancellationToken cancelToken,
             Func<TInput, CancellationToken, Task<TOutput>> func,
-            CancellationToken cancelToken = default(CancellationToken),
             int? maxParallelization = null)
         {
             var results = new ConcurrentQueue<TOutput>();
 
             await enumerable
                 .WhenAll(
+                    cancelToken,
                     async (item, token) =>
                     {
                         var result = await func(item, cancelToken).ConfigureAwait(false);
                         results.Enqueue(result);
                     },
-                    cancelToken,
                     maxParallelization)
                 .ConfigureAwait(false);
 
             return results;
         }
 
+        public static Task WhenAll<T>(
+            this IEnumerable<T> enumerable,
+            Func<T, Task> func,
+            int? maxParallelization = null)
+        {
+            return enumerable.WhenAll(CancellationToken.None, (item, token) => func(item), maxParallelization);
+        }
+
         public static async Task WhenAll<T>(
-            this IEnumerable<T> enumerable, 
+            this IEnumerable<T> enumerable,
+            CancellationToken cancelToken, 
             Func<T, CancellationToken, Task> func, 
-            CancellationToken cancelToken = default(CancellationToken), 
             int? maxParallelization = null)
         {
             var exceptions = new ConcurrentQueue<Exception>();

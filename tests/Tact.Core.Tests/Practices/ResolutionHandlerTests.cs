@@ -83,9 +83,9 @@ namespace Tact.Core.Tests.Practices
         {
             using (var resolver = new Container(new InMemoryLog()))
             {
-                Assert.Throws<ArgumentException>(() => resolver.RegisterSingleton<Six>());
-                Assert.Throws<ArgumentException>(() => resolver.RegisterPerScope<Six>());
-                Assert.Throws<ArgumentException>(() => resolver.RegisterTransient<Six>());
+                Assert.Throws<InvalidOperationException>(() => resolver.RegisterSingleton<Six>());
+                Assert.Throws<InvalidOperationException>(() => resolver.RegisterPerScope<Six>());
+                Assert.Throws<InvalidOperationException>(() => resolver.RegisterTransient<Six>());
             }
         }
 
@@ -94,9 +94,9 @@ namespace Tact.Core.Tests.Practices
         {
             using (var resolver = new Container(new InMemoryLog()))
             {
-                Assert.Throws<ArgumentException>(() => resolver.RegisterSingleton<IOne>());
-                Assert.Throws<ArgumentException>(() => resolver.RegisterPerScope<IOne>());
-                Assert.Throws<ArgumentException>(() => resolver.RegisterTransient<IOne>());
+                Assert.Throws<InvalidOperationException>(() => resolver.RegisterSingleton<IOne>());
+                Assert.Throws<InvalidOperationException>(() => resolver.RegisterPerScope<IOne>());
+                Assert.Throws<InvalidOperationException>(() => resolver.RegisterTransient<IOne>());
             }
         }
 

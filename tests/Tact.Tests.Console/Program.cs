@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Tact.Core.Tests.ComponentModel.DataAnnotations;
 using Tact.Core.Tests.Extensions;
 using Tact.Core.Tests.Practices;
+using Tact.Core.Tests.Threading;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices;
 using Tact.Practices.Implementation;
@@ -105,6 +106,12 @@ namespace Tact.Tests.Console
             new TaskExtensionTests().GenericIgnoreCancellationWithInvalidToken().Wait();
             new TaskExtensionTests().GenericIgnoreCancellationWithException().Wait();
 
+            new TypeExtensionTests().DefaultConstructor();
+            new TypeExtensionTests().OneConstructor();
+            new TypeExtensionTests().TwoConstructors();
+
+            new EnumerableExtensionTests().WhenAll().Wait();
+
             new RequireNonDefaultTests().AllErrors();
             new RequireNonDefaultTests().NoErrors();
             new RequireNonDefaultTests().Strings();
@@ -120,6 +127,13 @@ namespace Tact.Tests.Console
 
             new RegisterConditionTests().ShouldRegisterFalse();
             new RegisterConditionTests().ShouldRegisterTrue();
+
+            new DisposableTests().AsyncDisposableTest().Wait();
+            new DisposableTests().DisposableTest().Wait();
+            new DisposableTests().NonDisposableTest().Wait();
+
+            new UsingTests().UsingTest().Wait();
+            new UsingTests().UsingThrows().Wait();
 
             System.Console.WriteLine("...Complete");
         }

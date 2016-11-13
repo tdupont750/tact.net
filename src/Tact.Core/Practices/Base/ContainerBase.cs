@@ -46,7 +46,7 @@ namespace Tact.Practices.Base
                     .ToArray();
             }
 
-            return lifetimeManagers.WhenAll((manager, token) => manager.DisposeAsync(this, cancelToken), cancelToken);
+            return lifetimeManagers.WhenAll(cancelToken, (manager, token) => manager.DisposeAsync(this, cancelToken));
         }
 
         public object Resolve(Type type)
