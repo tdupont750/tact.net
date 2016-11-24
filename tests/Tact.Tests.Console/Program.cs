@@ -135,6 +135,9 @@ namespace Tact.Tests.Console
             new UsingTests().UsingTest().Wait();
             new UsingTests().UsingThrows().Wait();
 
+            new SemaphoreSlimExtensionTests().UseAsync().Wait();
+            new ReaderWriterLockSlimExtensionTests().Use();
+
             System.Console.WriteLine("...Complete");
         }
     }

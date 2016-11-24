@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Tact.Configuration;
 using Tact.Diagnostics;
 using Tact.Practices;
 using Tact.Practices.LifetimeManagers;
-using Tact.Practices.LifetimeManagers.Attributes;
 using Tact.Practices.LifetimeManagers.Implementation;
 
 namespace Tact
