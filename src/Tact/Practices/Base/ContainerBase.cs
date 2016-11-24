@@ -38,7 +38,7 @@ namespace Tact.Practices.Base
 
             ILifetimeManager[] lifetimeManagers;
 
-            using (EnterReadLock())
+            using (_lock.UseReadLock())
             {
                 lifetimeManagers = _multiRegistrationMap.Values
                     .SelectMany(v => v.Values)
@@ -112,7 +112,7 @@ namespace Tact.Practices.Base
             var instances = new List<object>();
 
             using (EnterPush(type, stack))
-            using (EnterReadLock())
+            using (_lock.UseReadLock())
             {
                 if (_multiRegistrationMap.ContainsKey(type))
                 {
@@ -146,7 +146,7 @@ namespace Tact.Practices.Base
 
         public void Register(Type fromType, ILifetimeManager lifetimeManager)
         {
-            using (EnterWriteLock())
+            using (_lock.UseWriteLock())
             {
                 if (_lifetimeManagerMap.ContainsKey(fromType))
                 {
@@ -166,7 +166,7 @@ namespace Tact.Practices.Base
             if (string.IsNullOrWhiteSpace(key))
                 throw new ArgumentException("Required", nameof(key));
 
-            using (EnterWriteLock())
+            using (_lock.UseWriteLock())
             {
                 if (_multiRegistrationMap.ContainsKey(fromType))
                     _multiRegistrationMap[fromType][key] = lifetimeManager;
@@ -196,7 +196,7 @@ namespace Tact.Practices.Base
         private bool TryResolve(Type type, Stack<Type> stack, bool canThrow, out object result)
         {
             using (EnterPush(type, stack))
-            using (EnterReadLock())
+            using (_lock.UseReadLock())
             {
                 if (_lifetimeManagerMap.ContainsKey(type))
                 {
@@ -218,7 +218,7 @@ namespace Tact.Practices.Base
         private bool TryResolve(Type type, string key, Stack<Type> stack, bool canThrow, out object result)
         {
             using (EnterPush(type, stack))
-            using (EnterReadLock())
+            using (_lock.UseReadLock())
             {
                 if (_multiRegistrationMap.ContainsKey(type))
                 {
@@ -244,8 +244,8 @@ namespace Tact.Practices.Base
 
         private static void InitializeScope(ContainerBase source, ContainerBase target)
         {
-            using (source.EnterReadLock())
-            using (target.EnterWriteLock())
+            using (source._lock.UseReadLock())
+            using (target._lock.UseWriteLock())
             {
                 foreach (var pair in source._lifetimeManagerMap)
                 {
@@ -275,40 +275,8 @@ namespace Tact.Practices.Base
 
             return new DisposablePush(type, stack);
         }
-        
-        private IDisposable EnterReadLock()
-        {
-            _lock.EnterReadLock();
-            return new DisposableLock(_lock, true);
-        }
 
-        private IDisposable EnterWriteLock()
-        {
-            _lock.EnterWriteLock();
-            return new DisposableLock(_lock, false);
-        }
-
-        private class DisposableLock : IDisposable
-        {
-            private readonly ReaderWriterLockSlim _lock;
-            private readonly bool _isRead;
-
-            public DisposableLock(ReaderWriterLockSlim lockSlim, bool isRead)
-            {
-                _lock = lockSlim;
-                _isRead = isRead;
-            }
-
-            public void Dispose()
-            {
-                if (_isRead)
-                    _lock.ExitReadLock();
-                else
-                    _lock.ExitWriteLock();
-            }
-        }
-
-        private class DisposablePush : IDisposable
+        private struct DisposablePush : IDisposable
         {
             private readonly Type _type;
             private readonly Stack<Type> _stack;
