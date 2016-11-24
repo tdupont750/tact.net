@@ -8,63 +8,51 @@ namespace Tact
 {
     public static class EnumerableExtensions
     {
-        public static Task<IEnumerable<TOutput>> WhenAll<TInput, TOutput>(
-            this IEnumerable<TInput> enumerable,
-            Func<TInput, Task<TOutput>> func,
-            int? maxParallelization = null)
-        {
-            return enumerable.WhenAll(CancellationToken.None, (input, token) => func(input), maxParallelization);
-        }
-
-        public static async Task<IEnumerable<TOutput>> WhenAll<TInput, TOutput>(
-            this IEnumerable<TInput> enumerable,
-            CancellationToken cancelToken,
-            Func<TInput, CancellationToken, Task<TOutput>> func,
-            int? maxParallelization = null)
-        {
-            var results = new ConcurrentQueue<TOutput>();
-
-            await enumerable
-                .WhenAll(
-                    cancelToken,
-                    async (item, token) =>
-                    {
-                        var result = await func(item, cancelToken).ConfigureAwait(false);
-                        results.Enqueue(result);
-                    },
-                    maxParallelization)
-                .ConfigureAwait(false);
-
-            return results;
-        }
-
         public static Task WhenAll<T>(
             this IEnumerable<T> enumerable,
             Func<T, Task> func,
             int? maxParallelization = null)
         {
-            return enumerable.WhenAll(CancellationToken.None, (item, token) => func(item), maxParallelization);
+            return enumerable.WhenAll(CancellationToken.None, (item, index, token) => func(item), maxParallelization);
+        }
+
+        public static Task WhenAll<T>(
+            this IEnumerable<T> enumerable,
+            Func<T, int, Task> func,
+            int? maxParallelization = null)
+        {
+            return enumerable.WhenAll(CancellationToken.None, (item, index, token) => func(item, index), maxParallelization);
+        }
+
+        public static Task WhenAll<T>(
+            this IEnumerable<T> enumerable,
+            CancellationToken cancelToken,
+            Func<T, CancellationToken, Task> func,
+            int? maxParallelization = null)
+        {
+            return enumerable.WhenAll(cancelToken, (item, index, token) => func(item, token), maxParallelization);
         }
 
         public static async Task WhenAll<T>(
             this IEnumerable<T> enumerable,
             CancellationToken cancelToken, 
-            Func<T, CancellationToken, Task> func, 
+            Func<T, int, CancellationToken, Task> func, 
             int? maxParallelization = null)
         {
             var exceptions = new ConcurrentQueue<Exception>();
             var maxCount = maxParallelization ?? Environment.ProcessorCount;
             var tasks = new List<Task>(maxCount);
             
-            using (var enumerator = enumerable.GetEnumerator())
+            using (var enumerator = new EnumeratorInfo<T>(enumerable))
             {
                 for (var i = 0; i < maxCount; i++)
                 {
                     T item;
-                    if (!TryGetNext(enumerator, out item))
+                    int index;
+                    if (!enumerator.TryGetNext(out item, out index))
                         break;
 
-                    var task = RunLoopAsync(enumerator, item, exceptions, func, cancelToken);
+                    var task = RunLoopAsync(enumerator, item, index, exceptions, func, cancelToken);
                     tasks.Add(task);
                 }
 
@@ -76,38 +64,64 @@ namespace Tact
         }
 
         private static async Task RunLoopAsync<T>(
-            IEnumerator<T> enumerator, 
+            EnumeratorInfo<T> enumerator, 
             T item,
+            int index,
             ConcurrentQueue<Exception> exceptions,
-            Func<T, CancellationToken, Task> func,
+            Func<T, int, CancellationToken, Task> func,
             CancellationToken cancelToken)
         {
             do
             {
+                if (exceptions.Count > 0)
+                    return;
+
                 try
                 {
-                    await func(item, cancelToken).ConfigureAwait(false);
+                    await func(item, index, cancelToken).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     exceptions.Enqueue(ex);
+                    return;
                 }
             }
-            while (TryGetNext(enumerator, out item));
+            while (enumerator.TryGetNext(out item, out index));
         }
 
-        private static bool TryGetNext<T>(IEnumerator<T> enumerator, out T item)
+        private class EnumeratorInfo<T> : IDisposable
         {
-            lock (enumerator)
-            {
-                if (enumerator.MoveNext())
-                {
-                    item = enumerator.Current;
-                    return true;
-                }
+            private readonly IEnumerator<T> _enumerator;
 
-                item = default(T);
-                return false;
+            private readonly object _lock = new object();
+
+            private int _index = -1;
+
+            public EnumeratorInfo(IEnumerable<T> enumerable)
+            {
+                _enumerator = enumerable.GetEnumerator();
+            }
+
+            public void Dispose()
+            {
+                _enumerator.Dispose();
+            }
+
+            public bool TryGetNext(out T item, out int index)
+            {
+                lock (_lock)
+                {
+                    if (_enumerator.MoveNext())
+                    {
+                        index = Interlocked.Increment(ref _index);
+                        item = _enumerator.Current;
+                        return true;
+                    }
+
+                    index = -1;
+                    item = default(T);
+                    return false;
+                }
             }
         }
     }

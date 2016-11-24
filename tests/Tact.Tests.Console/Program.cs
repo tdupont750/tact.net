@@ -111,6 +111,9 @@ namespace Tact.Tests.Console
             new TypeExtensionTests().TwoConstructors();
 
             new EnumerableExtensionTests().WhenAll().Wait();
+            new EnumerableExtensionTests().BailAfterFirstException().Wait();
+
+            new CollectionExtensionTests().OrderedResults().Wait();
 
             new RequireNonDefaultTests().AllErrors();
             new RequireNonDefaultTests().NoErrors();

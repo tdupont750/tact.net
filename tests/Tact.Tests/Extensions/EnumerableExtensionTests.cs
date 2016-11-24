@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -36,6 +37,28 @@ namespace Tact.Tests.Extensions
 
             Assert.Equal(0, currentCount);
             Assert.Equal(maxCount, expectedCount);
+        }
+
+        public async Task BailAfterFirstException()
+        {
+            const int maxCount = 100;
+            var count = 0;
+
+             var ex = await Assert
+                .ThrowsAsync<AggregateException>(() => Enumerable
+                    .Range(0, maxCount)
+                    .WhenAll(async v =>
+                    {
+                        Interlocked.Increment(ref count);
+                        await Task.Delay(15 + (v % 15)).ConfigureAwait(false);
+
+                        if (v == 50)
+                            throw new InvalidOperationException();
+                    }))
+                .ConfigureAwait(false);
+
+            Assert.True(count < maxCount);
+            Assert.IsType<InvalidOperationException>(ex.InnerException);
         }
     }
 }
