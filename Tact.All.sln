@@ -10,11 +10,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.Core", "src\Tact.Core\Tact.Core.xproj", "{3AEC4A57-FE2E-4B87-9EB9-7A1FD3346E37}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact", "src\Tact\Tact.xproj", "{3AEC4A57-FE2E-4B87-9EB9-7A1FD3346E37}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3958FA43-9C0E-40A7-8BB1-52337DAD77C4}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.Core.Tests", "tests\Tact.Core.Tests\Tact.Core.Tests.xproj", "{33F16B6B-8E20-4655-B7AA-B502B71CFCBF}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.Tests", "tests\Tact.Tests\Tact.Tests.xproj", "{33F16B6B-8E20-4655-B7AA-B502B71CFCBF}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.Tests.Console", "tests\Tact.Tests.Console\Tact.Tests.Console.xproj", "{4D1DAE9A-0020-4CEE-B482-0148F24C0E42}"
 EndProject

@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace Tact.Core.Tests.Extensions
+namespace Tact.Tests.Extensions
 {
     public class TypeExtensionTests
     {

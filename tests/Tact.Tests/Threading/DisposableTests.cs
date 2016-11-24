@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Tact.Threading;
 using Xunit;
 
-namespace Tact.Core.Tests.Threading
+namespace Tact.Tests.Threading
 {
     public class DisposableTests
     {

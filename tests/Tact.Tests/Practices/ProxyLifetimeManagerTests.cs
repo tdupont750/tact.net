@@ -2,7 +2,7 @@
 using Tact.Practices.Implementation;
 using Xunit;
 
-namespace Tact.Core.Tests.Practices
+namespace Tact.Tests.Practices
 {
     public class ProxyLifetimeManagerTests
     {

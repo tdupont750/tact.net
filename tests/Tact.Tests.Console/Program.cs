@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
-using Tact.Core.Tests.ComponentModel.DataAnnotations;
-using Tact.Core.Tests.Extensions;
-using Tact.Core.Tests.Practices;
-using Tact.Core.Tests.Threading;
+using Tact.Tests.ComponentModel.DataAnnotations;
+using Tact.Tests.Extensions;
+using Tact.Tests.Practices;
+using Tact.Tests.Threading;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices;
 using Tact.Practices.Implementation;

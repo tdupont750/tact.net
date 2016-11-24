@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Tact.Core.Tests.Extensions
+namespace Tact.Tests.Extensions
 {
     public class EnumerableExtensionTests
     {

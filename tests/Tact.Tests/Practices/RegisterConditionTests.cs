@@ -10,7 +10,7 @@ using Tact.Practices.LifetimeManagers;
 using Tact.Practices.LifetimeManagers.Attributes;
 using Xunit;
 
-namespace Tact.Core.Tests.Practices
+namespace Tact.Tests.Practices
 {
     public class RegisterConditionTests
     {

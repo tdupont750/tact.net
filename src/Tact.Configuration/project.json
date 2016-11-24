@@ -6,7 +6,7 @@
     "Microsoft.Extensions.Configuration.Binder": "1.0.0",
     "NETStandard.Library": "1.6.0",
     "System.ComponentModel.Annotations": "4.1.0",
-    "Tact.Core": "1.0.0-*"
+    "Tact": "1.0.0-*"
   },
 
   "frameworks": {

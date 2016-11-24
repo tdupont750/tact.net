@@ -4,7 +4,7 @@ using System.Linq;
 using Tact.ComponentModel.DataAnnotations;
 using Xunit;
 
-namespace Tact.Core.Tests.ComponentModel.DataAnnotations
+namespace Tact.Tests.ComponentModel.DataAnnotations
 {
     public class RequireNonDefaultTests
     {

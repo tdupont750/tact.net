@@ -5,7 +5,7 @@
     "Microsoft.Extensions.Configuration": "1.0.0",
     "NETStandard.Library": "1.6.0",
     "Tact.Configuration": "1.0.0-*",
-    "Tact.Core": "1.0.0-*",
+    "Tact": "1.0.0-*",
     "xunit": "2.2.0-beta3-build3402"
   },
 
