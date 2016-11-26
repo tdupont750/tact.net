@@ -7,19 +7,6 @@ using O = System.Object;
 
 namespace Tact.Reflection
 {
-    public static class EfficientInvokerExtensions
-    {
-        public static EfficientInvoker GetEfficientInvoker(this Type type, string methodName)
-        {
-            return EfficientInvoker.GetForMethod(type, methodName);
-        }
-
-        public static EfficientInvoker GetEfficientInvoker(this Delegate del)
-        {
-            return EfficientInvoker.GetForDelegate(del);
-        }
-    }
-
     public sealed class EfficientInvoker
     {
         private const string TooManyArgsMessage = "Invokes for more than 10 args are not yet implemented";
@@ -45,7 +32,7 @@ namespace Tact.Reflection
             return TypeToWrapperMap.GetOrAdd(type, t =>
             {
                 var method = del.GetMethodInfo();
-                var info = CreateInfo(type, method, true);
+                var info = CreateMethodInfo(type, method, true);
                 var wrapper = CreateWrapper(info);
                 return new EfficientInvoker(wrapper);
             });
@@ -57,7 +44,18 @@ namespace Tact.Reflection
             return MethodToWrapperMap.GetOrAdd(key, k =>
             {
                 var method = type.GetTypeInfo().GetMethod(methodName);
-                var info = CreateInfo(type, method, false);
+                var info = CreateMethodInfo(type, method, false);
+                var wrapper = CreateWrapper(info);
+                return new EfficientInvoker(wrapper);
+            });
+        }
+
+        public static EfficientInvoker GetForProperty(Type type, string propertyName)
+        {
+            var key = new MethodKey(type, propertyName);
+            return MethodToWrapperMap.GetOrAdd(key, k =>
+            {
+                var info = CreatePropertyInfo(type, propertyName);
                 var wrapper = CreateWrapper(info);
                 return new EfficientInvoker(wrapper);
             });
@@ -67,8 +65,8 @@ namespace Tact.Reflection
         {
             return _func(target, args);
         }
-        
-        private static WrapperInfo CreateInfo(Type type, MethodInfo method, bool isDelegate)
+
+        private static WrapperInfo CreateMethodInfo(Type type, MethodInfo method, bool isDelegate)
         {
             var parameters = method.GetParameters();
             if (parameters.Length > 10) throw new NotImplementedException(TooManyArgsMessage);
@@ -96,6 +94,18 @@ namespace Tact.Reflection
             var lambdaExp = Expression.Lambda(callCastExp, parameterExps);
             var lambda = lambdaExp.Compile();
             return new WrapperInfo(lambda, parameters.Length, hasReturnValue);
+        }
+
+        private static WrapperInfo CreatePropertyInfo(Type type, string propertyName)
+        {
+            var property = type.GetRuntimeProperty(propertyName);
+            var argExp = Expression.Parameter(typeof(object), "target");
+            var castArgExp = Expression.Convert(argExp, type);
+            var propExp = Expression.Property(castArgExp, property);
+            var castPropExp = Expression.Convert(propExp, typeof(object));
+            var lambdaExp = Expression.Lambda(castPropExp, argExp);
+            var lambda = lambdaExp.Compile();
+            return new WrapperInfo(lambda, 0, true);
         }
 
         private static Func<object, object[], object> CreateWrapper(WrapperInfo info)

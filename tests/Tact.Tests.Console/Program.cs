@@ -155,6 +155,9 @@ namespace Tact.Tests.Console
             var testOutputHelper2 = new TestOutputHelper();
             new EfficientInvokerTests(testOutputHelper2).MethodComparison();
 
+            var testOutputHelper3 = new TestOutputHelper();
+            new EfficientInvokerTests(testOutputHelper3).PropertyComparison();
+
             System.Console.WriteLine("...Complete");
         }
 
