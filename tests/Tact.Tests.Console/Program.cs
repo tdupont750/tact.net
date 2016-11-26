@@ -1,15 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using Microsoft.Extensions.Configuration;
-using Tact.Tests.ComponentModel.DataAnnotations;
-using Tact.Tests.Extensions;
-using Tact.Tests.Practices;
-using Tact.Tests.Threading;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices;
 using Tact.Practices.Implementation;
+using Tact.Tests.ComponentModel.DataAnnotations;
 using Tact.Tests.Console.Services;
+using Tact.Tests.Extensions;
+using Tact.Tests.Practices;
+using Tact.Tests.Reflection;
+using Tact.Tests.Threading;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Tact.Tests.Console
 {
@@ -17,10 +21,14 @@ namespace Tact.Tests.Console
     {
         public static void Main(string[] args)
         {
+            Thread.Sleep(1000);
+            
             Demo();
             RunTests();
-        }
 
+            Thread.Sleep(1000);
+        }
+        
         private static void Demo()
         {
             var expectedThings = new List<int> {1, 2};
@@ -141,7 +149,29 @@ namespace Tact.Tests.Console
             new SemaphoreSlimExtensionTests().UseAsync().Wait();
             new ReaderWriterLockSlimExtensionTests().Use();
 
+            var testOutputHelper1 = new TestOutputHelper();
+            new EfficientInvokerTests(testOutputHelper1).DelegateComparison();
+
+            var testOutputHelper2 = new TestOutputHelper();
+            new EfficientInvokerTests(testOutputHelper2).MethodComparison();
+
             System.Console.WriteLine("...Complete");
+        }
+
+        public class TestOutputHelper : ITestOutputHelper
+        {
+            public ConcurrentQueue<string> Lines { get; } = new ConcurrentQueue<string>();
+
+            public void WriteLine(string message)
+            {
+                Lines.Enqueue(message);
+            }
+
+            public void WriteLine(string format, params object[] args)
+            {
+                var message = string.Format(format, args);
+                Lines.Enqueue(message);
+            }
         }
     }
 }
