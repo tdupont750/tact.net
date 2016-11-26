@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Reflection;
+using Tact.Reflection;
 
 namespace Tact
 {
@@ -41,6 +42,15 @@ namespace Tact
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+        public static EfficientInvoker GetMethodInvoker(this Type type, string methodName)
+        {
+            return EfficientInvoker.GetForMethod(type, methodName);
+        }
+
+        public static EfficientInvoker GetPropertyInvoker(this Type type, string propertyName)
+        {
+            return EfficientInvoker.GetForProperty(type, propertyName);
         }
 
         private enum Result

@@ -125,6 +125,19 @@ namespace Tact.Tests.Extensions
                 .ConfigureAwait(false);
         }
 
+        [Fact]
+        public void GetResult()
+        {
+            const int value = 42;
+            var task = (Task) Task.FromResult(value);
+
+            var result = task.GetResult();
+            Assert.Equal(value, result);
+
+            var genericResult = task.GetResult<int>();
+            Assert.Equal(value, genericResult);
+        }
+
         private static Task Run(Func<Task> action) => action();
         private static Task<T> Run<T>(Func<Task<T>> action) => action();
     }

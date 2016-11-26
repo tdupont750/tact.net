@@ -113,6 +113,7 @@ namespace Tact.Tests.Console
             new TaskExtensionTests().GenericIgnoreCancellationWithToken().Wait();
             new TaskExtensionTests().GenericIgnoreCancellationWithInvalidToken().Wait();
             new TaskExtensionTests().GenericIgnoreCancellationWithException().Wait();
+            new TaskExtensionTests().GetResult();
 
             new TypeExtensionTests().DefaultConstructor();
             new TypeExtensionTests().OneConstructor();
@@ -157,6 +158,9 @@ namespace Tact.Tests.Console
 
             var testOutputHelper3 = new TestOutputHelper();
             new EfficientInvokerTests(testOutputHelper3).PropertyComparison();
+
+            var testOutputHelper4 = new TestOutputHelper();
+            new EfficientInvokerTests(testOutputHelper4).InvokeAsync().Wait();
 
             System.Console.WriteLine("...Complete");
         }

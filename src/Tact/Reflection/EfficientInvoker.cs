@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 using O = System.Object;
 
 namespace Tact.Reflection
@@ -10,7 +11,7 @@ namespace Tact.Reflection
     public sealed class EfficientInvoker
     {
         private const string TooManyArgsMessage = "Invokes for more than 10 args are not yet implemented";
-
+        
         private static readonly Type VoidType = typeof(void);
 
         private static readonly ConcurrentDictionary<Type, EfficientInvoker> TypeToWrapperMap
@@ -64,6 +65,16 @@ namespace Tact.Reflection
         public object Invoke(object target, params object[] args)
         {
             return _func(target, args);
+        }
+
+        public async Task<object> InvokeAsync(object target, params object[] args)
+        {
+            var result = _func(target, args);
+            var task = result as Task;
+            if (task == null) return result;
+
+            await task.ConfigureAwait(false);
+            return task.GetResult();
         }
 
         private static WrapperInfo CreateMethodInfo(Type type, MethodInfo method, bool isDelegate)

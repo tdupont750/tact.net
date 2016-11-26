@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using Tact.Reflection;
 using Xunit;
 using Xunit.Abstractions;
@@ -236,6 +237,17 @@ namespace Tact.Tests.Reflection
             return sw1.ElapsedTicks;
         }
 
+        [Fact]
+        public async Task InvokeAsync()
+        {
+            var invoker = _obj.GetType().GetMethodInvoker("TestMethodAsync");
+            var result1 = await invoker.InvokeAsync(_obj, 1).ConfigureAwait(false);
+            var result2 = await invoker.InvokeAsync(_obj, 2).ConfigureAwait(false);
+
+            Assert.Equal(false, result1);
+            Assert.Equal(true, result2);
+        }
+
         private class TestClass
         {
             public int Count;
@@ -245,6 +257,13 @@ namespace Tact.Tests.Reflection
             {
                 Interlocked.Increment(ref Count);
                 return i + (b ? 1 : 2);
+            }
+
+            // ReSharper disable once UnusedMember.Local
+            public async Task<bool> TestMethodAsync(int i)
+            {
+                await Task.Delay(16).ConfigureAwait(false);
+                return i % 2 == 0;
             }
 
             // ReSharper disable once UnusedMember.Local
