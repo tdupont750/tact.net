@@ -12,7 +12,6 @@ namespace Tact.Tests.Reflection
 {
     public class EfficientInvokerTests
     {
-        public const int MinPerformanceIncrease = 5;
         public const int Iterations = 1000000;
 
         private static readonly object[] Args = { 1, true };
@@ -41,7 +40,7 @@ namespace Tact.Tests.Reflection
             var ticks1 = DelegateEfficientInvoke(func);
             Assert.Equal(Iterations * 2, count);
 
-            Assert.True(ticks1 < ticks0 * MinPerformanceIncrease);
+            Assert.True(ticks1 * 10 < ticks0);
         }
         
         private long DelegateDynamicInvoke(Delegate d)
@@ -50,7 +49,7 @@ namespace Tact.Tests.Reflection
             d.DynamicInvoke(1, 1);
             sw0.Stop();
 
-            _output.WriteLine(sw0.ElapsedTicks.ToString());
+            _output.WriteLine($"DelegateDynamicInvoke - First - MS: {sw0.ElapsedMilliseconds}");
 
             var sw1 = Stopwatch.StartNew();
             for (var i = 1; i < Iterations; i++)
@@ -59,7 +58,7 @@ namespace Tact.Tests.Reflection
             }
             sw1.Stop();
 
-            _output.WriteLine(sw1.ElapsedTicks.ToString());
+            _output.WriteLine($"DelegateDynamicInvoke -  Rest - MS: {sw1.ElapsedMilliseconds}");
             return sw1.ElapsedTicks;
         }
 
@@ -70,7 +69,7 @@ namespace Tact.Tests.Reflection
             x.Invoke(d, 1, 1);
             sw0.Stop();
 
-            _output.WriteLine(sw0.ElapsedTicks.ToString());
+            _output.WriteLine($"DelegateEfficientInvoke - First - MS: {sw0.ElapsedMilliseconds}");
 
             var sw1 = Stopwatch.StartNew();
             for (var i = 1; i < Iterations; i++)
@@ -79,7 +78,7 @@ namespace Tact.Tests.Reflection
             }
             sw1.Stop();
 
-            _output.WriteLine(sw1.ElapsedTicks.ToString());
+            _output.WriteLine($"DelegateEfficientInvoke -  Rest - MS: {sw1.ElapsedMilliseconds}");
             return sw1.ElapsedTicks;
         }
 
@@ -96,7 +95,7 @@ namespace Tact.Tests.Reflection
             Assert.Equal(Iterations * 3, _obj.Count);
 
             Assert.True(ticks1 < ticks0);
-            Assert.True(ticks2 < ticks1 * MinPerformanceIncrease);
+            Assert.True(ticks2 * 8 < ticks0);
         }
 
         private long MethodInfoInvoke()
@@ -105,7 +104,7 @@ namespace Tact.Tests.Reflection
             _obj.GetType().GetTypeInfo().GetMethod("TestMethod").Invoke(_obj, Args);
             sw0.Stop();
 
-            _output.WriteLine(sw0.ElapsedMilliseconds.ToString());
+            _output.WriteLine($"MethodInfoInvoke - First - MS: {sw0.ElapsedMilliseconds}");
 
             var sw1 = Stopwatch.StartNew();
             for (var i = 1; i < Iterations; i++)
@@ -114,7 +113,7 @@ namespace Tact.Tests.Reflection
             }
             sw1.Stop();
 
-            _output.WriteLine(sw1.ElapsedTicks.ToString());
+            _output.WriteLine($"MethodInfoInvoke -  Rest - MS: {sw1.ElapsedMilliseconds}");
             return sw1.ElapsedTicks;
         }
 
@@ -126,7 +125,7 @@ namespace Tact.Tests.Reflection
             map.GetOrAdd(_obj.GetType(), type => type.GetTypeInfo().GetMethod("TestMethod")).Invoke(_obj, Args);
             sw0.Stop();
 
-            _output.WriteLine(sw0.ElapsedMilliseconds.ToString());
+            _output.WriteLine($"CachedMethodInfoInvoke - First - MS: {sw0.ElapsedMilliseconds}");
 
             var sw1 = Stopwatch.StartNew();
             for (var i = 1; i < Iterations; i++)
@@ -135,7 +134,7 @@ namespace Tact.Tests.Reflection
             }
             sw1.Stop();
 
-            _output.WriteLine(sw1.ElapsedTicks.ToString());
+            _output.WriteLine($"CachedMethodInfoInvoke -  Rest - MS: {sw1.ElapsedMilliseconds}");
             return sw1.ElapsedTicks;
         }
 
@@ -146,7 +145,7 @@ namespace Tact.Tests.Reflection
             x.Invoke(_obj, Args);
             sw0.Stop();
 
-            _output.WriteLine(sw0.ElapsedMilliseconds.ToString());
+            _output.WriteLine($"MethodEfficientInvoker - First - MS: {sw0.ElapsedMilliseconds}");
 
             var sw1 = Stopwatch.StartNew();
             for (var i = 1; i < Iterations; i++)
@@ -155,7 +154,7 @@ namespace Tact.Tests.Reflection
             }
             sw1.Stop();
 
-            _output.WriteLine(sw1.ElapsedTicks.ToString());
+            _output.WriteLine($"MethodEfficientInvoker -  Rest - MS: {sw1.ElapsedMilliseconds}");
             return sw1.ElapsedTicks;
         }
 
@@ -172,7 +171,7 @@ namespace Tact.Tests.Reflection
             Assert.Equal(Iterations * 3, _obj.Count);
 
             Assert.True(ticks1 < ticks0);
-            Assert.True(ticks2 < ticks1 * MinPerformanceIncrease);
+            Assert.True(ticks2 * 6 < ticks0);
         }
 
         private long PropertyInfoInvoke()
@@ -182,7 +181,7 @@ namespace Tact.Tests.Reflection
             sw0.Stop();
 
             Assert.Equal('a', a);
-            _output.WriteLine(sw0.ElapsedMilliseconds.ToString());
+            _output.WriteLine($"PropertyInfoInvoke - First - MS: {sw0.ElapsedMilliseconds}");
 
             var sw1 = Stopwatch.StartNew();
             for (var i = 1; i < Iterations; i++)
@@ -191,7 +190,7 @@ namespace Tact.Tests.Reflection
             }
             sw1.Stop();
 
-            _output.WriteLine(sw1.ElapsedTicks.ToString());
+            _output.WriteLine($"PropertyInfoInvoke -  Rest - MS: {sw1.ElapsedMilliseconds}");
             return sw1.ElapsedTicks;
         }
 
@@ -204,7 +203,7 @@ namespace Tact.Tests.Reflection
             sw0.Stop();
 
             Assert.Equal('a', a);
-            _output.WriteLine(sw0.ElapsedMilliseconds.ToString());
+            _output.WriteLine($"CachedPropertyInfoInvoke - First - MS: {sw0.ElapsedMilliseconds}");
 
             var sw1 = Stopwatch.StartNew();
             for (var i = 1; i < Iterations; i++)
@@ -213,7 +212,7 @@ namespace Tact.Tests.Reflection
             }
             sw1.Stop();
 
-            _output.WriteLine(sw1.ElapsedTicks.ToString());
+            _output.WriteLine($"CachedPropertyInfoInvoke -  Rest - MS: {sw1.ElapsedMilliseconds}");
             return sw1.ElapsedTicks;
         }
 
@@ -224,7 +223,7 @@ namespace Tact.Tests.Reflection
             x.Invoke(_obj);
             sw0.Stop();
 
-            _output.WriteLine(sw0.ElapsedMilliseconds.ToString());
+            _output.WriteLine($"PropertyEfficientInvoker - First - MS: {sw0.ElapsedMilliseconds}");
 
             var sw1 = Stopwatch.StartNew();
             for (var i = 1; i < Iterations; i++)
@@ -233,7 +232,7 @@ namespace Tact.Tests.Reflection
             }
             sw1.Stop();
 
-            _output.WriteLine(sw1.ElapsedTicks.ToString());
+            _output.WriteLine($"PropertyEfficientInvoker -  Rest - MS: {sw1.ElapsedMilliseconds}");
             return sw1.ElapsedTicks;
         }
 

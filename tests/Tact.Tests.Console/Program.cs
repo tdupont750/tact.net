@@ -172,12 +172,14 @@ namespace Tact.Tests.Console
             public void WriteLine(string message)
             {
                 Lines.Enqueue(message);
+                System.Console.WriteLine(message);
             }
 
             public void WriteLine(string format, params object[] args)
             {
                 var message = string.Format(format, args);
                 Lines.Enqueue(message);
+                System.Console.WriteLine(message);
             }
         }
     }
