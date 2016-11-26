@@ -45,12 +45,12 @@ namespace Tact
         }
         public static EfficientInvoker GetMethodInvoker(this Type type, string methodName)
         {
-            return EfficientInvoker.GetForMethod(type, methodName);
+            return EfficientInvoker.ForMethod(type, methodName);
         }
 
         public static EfficientInvoker GetPropertyInvoker(this Type type, string propertyName)
         {
-            return EfficientInvoker.GetForProperty(type, propertyName);
+            return EfficientInvoker.ForProperty(type, propertyName);
         }
 
         private enum Result

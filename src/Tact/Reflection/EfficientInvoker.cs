@@ -27,7 +27,7 @@ namespace Tact.Reflection
             _func = func;
         }
 
-        public static EfficientInvoker GetForDelegate(Delegate del)
+        public static EfficientInvoker ForDelegate(Delegate del)
         {
             var type = del.GetType();
             return TypeToWrapperMap.GetOrAdd(type, t =>
@@ -39,7 +39,7 @@ namespace Tact.Reflection
             });
         }
 
-        public static EfficientInvoker GetForMethod(Type type, string methodName)
+        public static EfficientInvoker ForMethod(Type type, string methodName)
         {
             var key = new MethodKey(type, methodName);
             return MethodToWrapperMap.GetOrAdd(key, k =>
@@ -51,7 +51,7 @@ namespace Tact.Reflection
             });
         }
 
-        public static EfficientInvoker GetForProperty(Type type, string propertyName)
+        public static EfficientInvoker ForProperty(Type type, string propertyName)
         {
             var key = new MethodKey(type, propertyName);
             return MethodToWrapperMap.GetOrAdd(key, k =>
