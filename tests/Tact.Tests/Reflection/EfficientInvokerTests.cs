@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Tact.Reflection;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -23,7 +22,18 @@ namespace Tact.Tests.Reflection
         {
             _output = output;
         }
-        
+
+        [Fact]
+        public void NoResultDelegate()
+        {
+            var count = 0;
+            Action<int> func = c => Interlocked.Add(ref count, c);
+            var invoker = func.GetInvoker();
+            invoker.Invoke(func, 2);
+            invoker.Invoke(func, 3);
+            Assert.Equal(5, count);
+        }
+
         [Fact]
         public void DelegateComparison()
         {

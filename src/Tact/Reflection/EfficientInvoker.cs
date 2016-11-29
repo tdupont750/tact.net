@@ -63,9 +63,12 @@ namespace Tact.Reflection
         {
             var result = _func(target, args);
             var task = result as Task;
-            if (task == null) return result;
+            if (task == null)
+                return result;
 
-            await task.ConfigureAwait(false);
+            if (!task.IsCompleted)
+                await task.ConfigureAwait(false);
+
             return task.GetResult();
         }
 
@@ -90,32 +93,35 @@ namespace Tact.Reflection
                 ? (Expression)Expression.Invoke(castTargetExp, paramsExps)
                 : Expression.Call(castTargetExp, method, paramsExps);
 
-            var resultExp = hasReturn ? Expression.Convert(invokeExp, typeof(object)) : invokeExp;
-            var lambdaExp = Expression.Lambda(resultExp, targetExp, argsExp);
-            var lambda = lambdaExp.Compile();
+            LambdaExpression lambdaExp;
 
             if (hasReturn)
-                return (Func<object, object[], object>)lambda;
-
-            var action = (Action<object, object[]>)lambda;
-            return (target, args) =>
             {
-                action(target, args);
-                return null;
-            };
+                var resultExp = Expression.Convert(invokeExp, typeof(object));
+                lambdaExp = Expression.Lambda(resultExp, targetExp, argsExp);
+            }
+            else
+            {
+                var constExp = Expression.Constant(null, typeof(object));
+                var blockExp = Expression.Block(invokeExp, constExp);
+                lambdaExp = Expression.Lambda(blockExp, targetExp, argsExp);
+            }
+
+            var lambda = lambdaExp.Compile();
+            return (Func<object, object[], object>)lambda;
         }
         
         private static Func<object, object[], object> CreatePropertyWrapper(Type type, string propertyName)
         {
             var property = type.GetRuntimeProperty(propertyName);
-            var argExp = Expression.Parameter(typeof(object), "target");
-            var castArgExp = Expression.Convert(argExp, type);
+            var targetExp = Expression.Parameter(typeof(object), "target");
+            var argsExp = Expression.Parameter(typeof(object[]), "args");
+            var castArgExp = Expression.Convert(targetExp, type);
             var propExp = Expression.Property(castArgExp, property);
             var castPropExp = Expression.Convert(propExp, typeof(object));
-            var lambdaExp = Expression.Lambda(castPropExp, argExp);
+            var lambdaExp = Expression.Lambda(castPropExp, targetExp, argsExp);
             var lambda = lambdaExp.Compile();
-            var func = (Func<object, object>) lambda;
-            return (target, args) => func(target);
+            return (Func<object, object[], object>) lambda;
         }
 
         private class MethodKeyComparer : IEqualityComparer<MethodKey>

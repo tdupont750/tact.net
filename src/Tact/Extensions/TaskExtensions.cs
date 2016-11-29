@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ namespace Tact
         private const string ResultPropertyName = "Result";
 
         private static readonly Type GenericTaskType = typeof(Task<>);
+
+        private static readonly ConcurrentDictionary<Type, bool> GenericTaskTypeMap = new ConcurrentDictionary<Type, bool>();
 
         public static Task IgnoreCancellation(this Task task, CancellationToken token)
         {
@@ -107,7 +110,10 @@ namespace Tact
                 throw new ArgumentException(CompleteTaskMessage, nameof(task));
 
             var type = task.GetType();
-            return type.GetGenericTypeDefinition() == GenericTaskType
+            var isGenericTaskType = GenericTaskTypeMap.GetOrAdd(type,
+                t => t.GetGenericTypeDefinition() == GenericTaskType);
+
+            return isGenericTaskType
                 ? type.GetPropertyInvoker(ResultPropertyName).Invoke(task)
                 : null;
         }

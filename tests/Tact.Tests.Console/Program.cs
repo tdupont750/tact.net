@@ -149,20 +149,15 @@ namespace Tact.Tests.Console
 
             new SemaphoreSlimExtensionTests().UseAsync().Wait();
             new ReaderWriterLockSlimExtensionTests().Use();
-
-            var testOutputHelper1 = new TestOutputHelper();
-            new EfficientInvokerTests(testOutputHelper1).DelegateComparison();
-
-            var testOutputHelper2 = new TestOutputHelper();
-            new EfficientInvokerTests(testOutputHelper2).MethodComparison();
-
-            var testOutputHelper3 = new TestOutputHelper();
-            new EfficientInvokerTests(testOutputHelper3).PropertyComparison();
-
-            var testOutputHelper4 = new TestOutputHelper();
-            new EfficientInvokerTests(testOutputHelper4).InvokeAsync().Wait();
+            
+            new EfficientInvokerTests(new TestOutputHelper()).NoResultDelegate();
+            new EfficientInvokerTests(new TestOutputHelper()).DelegateComparison();
+            new EfficientInvokerTests(new TestOutputHelper()).MethodComparison();
+            new EfficientInvokerTests(new TestOutputHelper()).PropertyComparison();
+            new EfficientInvokerTests(new TestOutputHelper()).InvokeAsync().Wait();
 
             System.Console.WriteLine("...Complete");
+            System.Console.ReadLine();
         }
 
         public class TestOutputHelper : ITestOutputHelper
