@@ -38,7 +38,7 @@ namespace Tact.Practices.Implementation
         public Container(ILog log, IList<IResolutionHandler> resolutionHandlers)
             : base(log)
         {
-            ResolutionHandlers = resolutionHandlers;
+            ResolutionHandlers = resolutionHandlers ?? new List<IResolutionHandler>();
         }
 
         protected override IList<IResolutionHandler> ResolutionHandlers { get; }

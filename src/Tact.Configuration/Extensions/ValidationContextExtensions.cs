@@ -17,6 +17,9 @@ namespace Tact
 
         public static void ValidateObject(this ValidationContext context, bool validateAllProperties = true)
         {
+            if (context == null)
+                throw new ArgumentNullException(nameof(context));
+
             var instance = context.ObjectInstance;
             var type = instance.GetType();
 

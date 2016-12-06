@@ -38,6 +38,12 @@ namespace Tact
             Func<TInput, int, CancellationToken, Task<TOutput>> func,
             int? maxParallelization = null)
         {
+            if (collection == null)
+                throw new ArgumentNullException(nameof(collection));
+
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
             var results = new TOutput[collection.Count];
 
             await collection

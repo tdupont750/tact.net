@@ -39,6 +39,12 @@ namespace Tact
             Func<T, int, CancellationToken, Task> func, 
             int? maxParallelization = null)
         {
+            if (enumerable == null)
+                throw new ArgumentNullException(nameof(enumerable));
+
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
             var exceptions = new ConcurrentQueue<Exception>();
             var maxCount = maxParallelization ?? Environment.ProcessorCount;
             var tasks = new List<Task>(maxCount);

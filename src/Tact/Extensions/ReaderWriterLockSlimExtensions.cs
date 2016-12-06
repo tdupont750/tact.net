@@ -12,13 +12,21 @@ namespace Tact
 
         public static IDisposable UseReadLock(this ReaderWriterLockSlim lockSlim, TimeSpan timeout)
         {
+            if (lockSlim == null)
+                throw new ArgumentNullException(nameof(lockSlim));
+
             var result = lockSlim.TryEnterReadLock(timeout);
-            if (!result) throw new TimeoutException("Unable to obtain a read lock");
+            if (!result)
+                throw new TimeoutException("Unable to obtain a read lock");
+
             return new ReaderWriterLockSlimWrapper(lockSlim, false);
         }
 
         public static IDisposable UseReadLock(this ReaderWriterLockSlim lockSlim)
         {
+            if (lockSlim == null)
+                throw new ArgumentNullException(nameof(lockSlim));
+
             lockSlim.EnterReadLock();
             return new ReaderWriterLockSlimWrapper(lockSlim, false);
         }
@@ -30,13 +38,21 @@ namespace Tact
 
         public static IDisposable UseWriteLock(this ReaderWriterLockSlim lockSlim, TimeSpan timeout)
         {
+            if (lockSlim == null)
+                throw new ArgumentNullException(nameof(lockSlim));
+
             var result = lockSlim.TryEnterWriteLock(timeout);
-            if (!result) throw new TimeoutException("Unable to obtain a write lock");
+            if (!result)
+                throw new TimeoutException("Unable to obtain a write lock");
+
             return new ReaderWriterLockSlimWrapper(lockSlim, true);
         }
 
         public static IDisposable UseWriteLock(this ReaderWriterLockSlim lockSlim)
         {
+            if (lockSlim == null)
+                throw new ArgumentNullException(nameof(lockSlim));
+
             lockSlim.EnterWriteLock();
             return new ReaderWriterLockSlimWrapper(lockSlim, true);
         }

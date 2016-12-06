@@ -9,6 +9,7 @@ namespace Tact
     public static class TaskExtensions
     {
         private const string CompleteTaskMessage = "Task must be complete";
+
         private const string ResultPropertyName = "Result";
 
         private static readonly Type GenericTaskType = typeof(Task<>);
@@ -17,6 +18,9 @@ namespace Tact
 
         public static Task IgnoreCancellation(this Task task, CancellationToken token)
         {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
             // ReSharper disable once MethodSupportsCancellation
             return task
                 .ContinueWith(t =>
@@ -36,6 +40,9 @@ namespace Tact
 
         public static Task IgnoreCancellation(this Task task)
         {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
             return task
                 .ContinueWith(t =>
                 {
@@ -53,6 +60,9 @@ namespace Tact
 
         public static Task<T> IgnoreCancellation<T>(this Task<T> task, CancellationToken token)
         {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
             // ReSharper disable once MethodSupportsCancellation
             return task
                 .ContinueWith(t =>
@@ -72,6 +82,9 @@ namespace Tact
 
         public static Task<T> IgnoreCancellation<T>(this Task<T> task)
         {
+            if (task == null)
+                throw new ArgumentNullException(nameof(task));
+
             return task
                 .ContinueWith(t =>
                 {

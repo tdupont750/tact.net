@@ -20,6 +20,12 @@ namespace Tact.Threading
             Func<TInput, CancellationToken, Task<TOutput>> func)
             where TInput : IAsyncDisposable
         {
+            if (disposable == null)
+                throw new ArgumentNullException(nameof(disposable));
+
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
             try
             {
                 return await func(disposable, cancelToken).ConfigureAwait(false);
@@ -44,6 +50,12 @@ namespace Tact.Threading
             Func<T, CancellationToken, Task> func)
             where T : IAsyncDisposable
         {
+            if (disposable == null)
+                throw new ArgumentNullException(nameof(disposable));
+
+            if (func == null)
+                throw new ArgumentNullException(nameof(func));
+
             try
             {
                 await func(disposable, cancelToken).ConfigureAwait(false);

@@ -33,6 +33,9 @@ namespace Tact
         public static void ConfigureByAttribute<T>(this IContainer container, IConfiguration configuration, params Type[] types)
             where T : IRegisterConfigurationAttribute
         {
+            if(container == null)
+                throw new ArgumentNullException(nameof(container));
+
             ILog logger;
             container.TryResolve(out logger);
 

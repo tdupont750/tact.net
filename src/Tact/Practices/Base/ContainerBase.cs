@@ -22,7 +22,11 @@ namespace Tact.Practices.Base
 
         protected ContainerBase(ILog log)
         {
+            if (log == null)
+                throw new ArgumentNullException(nameof(log));
+
             Log = log;
+
             this.RegisterInstance(log);
         }
 
@@ -179,6 +183,9 @@ namespace Tact.Practices.Base
 
         public object CreateInstance(Type type, Stack<Type> stack)
         {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
             var constructor = type.EnsureSingleCostructor();
             var parameterTypes = constructor.GetParameters().Select(p => p.ParameterType).ToArray();
             var arguments = new object[parameterTypes.Length];
@@ -195,6 +202,12 @@ namespace Tact.Practices.Base
 
         private bool TryResolve(Type type, Stack<Type> stack, bool canThrow, out object result)
         {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (stack == null)
+                throw new ArgumentNullException(nameof(stack));
+
             using (EnterPush(type, stack))
             using (_lock.UseReadLock())
             {
@@ -217,6 +230,15 @@ namespace Tact.Practices.Base
 
         private bool TryResolve(Type type, string key, Stack<Type> stack, bool canThrow, out object result)
         {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+
+            if (stack == null)
+                throw new ArgumentNullException(nameof(stack));
+
             using (EnterPush(type, stack))
             using (_lock.UseReadLock())
             {
