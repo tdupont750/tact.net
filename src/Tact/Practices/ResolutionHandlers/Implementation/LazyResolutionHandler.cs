@@ -20,7 +20,7 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
                 .Single(m => m.Name == "CreateLazy" && m.IsGenericMethod);
         }
         
-        public bool TryGetService(
+        public bool TryResolve(
             IContainer container, 
             Type type, 
             Stack<Type> stack,

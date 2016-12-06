@@ -21,7 +21,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public virtual string Description => $"Singleton: {_toType.Name}";
 
-        public virtual ILifetimeManager Clone(IContainer scope)
+        public virtual ILifetimeManager BeginScope(IContainer scope)
         {
             return this;
         }

@@ -22,7 +22,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public string Description => $"PerResolve: {_toType.Name}";
 
-        public ILifetimeManager Clone(IContainer scope)
+        public ILifetimeManager BeginScope(IContainer scope)
         {
             return new PerResolveLifetimeManager(_toType, scope, _factory);
         }

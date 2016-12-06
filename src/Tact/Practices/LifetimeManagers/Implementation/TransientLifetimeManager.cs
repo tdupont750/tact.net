@@ -20,7 +20,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public string Description => $"Transient: {_toType.Name}";
 
-        public ILifetimeManager Clone(IContainer scope)
+        public ILifetimeManager BeginScope(IContainer scope)
         {
             return new TransientLifetimeManager(_toType, scope, _factory);
         }

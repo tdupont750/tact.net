@@ -16,7 +16,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public override string Description => $"PerScope: {_toType.Name}";
 
-        public override ILifetimeManager Clone(IContainer scope)
+        public override ILifetimeManager BeginScope(IContainer scope)
         {
             return new PerScopeLifetimeManager(_toType, scope, _factory);
         }

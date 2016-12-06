@@ -19,7 +19,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public string Description => $"Instance: {_instance.GetType().Name}";
 
-        public ILifetimeManager Clone(IContainer scope)
+        public ILifetimeManager BeginScope(IContainer scope)
         {
             return this;
         }

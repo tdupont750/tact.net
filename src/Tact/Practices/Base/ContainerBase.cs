@@ -128,7 +128,7 @@ namespace Tact.Practices.Base
                     foreach (var resolutionHandler in ResolutionHandlers)
                     {
                         object instance;
-                        if (resolutionHandler.TryGetService(this, type, stack, false, out instance))
+                        if (resolutionHandler.TryResolve(this, type, stack, false, out instance))
                             instances.Add(instance);
                     }
                 }
@@ -206,7 +206,7 @@ namespace Tact.Practices.Base
 
                 foreach (var handler in ResolutionHandlers)
                 {
-                    if (handler.TryGetService(this, type, stack, canThrow, out result))
+                    if (handler.TryResolve(this, type, stack, canThrow, out result))
                         return true;
                 }
 
@@ -233,7 +233,7 @@ namespace Tact.Practices.Base
 
                 foreach (var resolutionHandler in ResolutionHandlers)
                 {
-                    if (resolutionHandler.TryGetService(this, type, stack, canThrow, out result))
+                    if (resolutionHandler.TryResolve(this, type, stack, canThrow, out result))
                         return true;
                 }
             }
@@ -249,7 +249,7 @@ namespace Tact.Practices.Base
             {
                 foreach (var pair in source._lifetimeManagerMap)
                 {
-                    var clone = pair.Value.Clone(target);
+                    var clone = pair.Value.BeginScope(target);
                     target._lifetimeManagerMap[pair.Key] = clone;
                 }
 
@@ -259,7 +259,7 @@ namespace Tact.Practices.Base
 
                     foreach (var lifetimeManager in pair.Value)
                     {
-                        var clone = lifetimeManager.Value.Clone(target);
+                        var clone = lifetimeManager.Value.BeginScope(target);
                         clones[lifetimeManager.Key] = clone;
                     }
 

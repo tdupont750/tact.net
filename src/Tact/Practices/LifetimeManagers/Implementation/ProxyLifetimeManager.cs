@@ -24,7 +24,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
             _hasKey = !string.IsNullOrWhiteSpace(_toKey);
         }
 
-        public ILifetimeManager Clone(IContainer scope)
+        public ILifetimeManager BeginScope(IContainer scope)
         {
             return new ProxyLifetimeManager(_toType, _toKey, scope);
         }

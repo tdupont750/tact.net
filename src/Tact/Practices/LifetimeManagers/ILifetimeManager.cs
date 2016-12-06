@@ -9,7 +9,7 @@ namespace Tact.Practices.LifetimeManagers
     {
         string Description { get; }
 
-        ILifetimeManager Clone(IContainer scope);
+        ILifetimeManager BeginScope(IContainer scope);
 
         object Resolve(Stack<Type> stack);
 
