@@ -12,6 +12,26 @@
   "frameworks": {
     "netstandard1.6": {
       "imports": "dnxcore50"
+    },
+    "net461": {
     }
+  },
+
+  "authors": [ "Tom DuPont" ],
+  "copyright": "2016 Tom DuPont",
+  "description": "A configuration library for Tact.NET - A tactful collection of utilities for .NET development.",
+
+  "packOptions": {
+    "iconUrl": "https://sites.google.com/site/tdupont750/Tact_NET_S.png",
+    "language": "en-us",
+    "licenseUrl": "http://www.opensource.org/licenses/MIT",
+    "projectUrl": "https://github.com/tdupont750/tact.net",
+    "title": "Tact.NET - Configuration"
+  },
+
+  "scripts": {
+    "postcompile": [
+      "dotnet pack --no-build --configuration %compile:Configuration%"
+    ]
   }
 }
