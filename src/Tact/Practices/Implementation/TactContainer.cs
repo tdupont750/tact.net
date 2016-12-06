@@ -6,16 +6,17 @@ using Tact.Practices.ResolutionHandlers.Implementation;
 
 namespace Tact.Practices.Implementation
 {
-    public sealed class Container : ContainerBase
+    public sealed class TactContainer : ContainerBase
     {
-        public Container(
+        public TactContainer(
             ILog log,
+            int? maxDisposeParallelization = null,
             bool throwOnFailedResolve = true,
             bool resolveUnregistered = true,
             bool resolveLazy = true,
             bool resolveEnumerable = true,
             bool resolveFunc = true)
-            : base(log)
+            : base(log, maxDisposeParallelization)
         {
             ResolutionHandlers = new List<IResolutionHandler>();
 
@@ -35,8 +36,10 @@ namespace Tact.Practices.Implementation
                 ResolutionHandlers.Add(new ThrowOnFailResolutionHandler());
         }
 
-        public Container(ILog log, IList<IResolutionHandler> resolutionHandlers)
-            : base(log)
+        public TactContainer(ILog log, 
+            IList<IResolutionHandler> resolutionHandlers,
+            int? maxDisposeParallelization = null)
+            : base(log, maxDisposeParallelization)
         {
             ResolutionHandlers = resolutionHandlers ?? new List<IResolutionHandler>();
         }
@@ -45,7 +48,7 @@ namespace Tact.Practices.Implementation
 
         protected override ContainerBase CreateScope()
         {
-            return new Container(Log, ResolutionHandlers);
+            return new TactContainer(Log, ResolutionHandlers);
         }
     }
 }

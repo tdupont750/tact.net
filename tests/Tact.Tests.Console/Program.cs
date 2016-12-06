@@ -66,7 +66,7 @@ namespace Tact.Tests.Console
             var config = configBuilder.Build();
 
             var logger = new InMemoryLog();
-            var container = new Container(logger);
+            var container = new TactContainer(logger);
 
             var assembly = Assembly.GetEntryAssembly();
 

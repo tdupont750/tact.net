@@ -12,21 +12,21 @@ namespace Tact.Tests.Practices
         [Fact]
         public void ThrowOnFail()
         {
-            using (var resolver = new Container(new InMemoryLog()))
+            using (var resolver = new TactContainer(new InMemoryLog()))
                 Assert.Throws<InvalidOperationException>(() => resolver.Resolve<IOne>());
         }
 
         [Fact]
         public void DoNotThrowOnFail()
         {
-            using (var resolver = new Container(new InMemoryLog(), false))
+            using (var resolver = new TactContainer(new InMemoryLog(), throwOnFailedResolve: false))
                 Assert.Null(resolver.Resolve<IOne>());
         }
 
         [Fact]
         public void LazyResolve()
         {
-            using (var resolver = new Container(new InMemoryLog(), false))
+            using (var resolver = new TactContainer(new InMemoryLog(), throwOnFailedResolve: false))
             {
                 resolver.RegisterSingleton<IOne, One>();
 
@@ -53,7 +53,7 @@ namespace Tact.Tests.Practices
         [Fact]
         public void EnumerableResolve()
         {
-            using (var resolver = new Container(new InMemoryLog(), false))
+            using (var resolver = new TactContainer(new InMemoryLog(), throwOnFailedResolve: false))
             {
                 resolver.RegisterSingleton<ITwo, One>("Two");
 
@@ -65,7 +65,7 @@ namespace Tact.Tests.Practices
         [Fact]
         public void FuncResolve()
         {
-            using (var resolver = new Container(new InMemoryLog(), false))
+            using (var resolver = new TactContainer(new InMemoryLog(), throwOnFailedResolve: false))
             {
                 resolver.RegisterSingleton<ITwo, One>();
 
@@ -81,7 +81,7 @@ namespace Tact.Tests.Practices
         [Fact]
         public void ConstructorRequired()
         {
-            using (var resolver = new Container(new InMemoryLog()))
+            using (var resolver = new TactContainer(new InMemoryLog()))
             {
                 Assert.Throws<InvalidOperationException>(() => resolver.RegisterSingleton<Six>());
                 Assert.Throws<InvalidOperationException>(() => resolver.RegisterPerScope<Six>());
@@ -92,7 +92,7 @@ namespace Tact.Tests.Practices
         [Fact]
         public void ClassRequired()
         {
-            using (var resolver = new Container(new InMemoryLog()))
+            using (var resolver = new TactContainer(new InMemoryLog()))
             {
                 Assert.Throws<InvalidOperationException>(() => resolver.RegisterSingleton<IOne>());
                 Assert.Throws<InvalidOperationException>(() => resolver.RegisterPerScope<IOne>());
@@ -160,7 +160,7 @@ namespace Tact.Tests.Practices
         [Fact]
         public void PreventRecursion()
         {
-            using (var resolver = new Container(new InMemoryLog()))
+            using (var resolver = new TactContainer(new InMemoryLog()))
             {
                 resolver.RegisterTransient<Seven>();
                 Assert.Throws<InvalidOperationException>(() => resolver.Resolve<Seven>());

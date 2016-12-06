@@ -9,7 +9,7 @@ namespace Tact.Tests.Practices
         [Fact]
         public void SingletonProxy()
         {
-            using (var resolver = new Container(new InMemoryLog()))
+            using (var resolver = new TactContainer(new InMemoryLog()))
             {
                 resolver.RegisterSingleton<IOne, One>();
                 resolver.RegisterProxy<ITwo, IOne>();
@@ -24,7 +24,7 @@ namespace Tact.Tests.Practices
         [Fact]
         public void PerScopeProxy()
         {
-            using (var resolver = new Container(new InMemoryLog()))
+            using (var resolver = new TactContainer(new InMemoryLog()))
             {
                 resolver.RegisterPerScope<IOne, One>();
                 resolver.RegisterProxy<ITwo, IOne>();
@@ -48,7 +48,7 @@ namespace Tact.Tests.Practices
         [Fact]
         public void KeyProxy()
         {
-            using (var resolver = new Container(new InMemoryLog()))
+            using (var resolver = new TactContainer(new InMemoryLog()))
             {
                 resolver.RegisterSingleton<IOne, One>("Hello");
                 resolver.RegisterProxy<ITwo, IOne>("Hello", "World");

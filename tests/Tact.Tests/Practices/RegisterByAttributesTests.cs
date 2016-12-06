@@ -12,7 +12,7 @@ namespace Tact.Tests.Practices
         public void RegisterByAttribute()
         {
             var log = new InMemoryLog();
-            using (var container = new Container(log))
+            using (var container = new TactContainer(log))
             {
                 Assert.Throws<InvalidOperationException>(() => container.Resolve<ITester>());
 

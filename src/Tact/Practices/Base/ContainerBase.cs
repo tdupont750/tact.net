@@ -12,20 +12,26 @@ namespace Tact.Practices.Base
     public abstract class ContainerBase : IContainer
     {
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+
         private readonly Dictionary<Type, ILifetimeManager> _lifetimeManagerMap = new Dictionary<Type, ILifetimeManager>();
+
         private readonly Dictionary<Type, Dictionary<string, ILifetimeManager>> _multiRegistrationMap = new Dictionary<Type, Dictionary<string, ILifetimeManager>>();
-        protected readonly ILog Log;
+
+        private readonly int? _maxDisposeParallelization;
 
         private int _isDisposed;
 
+        protected readonly ILog Log;
+
         protected abstract IList<IResolutionHandler> ResolutionHandlers { get; }
 
-        protected ContainerBase(ILog log)
+        protected ContainerBase(ILog log, int? maxDisposeParallelization)
         {
             if (log == null)
                 throw new ArgumentNullException(nameof(log));
 
             Log = log;
+            _maxDisposeParallelization = maxDisposeParallelization;
 
             this.RegisterInstance(log);
         }
@@ -49,8 +55,8 @@ namespace Tact.Practices.Base
                     .Concat(_lifetimeManagerMap.Values)
                     .ToArray();
             }
-
-            return lifetimeManagers.WhenAll(cancelToken, (manager, token) => manager.DisposeAsync(this, cancelToken));
+            
+            return lifetimeManagers.WhenAll(cancelToken, (manager, token) => manager.DisposeAsync(this, cancelToken), _maxDisposeParallelization);
         }
 
         public object Resolve(Type type)

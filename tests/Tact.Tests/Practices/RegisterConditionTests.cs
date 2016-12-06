@@ -18,7 +18,7 @@ namespace Tact.Tests.Practices
         public void ShouldRegisterTrue()
         {
             var logger = new InMemoryLog();
-            using (var container = new Container(logger))
+            using (var container = new TactContainer(logger))
             {
                 var map = new Dictionary<string, string>
                 {
@@ -40,7 +40,7 @@ namespace Tact.Tests.Practices
         public void ShouldRegisterFalse()
         {
             var logger = new InMemoryLog();
-            using (var container = new Container(logger))
+            using (var container = new TactContainer(logger))
             {
                 var map = new Dictionary<string, string>
                 {

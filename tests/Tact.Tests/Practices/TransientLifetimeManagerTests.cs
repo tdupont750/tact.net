@@ -12,7 +12,7 @@ namespace Tact.Tests.Practices
         {
             IOne a, b, c, d;
 
-            using (var resolver = new Container(new InMemoryLog()))
+            using (var resolver = new TactContainer(new InMemoryLog()))
             {
                 resolver.RegisterTransient<IOne, One>();
 

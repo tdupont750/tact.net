@@ -9,7 +9,7 @@ namespace Tact.Tests.Practices
         [Fact]
         public void RegisterPerResolve()
         {
-            using (var resolver = new Container(new InMemoryLog()))
+            using (var resolver = new TactContainer(new InMemoryLog()))
             {
                 resolver.RegisterPerResolve<IOne, One>();
                 resolver.RegisterPerResolve<ITwo, Two>();
