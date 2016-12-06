@@ -25,6 +25,7 @@ namespace Tact
 
         public interface ILog
         {
+            ILog GetLog(string name);
             bool IsEnabled(LogLevel level);
             void Log(LogLevel level, string message);
             void Log(LogLevel level, string format, params object[] args);
@@ -34,7 +35,14 @@ namespace Tact
     }
 
     public static class LogExtensions
-    { 
+    {
+        public static ILog GetLog(this ILog log, Type type)
+        {
+            if (log == null) throw new ArgumentNullException(nameof(log));
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            return log.GetLog(type.Name);
+        }
+
 <# foreach(var level in logLevels) { #>
 <# for(var argCount = 0; argCount <= 8; argCount++) { #>
 <# var paramName = argCount == 0 ? "message" : "format"; #>
@@ -53,6 +61,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.<#= level #>)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(<#= paramName #>, memberName, sourceFilePath, sourceLineNumber) : <#= paramName #>;
             log.Log(LogLevel.<#= level #>,<# if (hasException == 1) { #> ex,<# } #> newFormat<# for(var i = 0; i < argCount; i++) { #>, arg<#= i #><# } #>);

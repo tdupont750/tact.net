@@ -21,6 +21,7 @@ namespace Tact
 
         public interface ILog
         {
+            ILog GetLog(string name);
             bool IsEnabled(LogLevel level);
             void Log(LogLevel level, string message);
             void Log(LogLevel level, string format, params object[] args);
@@ -30,7 +31,14 @@ namespace Tact
     }
 
     public static class LogExtensions
-    { 
+    {
+        public static ILog GetLog(this ILog log, Type type)
+        {
+            if (log == null) throw new ArgumentNullException(nameof(log));
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            return log.GetLog(type.Name);
+        }
+
         public static void Trace(
             this ILog log,
             string message,
@@ -39,6 +47,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(message, memberName, sourceFilePath, sourceLineNumber) : message;
             log.Log(LogLevel.Trace, newFormat);
@@ -53,6 +62,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(message, memberName, sourceFilePath, sourceLineNumber) : message;
             log.Log(LogLevel.Trace, ex, newFormat);
@@ -67,6 +77,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, newFormat, arg0);
@@ -82,6 +93,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, ex, newFormat, arg0);
@@ -97,6 +109,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, newFormat, arg0, arg1);
@@ -113,6 +126,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, ex, newFormat, arg0, arg1);
@@ -129,6 +143,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, newFormat, arg0, arg1, arg2);
@@ -146,6 +161,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, ex, newFormat, arg0, arg1, arg2);
@@ -163,6 +179,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, newFormat, arg0, arg1, arg2, arg3);
@@ -181,6 +198,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, ex, newFormat, arg0, arg1, arg2, arg3);
@@ -199,6 +217,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, newFormat, arg0, arg1, arg2, arg3, arg4);
@@ -218,6 +237,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, ex, newFormat, arg0, arg1, arg2, arg3, arg4);
@@ -237,6 +257,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, newFormat, arg0, arg1, arg2, arg3, arg4, arg5);
@@ -257,6 +278,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5);
@@ -277,6 +299,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -298,6 +321,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -319,6 +343,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -341,6 +366,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Trace)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Trace, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -354,6 +380,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(message, memberName, sourceFilePath, sourceLineNumber) : message;
             log.Log(LogLevel.Debug, newFormat);
@@ -368,6 +395,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(message, memberName, sourceFilePath, sourceLineNumber) : message;
             log.Log(LogLevel.Debug, ex, newFormat);
@@ -382,6 +410,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, newFormat, arg0);
@@ -397,6 +426,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, ex, newFormat, arg0);
@@ -412,6 +442,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, newFormat, arg0, arg1);
@@ -428,6 +459,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, ex, newFormat, arg0, arg1);
@@ -444,6 +476,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, newFormat, arg0, arg1, arg2);
@@ -461,6 +494,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, ex, newFormat, arg0, arg1, arg2);
@@ -478,6 +512,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, newFormat, arg0, arg1, arg2, arg3);
@@ -496,6 +531,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, ex, newFormat, arg0, arg1, arg2, arg3);
@@ -514,6 +550,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, newFormat, arg0, arg1, arg2, arg3, arg4);
@@ -533,6 +570,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, ex, newFormat, arg0, arg1, arg2, arg3, arg4);
@@ -552,6 +590,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, newFormat, arg0, arg1, arg2, arg3, arg4, arg5);
@@ -572,6 +611,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5);
@@ -592,6 +632,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -613,6 +654,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -634,6 +676,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -656,6 +699,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Debug)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Debug, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -669,6 +713,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(message, memberName, sourceFilePath, sourceLineNumber) : message;
             log.Log(LogLevel.Info, newFormat);
@@ -683,6 +728,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(message, memberName, sourceFilePath, sourceLineNumber) : message;
             log.Log(LogLevel.Info, ex, newFormat);
@@ -697,6 +743,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, newFormat, arg0);
@@ -712,6 +759,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, ex, newFormat, arg0);
@@ -727,6 +775,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, newFormat, arg0, arg1);
@@ -743,6 +792,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, ex, newFormat, arg0, arg1);
@@ -759,6 +809,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, newFormat, arg0, arg1, arg2);
@@ -776,6 +827,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, ex, newFormat, arg0, arg1, arg2);
@@ -793,6 +845,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, newFormat, arg0, arg1, arg2, arg3);
@@ -811,6 +864,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, ex, newFormat, arg0, arg1, arg2, arg3);
@@ -829,6 +883,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, newFormat, arg0, arg1, arg2, arg3, arg4);
@@ -848,6 +903,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, ex, newFormat, arg0, arg1, arg2, arg3, arg4);
@@ -867,6 +923,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, newFormat, arg0, arg1, arg2, arg3, arg4, arg5);
@@ -887,6 +944,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5);
@@ -907,6 +965,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -928,6 +987,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -949,6 +1009,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -971,6 +1032,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Info)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Info, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -984,6 +1046,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(message, memberName, sourceFilePath, sourceLineNumber) : message;
             log.Log(LogLevel.Warn, newFormat);
@@ -998,6 +1061,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(message, memberName, sourceFilePath, sourceLineNumber) : message;
             log.Log(LogLevel.Warn, ex, newFormat);
@@ -1012,6 +1076,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, newFormat, arg0);
@@ -1027,6 +1092,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, ex, newFormat, arg0);
@@ -1042,6 +1108,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, newFormat, arg0, arg1);
@@ -1058,6 +1125,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, ex, newFormat, arg0, arg1);
@@ -1074,6 +1142,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, newFormat, arg0, arg1, arg2);
@@ -1091,6 +1160,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, ex, newFormat, arg0, arg1, arg2);
@@ -1108,6 +1178,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, newFormat, arg0, arg1, arg2, arg3);
@@ -1126,6 +1197,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, ex, newFormat, arg0, arg1, arg2, arg3);
@@ -1144,6 +1216,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, newFormat, arg0, arg1, arg2, arg3, arg4);
@@ -1163,6 +1236,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, ex, newFormat, arg0, arg1, arg2, arg3, arg4);
@@ -1182,6 +1256,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, newFormat, arg0, arg1, arg2, arg3, arg4, arg5);
@@ -1202,6 +1277,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5);
@@ -1222,6 +1298,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -1243,6 +1320,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -1264,6 +1342,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -1286,6 +1365,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Warn)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Warn, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -1299,6 +1379,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(message, memberName, sourceFilePath, sourceLineNumber) : message;
             log.Log(LogLevel.Error, newFormat);
@@ -1313,6 +1394,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(message, memberName, sourceFilePath, sourceLineNumber) : message;
             log.Log(LogLevel.Error, ex, newFormat);
@@ -1327,6 +1409,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, newFormat, arg0);
@@ -1342,6 +1425,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, ex, newFormat, arg0);
@@ -1357,6 +1441,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, newFormat, arg0, arg1);
@@ -1373,6 +1458,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, ex, newFormat, arg0, arg1);
@@ -1389,6 +1475,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, newFormat, arg0, arg1, arg2);
@@ -1406,6 +1493,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, ex, newFormat, arg0, arg1, arg2);
@@ -1423,6 +1511,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, newFormat, arg0, arg1, arg2, arg3);
@@ -1441,6 +1530,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, ex, newFormat, arg0, arg1, arg2, arg3);
@@ -1459,6 +1549,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, newFormat, arg0, arg1, arg2, arg3, arg4);
@@ -1478,6 +1569,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, ex, newFormat, arg0, arg1, arg2, arg3, arg4);
@@ -1497,6 +1589,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, newFormat, arg0, arg1, arg2, arg3, arg4, arg5);
@@ -1517,6 +1610,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5);
@@ -1537,6 +1631,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -1558,6 +1653,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -1579,6 +1675,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -1601,6 +1698,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Error)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Error, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -1614,6 +1712,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(message, memberName, sourceFilePath, sourceLineNumber) : message;
             log.Log(LogLevel.Fatal, newFormat);
@@ -1628,6 +1727,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(message, memberName, sourceFilePath, sourceLineNumber) : message;
             log.Log(LogLevel.Fatal, ex, newFormat);
@@ -1642,6 +1742,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, newFormat, arg0);
@@ -1657,6 +1758,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, ex, newFormat, arg0);
@@ -1672,6 +1774,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, newFormat, arg0, arg1);
@@ -1688,6 +1791,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, ex, newFormat, arg0, arg1);
@@ -1704,6 +1808,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, newFormat, arg0, arg1, arg2);
@@ -1721,6 +1826,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, ex, newFormat, arg0, arg1, arg2);
@@ -1738,6 +1844,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, newFormat, arg0, arg1, arg2, arg3);
@@ -1756,6 +1863,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, ex, newFormat, arg0, arg1, arg2, arg3);
@@ -1774,6 +1882,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, newFormat, arg0, arg1, arg2, arg3, arg4);
@@ -1793,6 +1902,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, ex, newFormat, arg0, arg1, arg2, arg3, arg4);
@@ -1812,6 +1922,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, newFormat, arg0, arg1, arg2, arg3, arg4, arg5);
@@ -1832,6 +1943,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5);
@@ -1852,6 +1964,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -1873,6 +1986,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -1894,6 +2008,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -1916,6 +2031,7 @@ namespace Tact
             [CallerFilePath] string sourceFilePath = "",
             [CallerLineNumber] int sourceLineNumber = 0)
         {
+            if (log == null) throw new ArgumentNullException(nameof(log));
             if (!log.IsEnabled(LogLevel.Fatal)) return;
             var newFormat = logCallSite == LogCallSite.Enabled ? GetFormat(format, memberName, sourceFilePath, sourceLineNumber) : format;
             log.Log(LogLevel.Fatal, ex, newFormat, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
