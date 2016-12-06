@@ -35,7 +35,17 @@ namespace Tact
     }
 
     public static class LogExtensions
-    {
+    {        
+        public static ILog GetLog<T>(this ILog log, T target)
+        {
+            return log.GetLog(typeof(T));
+        }
+
+        public static ILog GetLog<T>(this ILog log)
+        {
+            return log.GetLog(typeof(T));
+        }
+
         public static ILog GetLog(this ILog log, Type type)
         {
             if (log == null) throw new ArgumentNullException(nameof(log));
