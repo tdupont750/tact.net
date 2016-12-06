@@ -11,11 +11,11 @@ namespace Tact.Practices.Implementation
         public TactContainer(
             ILog log,
             int? maxDisposeParallelization = null,
-            bool throwOnFailedResolve = true,
-            bool resolveUnregistered = true,
             bool resolveLazy = true,
             bool resolveEnumerable = true,
-            bool resolveFunc = true)
+            bool resolveFunc = true,
+            bool resolveUnregistered = true,
+            bool throwOnFailedResolve = true)
             : base(log, maxDisposeParallelization)
         {
             ResolutionHandlers = new List<IResolutionHandler>();
@@ -48,7 +48,7 @@ namespace Tact.Practices.Implementation
 
         protected override ContainerBase CreateScope()
         {
-            return new TactContainer(Log, ResolutionHandlers);
+            return new TactContainer(Log, ResolutionHandlers, MaxDisposeParallelization);
         }
     }
 }
