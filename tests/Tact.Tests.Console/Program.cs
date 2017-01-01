@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices;
 using Tact.Practices.Implementation;
+using Tact.Tests.Collections;
 using Tact.Tests.ComponentModel.DataAnnotations;
 using Tact.Tests.Console.Services;
 using Tact.Tests.Extensions;
@@ -155,6 +156,14 @@ namespace Tact.Tests.Console
             new EfficientInvokerTests(new TestOutputHelper()).MethodComparison();
             new EfficientInvokerTests(new TestOutputHelper()).PropertyComparison();
             new EfficientInvokerTests(new TestOutputHelper()).InvokeAsync().Wait();
+
+            new ObjectPoolTests(new TestOutputHelper()).AquireAndRelease();
+            new ObjectPoolTests(new TestOutputHelper()).Parallelism(2).Wait();
+            new ObjectPoolTests(new TestOutputHelper()).Parallelism(4).Wait();
+            new ObjectPoolTests(new TestOutputHelper()).Parallelism(6).Wait();
+            new ObjectPoolTests(new TestOutputHelper()).Parallelism(8).Wait();
+            new ObjectPoolTests(new TestOutputHelper()).Use();
+            new ObjectPoolTests(new TestOutputHelper()).TryAquire();
 
             System.Console.WriteLine("...Complete");
             System.Console.ReadLine();
