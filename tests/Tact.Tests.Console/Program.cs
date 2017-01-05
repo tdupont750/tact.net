@@ -157,13 +157,13 @@ namespace Tact.Tests.Console
             new EfficientInvokerTests(new TestOutputHelper()).PropertyComparison();
             new EfficientInvokerTests(new TestOutputHelper()).InvokeAsync().Wait();
 
-            new ObjectPoolTests(new TestOutputHelper()).AquireAndRelease();
+            new ObjectPoolTests(new TestOutputHelper()).AcquireAndRelease();
             new ObjectPoolTests(new TestOutputHelper()).Parallelism(2).Wait();
             new ObjectPoolTests(new TestOutputHelper()).Parallelism(4).Wait();
             new ObjectPoolTests(new TestOutputHelper()).Parallelism(6).Wait();
             new ObjectPoolTests(new TestOutputHelper()).Parallelism(8).Wait();
             new ObjectPoolTests(new TestOutputHelper()).Use();
-            new ObjectPoolTests(new TestOutputHelper()).TryAquire();
+            new ObjectPoolTests(new TestOutputHelper()).TryAcquire();
 
             System.Console.WriteLine("...Complete");
             System.Console.ReadLine();

@@ -29,7 +29,7 @@ namespace Tact.Collections
             _maxSize = maxSize - 1;
         }
 
-        public T Aquire()
+        public T Acquire()
         {
             var nextTicket = EnterLock();
 
@@ -50,7 +50,7 @@ namespace Tact.Collections
             return value;
         }
         
-        public bool TryAquire(out T value)
+        public bool TryAcquire(out T value)
         {
             var nextTicket = EnterLock();
 
@@ -86,7 +86,7 @@ namespace Tact.Collections
 
         public UsableValue Use()
         {
-            var value = Aquire();
+            var value = Acquire();
             return new UsableValue(this, value);
         }
 

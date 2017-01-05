@@ -39,7 +39,7 @@ namespace Tact.Tests.Collections
                     for (var i = 0; i < count; i++)
                     {
                         // ReSharper disable AccessToDisposedClosure
-                        var value = pool.Aquire();
+                        var value = pool.Acquire();
                         value.WasteTime();
                         pool.Release(value);
                         // ReSharper restore AccessToDisposedClosure
@@ -56,7 +56,7 @@ namespace Tact.Tests.Collections
         }
         
         [Fact]
-        public void AquireAndRelease()
+        public void AcquireAndRelease()
         {
             TestObject a, b, c, d, e, f;
 
@@ -64,17 +64,17 @@ namespace Tact.Tests.Collections
 
             using (var pool = new ObjectPool<TestObject>(2, () => new TestObject(Interlocked.Increment(ref idSeed))))
             {
-                a = pool.Aquire();
-                b = pool.Aquire();
-                c = pool.Aquire();
+                a = pool.Acquire();
+                b = pool.Acquire();
+                c = pool.Acquire();
 
                 pool.Release(c);
                 pool.Release(b);
                 pool.Release(a);
 
-                d = pool.Aquire();
-                e = pool.Aquire();
-                f = pool.Aquire();
+                d = pool.Acquire();
+                e = pool.Acquire();
+                f = pool.Acquire();
 
                 pool.Release(f);
                 pool.Release(e);
@@ -97,20 +97,20 @@ namespace Tact.Tests.Collections
         }
 
         [Fact]
-        public void TryAquire()
+        public void TryAcquire()
         {
             var idSeed = 0;
 
             using (var pool = new ObjectPool<TestObject>(1, () => new TestObject(Interlocked.Increment(ref idSeed))))
             {
                 TestObject value;
-                Assert.False(pool.TryAquire(out value));
+                Assert.False(pool.TryAcquire(out value));
 
-                value = pool.Aquire();
+                value = pool.Acquire();
                 Assert.True(pool.Release(value));
                 Assert.False(pool.Release(value));
 
-                Assert.True(pool.TryAquire(out value));
+                Assert.True(pool.TryAcquire(out value));
             }
         }
 
