@@ -6,7 +6,8 @@
     "NETStandard.Library": "1.6.0",
     "Tact.Configuration": "1.0.0-*",
     "Tact": "1.0.0-*",
-    "xunit": "2.2.0-beta3-build3402"
+    "xunit": "2.2.0-beta3-build3402",
+    "Tact.Json": "1.0.0-*"
   },
 
   "frameworks": {

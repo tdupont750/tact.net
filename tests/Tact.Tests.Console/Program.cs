@@ -10,6 +10,7 @@ using Tact.Tests.Collections;
 using Tact.Tests.ComponentModel.DataAnnotations;
 using Tact.Tests.Console.Services;
 using Tact.Tests.Extensions;
+using Tact.Tests.Net.Http;
 using Tact.Tests.Practices;
 using Tact.Tests.Reflection;
 using Tact.Tests.Threading;
@@ -83,6 +84,8 @@ namespace Tact.Tests.Console
         private static void RunTests()
         {
             System.Console.WriteLine("Start...");
+
+            new JsonContentTest().ReadAsString();
 
             new PerResolveLifetimeManagerTests().RegisterPerResolve();
 
