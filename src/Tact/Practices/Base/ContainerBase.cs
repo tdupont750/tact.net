@@ -12,13 +12,25 @@ namespace Tact.Practices.Base
 {
     public abstract class ContainerBase : IContainer
     {
-        private static readonly ObjectPool<Stack<Type>> StackPool = new ObjectPool<Stack<Type>>(100, () => new Stack<Type>(), stack => stack.Clear()); 
+        private const int PoolSize = 1000;
+
+        private static readonly ObjectPool<Stack<Type>> StackPool 
+            = new ObjectPool<Stack<Type>>(PoolSize, () => new Stack<Type>(), stack => stack.Clear());
+
+        private static readonly ObjectPool<Dictionary<Type, ILifetimeManager>> MapPool 
+            = new ObjectPool<Dictionary<Type, ILifetimeManager>>(PoolSize, () => new Dictionary<Type, ILifetimeManager>(), map => map.Clear());
+
+        private static readonly ObjectPool<Dictionary<Type, Dictionary<string, ILifetimeManager>>> MultiMapPool
+            = new ObjectPool<Dictionary<Type, Dictionary<string, ILifetimeManager>>>(PoolSize, () => new Dictionary<Type, Dictionary<string, ILifetimeManager>>(), map => map.Clear());
+
+        private static readonly ObjectPool<Dictionary<string, ILifetimeManager>> KeyMapPool
+            = new ObjectPool<Dictionary<string, ILifetimeManager>>(PoolSize, () => new Dictionary<string, ILifetimeManager>(), map => map.Clear());
 
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-        private readonly Dictionary<Type, ILifetimeManager> _lifetimeManagerMap = new Dictionary<Type, ILifetimeManager>();
-        private readonly Dictionary<Type, Dictionary<string, ILifetimeManager>> _multiRegistrationMap = new Dictionary<Type, Dictionary<string, ILifetimeManager>>();
 
-        private int _isDisposed;
+        private Dictionary<Type, ILifetimeManager> _lifetimeManagerMap = MapPool.Acquire();
+        private Dictionary<Type, Dictionary<string, ILifetimeManager>> _multiRegistrationMap = MultiMapPool.Acquire();
+        private bool _isDisposed;
 
         protected readonly ILog Log;
         protected readonly int? MaxDisposeParallelization;
@@ -32,7 +44,7 @@ namespace Tact.Practices.Base
 
             Log = log;
             MaxDisposeParallelization = maxDisposeParallelization;
-
+            
             this.RegisterInstance(log);
         }
 
@@ -43,27 +55,37 @@ namespace Tact.Practices.Base
 
         public Task DisposeAsync(CancellationToken cancelToken)
         {
-            var isDisposed = Interlocked.Increment(ref _isDisposed);
-            if (isDisposed != 1) return Task.CompletedTask;
-
-            ILifetimeManager[] lifetimeManagers;
-
             using (_lock.UseWriteLock())
             {
-                lifetimeManagers = _multiRegistrationMap.Values
-                    .SelectMany(v => v.Values)
-                    .Concat(_lifetimeManagerMap.Values)
-                    .Where(lm => lm.RequiresDispose(this))
-                    .ToArray();
-
-                _multiRegistrationMap.Clear();
-                _lifetimeManagerMap.Clear();
+                if (_isDisposed) return Task.CompletedTask;
+                _isDisposed = true;
             }
 
-            if (lifetimeManagers.Length == 0)
+            // Get all managers that need to be disposed.
+            var lifetimeManagersToDispose = _multiRegistrationMap.Values
+                .SelectMany(v => v.Values)
+                .Concat(_lifetimeManagerMap.Values)
+                .Where(lm => lm.RequiresDispose(this))
+                .ToArray();
+
+            // Return the multi registration entry maps to the pool
+            foreach (var keyMap in _multiRegistrationMap)
+                KeyMapPool.Release(keyMap.Value);
+
+            // Return the multi registration map to the pool
+            MultiMapPool.Release(_multiRegistrationMap);
+            _multiRegistrationMap = null;
+
+            // Return the registration map to the pool
+            MapPool.Release(_lifetimeManagerMap);
+            _lifetimeManagerMap = null;
+
+            // Bail if there is nothing to dispose
+            if (lifetimeManagersToDispose.Length == 0)
                 return Task.CompletedTask;
 
-            return lifetimeManagers.WhenAll(
+            // Dispose async
+            return lifetimeManagersToDispose.WhenAll(
                 cancelToken,
                 (manager, token) => manager.DisposeAsync(this, cancelToken),
                 MaxDisposeParallelization);
@@ -134,6 +156,9 @@ namespace Tact.Practices.Base
             using (EnterPush(type, stack))
             using (_lock.UseReadLock())
             {
+                if (_isDisposed)
+                    throw new ObjectDisposedException(GetType().Name);
+
                 Dictionary<string, ILifetimeManager> registrations;
                 if (_multiRegistrationMap.TryGetValue(type, out registrations))
                 {
@@ -173,6 +198,9 @@ namespace Tact.Practices.Base
         {
             using (_lock.UseWriteLock())
             {
+                if (_isDisposed)
+                    throw new ObjectDisposedException(GetType().Name);
+
                 ILifetimeManager previous;
                 if (_lifetimeManagerMap.TryGetValue(fromType, out previous))
                 {
@@ -193,11 +221,18 @@ namespace Tact.Practices.Base
 
             using (_lock.UseWriteLock())
             {
+                if (_isDisposed)
+                    throw new ObjectDisposedException(GetType().Name);
+
                 Dictionary<string, ILifetimeManager> registrations;
                 if (_multiRegistrationMap.TryGetValue(fromType, out registrations))
                     registrations[key] = lifetimeManager;
                 else
-                    _multiRegistrationMap[fromType] = new Dictionary<string, ILifetimeManager> {{key, lifetimeManager}};
+                {
+                    var keyMap = KeyMapPool.Acquire();
+                    keyMap.Add(key, lifetimeManager);
+                    _multiRegistrationMap[fromType] = keyMap;
+                }
 
                 Log.Debug("Type: {0} - Key: {1} - {2}", fromType.Name, key, lifetimeManager.Description);
             }
@@ -233,6 +268,9 @@ namespace Tact.Practices.Base
             using (EnterPush(type, stack))
             using (_lock.UseReadLock())
             {
+                if (_isDisposed)
+                    throw new ObjectDisposedException(GetType().Name);
+
                 ILifetimeManager lifetimeManager;
                 if (_lifetimeManagerMap.TryGetValue(type, out lifetimeManager))
                 {
@@ -263,6 +301,9 @@ namespace Tact.Practices.Base
             using (EnterPush(type, stack))
             using (_lock.UseReadLock())
             {
+                if (_isDisposed)
+                    throw new ObjectDisposedException(GetType().Name);
+
                 Dictionary<string, ILifetimeManager> registrations;
                 if (_multiRegistrationMap.TryGetValue(type, out registrations))
                     foreach (var lifetimeManager in registrations)
@@ -286,6 +327,12 @@ namespace Tact.Practices.Base
             using (source._lock.UseReadLock())
             using (target._lock.UseWriteLock())
             {
+                if (source._isDisposed)
+                    throw new ObjectDisposedException(source.GetType().Name);
+
+                if (target._isDisposed)
+                    throw new ObjectDisposedException(target.GetType().Name);
+
                 foreach (var pair in source._lifetimeManagerMap)
                 {
                     var clone = pair.Value.BeginScope(target);
@@ -294,7 +341,7 @@ namespace Tact.Practices.Base
 
                 foreach (var pair in source._multiRegistrationMap)
                 {
-                    var clones = new Dictionary<string, ILifetimeManager>();
+                    var clones = KeyMapPool.Acquire();
 
                     foreach (var lifetimeManager in pair.Value)
                     {
