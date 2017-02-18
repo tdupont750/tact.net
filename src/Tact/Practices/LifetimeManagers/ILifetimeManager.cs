@@ -13,6 +13,8 @@ namespace Tact.Practices.LifetimeManagers
 
         object Resolve(Stack<Type> stack);
 
+        bool RequiresDispose(IContainer scope);
+
         Task DisposeAsync(IContainer scope, CancellationToken cancelToken = default(CancellationToken));
     }
 }

@@ -6,6 +6,8 @@ namespace Tact.Practices
 {
     public interface IContainer : IResolver
     {
+        new IContainer BeginScope();
+
         void Register(Type type, ILifetimeManager lifetimeManager);
         void Register(Type type, string key, ILifetimeManager lifetimeManager);
 

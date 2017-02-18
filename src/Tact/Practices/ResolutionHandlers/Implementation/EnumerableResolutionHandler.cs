@@ -7,45 +7,68 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
 {
     public class EnumerableResolutionHandler : IResolutionHandler
     {
-        private static readonly string EnumerablePrefix;
+        // ReSharper disable InconsistentNaming
+        private static readonly string IEnumerablePrefix;
+        private static readonly string ICollectionPrefix;
+        private static readonly string IListPrefix;
+        private static readonly string ListPrefix;
+        
+        // ReSharper restore InconsistentNaming
         private static readonly MethodInfo CreateEnumerableMethodInfo;
 
         static EnumerableResolutionHandler()
         {
-            EnumerablePrefix = typeof(IEnumerable<>).FullName;
+            IEnumerablePrefix = typeof(IEnumerable<>).FullName;
+            ICollectionPrefix = typeof(ICollection<>).FullName;
+            IListPrefix = typeof(IList<>).FullName;
+            ListPrefix = typeof(List<>).FullName;
 
             CreateEnumerableMethodInfo = typeof(EnumerableResolutionHandler)
                 .GetTypeInfo()
                 .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-                .Single(m => m.Name == "CreateEnumerable" && m.IsGenericMethod);
+                .Single(m => m.Name == nameof(CreateEnumerable) && m.IsGenericMethod);
+        }
+
+        private readonly bool _resolveEnumerable;
+        private readonly bool _resolveCollection;
+        private readonly bool _resolveList;
+
+        public EnumerableResolutionHandler(bool resolveEnumerable, bool resolveCollection, bool resolveList)
+        {
+            _resolveEnumerable = resolveEnumerable;
+            _resolveCollection = resolveCollection;
+            _resolveList = resolveList;
         }
 
         public bool TryResolve(
-            IContainer container, 
-            Type type, 
+            IContainer container,
+            Type type,
             Stack<Type> stack,
             bool canThrow,
             out object result)
         {
-            if (!type.FullName.StartsWith(EnumerablePrefix))
+            if ((_resolveEnumerable && type.FullName.StartsWith(IEnumerablePrefix))
+                || (_resolveCollection && type.FullName.StartsWith(ICollectionPrefix))
+                || (_resolveList && type.FullName.StartsWith(IListPrefix))
+                || (_resolveList && type.FullName.StartsWith(ListPrefix)))
             {
-                result = null;
-                return false;
+                var innerType = type.GenericTypeArguments[0];
+                var method = CreateEnumerableMethodInfo.MakeGenericMethod(innerType);
+                result = method.Invoke(this, new object[] {container, stack});
+                return true;
             }
 
-            var innerType = type.GenericTypeArguments[0];
-            var method = CreateEnumerableMethodInfo.MakeGenericMethod(innerType);
-            result = method.Invoke(this, new object[] { container, stack });
-            return true;
+            result = null;
+            return false;
         }
-
+        
         // ReSharper disable once UnusedMember.Local
         private IEnumerable<T> CreateEnumerable<T>(
             IContainer container, 
             Stack<Type> stack)
         {
             var type = typeof(T);
-            return container.ResolveAll(type, stack).Cast<T>();
+            return container.ResolveAll(type, stack).Cast<T>().ToList();
         }
     }
 }

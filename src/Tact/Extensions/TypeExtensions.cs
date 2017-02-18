@@ -14,23 +14,21 @@ namespace Tact
         private static readonly ConcurrentDictionary<Type, Tuple<Result, ConstructorInfo>> ResultMap =
             new ConcurrentDictionary<Type, Tuple<Result, ConstructorInfo>>();
 
+        public static bool HasSingleCostructor(this Type type)
+        {
+            if (type == null)
+                return false;
+
+            var result = ResultMap.GetOrAdd(type, GetConstructorInfo);
+            return result.Item1 == Result.Valid;
+        }
+
         public static ConstructorInfo EnsureSingleCostructor(this Type type)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 
-            var result = ResultMap.GetOrAdd(type, t =>
-            {
-                var typeInfo = type.GetTypeInfo();
-                if (!typeInfo.IsClass)
-                    return Tuple.Create(Result.ClassRequired, (ConstructorInfo) null);
-
-                var constuctors = typeInfo.GetConstructors();
-                if (constuctors.Length != 1)
-                    return Tuple.Create(Result.ConstructorRequired, (ConstructorInfo)null);
-
-                return Tuple.Create(Result.Valid, constuctors[0]);
-            });
+            var result = ResultMap.GetOrAdd(type, GetConstructorInfo);
 
             switch (result.Item1)
             {
@@ -56,6 +54,19 @@ namespace Tact
         public static EfficientInvoker GetPropertyInvoker(this Type type, string propertyName)
         {
             return EfficientInvoker.ForProperty(type, propertyName);
+        }
+
+        private static Tuple<Result, ConstructorInfo> GetConstructorInfo(Type type)
+        {
+            var typeInfo = type.GetTypeInfo();
+            if (!typeInfo.IsClass)
+                return Tuple.Create(Result.ClassRequired, (ConstructorInfo)null);
+
+            var constuctors = typeInfo.GetConstructors();
+            if (constuctors.Length != 1)
+                return Tuple.Create(Result.ConstructorRequired, (ConstructorInfo)null);
+
+            return Tuple.Create(Result.Valid, constuctors[0]);
         }
 
         private enum Result

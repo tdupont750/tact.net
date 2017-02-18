@@ -31,9 +31,15 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public Task DisposeAsync(IContainer scope, CancellationToken cancelToken)
         {
-            return ReferenceEquals(_scope, scope)
+            return RequiresDispose(scope)
                 ? Disposable.Async(_instance, cancelToken)
                 : Task.CompletedTask;
+        }
+
+        public bool RequiresDispose(IContainer scope)
+        {
+            return ReferenceEquals(_scope, scope) 
+                && _instance is IDisposable;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
             CreateFuncMethodInfo = typeof(FuncResolutionHandler)
                 .GetTypeInfo()
                 .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-                .Single(m => m.Name == "CreateFunc" && m.IsGenericMethod);
+                .Single(m => m.Name == nameof(CreateFunc) && m.IsGenericMethod);
         }
         
         public bool TryResolve(

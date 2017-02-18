@@ -17,7 +17,7 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
             CreateLazyMethodInfo = typeof(LazyResolutionHandler)
                 .GetTypeInfo()
                 .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
-                .Single(m => m.Name == "CreateLazy" && m.IsGenericMethod);
+                .Single(m => m.Name == nameof(CreateLazy) && m.IsGenericMethod);
         }
         
         public bool TryResolve(

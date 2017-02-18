@@ -12,10 +12,11 @@ namespace Tact.Practices.Implementation
             ILog log,
             int? maxDisposeParallelization = null,
             bool resolveLazy = true,
-            bool resolveEnumerable = true,
             bool resolveFunc = true,
             bool resolveUnregistered = true,
-            bool throwOnFailedResolve = true)
+            bool resolveEnumerable = true,
+            bool resolveCollection = true,
+            bool resolveList = true)
             : base(log, maxDisposeParallelization)
         {
             ResolutionHandlers = new List<IResolutionHandler>();
@@ -23,17 +24,14 @@ namespace Tact.Practices.Implementation
             if (resolveLazy)
                 ResolutionHandlers.Add(new LazyResolutionHandler());
 
-            if (resolveEnumerable)
-                ResolutionHandlers.Add(new EnumerableResolutionHandler());
+            if (resolveEnumerable || resolveCollection || resolveList)
+                ResolutionHandlers.Add(new EnumerableResolutionHandler(resolveEnumerable, resolveCollection, resolveList));
 
             if (resolveFunc)
                 ResolutionHandlers.Add(new FuncResolutionHandler());
 
             if (resolveUnregistered)
                 ResolutionHandlers.Add(new UnregisteredResolutionHandler());
-
-            if (throwOnFailedResolve)
-                ResolutionHandlers.Add(new ThrowOnFailResolutionHandler());
         }
 
         public TactContainer(ILog log, 

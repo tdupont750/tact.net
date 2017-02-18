@@ -20,6 +20,12 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
                 return false;
             }
 
+            if (!canThrow && !type.HasSingleCostructor())
+            {
+                result = null;
+                return false;
+            }
+
             result = container.CreateInstance(type, stack);
             return true;
         }

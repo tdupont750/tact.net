@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0-*",
+  "version": "1.0.3-*",
 
   "dependencies": {
     "Microsoft.Extensions.Configuration": "1.0.0",
@@ -31,7 +31,7 @@
 
   "scripts": {
     "postcompile": [
-      "dotnet pack --no-build --configuration %compile:Configuration%"
+      "dotnet pack --no-build --configuration %compile:Configuration% --output D:\\Code\\NuGet"
     ]
   }
 }

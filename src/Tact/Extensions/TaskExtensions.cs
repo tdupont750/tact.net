@@ -131,6 +131,12 @@ namespace Tact
                 : null;
         }
 
+        public static void WaitIfNeccessary(this Task task)
+        {
+            if (!task.IsCompleted || task.IsFaulted || task.IsCanceled)
+                task.Wait();
+        }
+
         private static class GenericTask<T>
         {
             public static readonly Task<T> CompletedTask = Task.FromResult(default(T));

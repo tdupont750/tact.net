@@ -68,5 +68,10 @@ namespace Tact.Practices.LifetimeManagers.Implementation
             // Nothing to do dispose
             return Task.CompletedTask;
         }
+
+        public bool RequiresDispose(IContainer scope)
+        {
+            return false;
+        }
     }
 }

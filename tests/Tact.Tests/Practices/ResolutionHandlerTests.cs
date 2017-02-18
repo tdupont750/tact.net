@@ -15,18 +15,11 @@ namespace Tact.Tests.Practices
             using (var resolver = new TactContainer(new InMemoryLog()))
                 Assert.Throws<InvalidOperationException>(() => resolver.Resolve<IOne>());
         }
-
-        [Fact]
-        public void DoNotThrowOnFail()
-        {
-            using (var resolver = new TactContainer(new InMemoryLog(), throwOnFailedResolve: false))
-                Assert.Null(resolver.Resolve<IOne>());
-        }
-
+        
         [Fact]
         public void LazyResolve()
         {
-            using (var resolver = new TactContainer(new InMemoryLog(), throwOnFailedResolve: false))
+            using (var resolver = new TactContainer(new InMemoryLog()))
             {
                 resolver.RegisterSingleton<IOne, One>();
 
@@ -53,7 +46,7 @@ namespace Tact.Tests.Practices
         [Fact]
         public void EnumerableResolve()
         {
-            using (var resolver = new TactContainer(new InMemoryLog(), throwOnFailedResolve: false))
+            using (var resolver = new TactContainer(new InMemoryLog()))
             {
                 resolver.RegisterSingleton<ITwo, One>("Two");
 
@@ -65,7 +58,7 @@ namespace Tact.Tests.Practices
         [Fact]
         public void FuncResolve()
         {
-            using (var resolver = new TactContainer(new InMemoryLog(), throwOnFailedResolve: false))
+            using (var resolver = new TactContainer(new InMemoryLog()))
             {
                 resolver.RegisterSingleton<ITwo, One>();
 

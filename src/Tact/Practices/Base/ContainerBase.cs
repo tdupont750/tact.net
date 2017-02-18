@@ -35,7 +35,7 @@ namespace Tact.Practices.Base
 
         public void Dispose()
         {
-            DisposeAsync(CancellationToken.None).Wait();
+            DisposeAsync(CancellationToken.None).WaitIfNeccessary();
         }
 
         public Task DisposeAsync(CancellationToken cancelToken)
@@ -45,23 +45,31 @@ namespace Tact.Practices.Base
 
             ILifetimeManager[] lifetimeManagers;
 
-            using (_lock.UseReadLock())
+            using (_lock.UseWriteLock())
             {
                 lifetimeManagers = _multiRegistrationMap.Values
                     .SelectMany(v => v.Values)
                     .Concat(_lifetimeManagerMap.Values)
+                    .Where(lm => lm.RequiresDispose(this))
                     .ToArray();
+
+                _multiRegistrationMap.Clear();
+                _lifetimeManagerMap.Clear();
             }
-            
-            return lifetimeManagers.WhenAll(cancelToken, (manager, token) => manager.DisposeAsync(this, cancelToken), MaxDisposeParallelization);
+
+            if (lifetimeManagers.Length == 0)
+                return Task.CompletedTask;
+
+            return lifetimeManagers.WhenAll(
+                cancelToken,
+                (manager, token) => manager.DisposeAsync(this, cancelToken),
+                MaxDisposeParallelization);
         }
 
         public object Resolve(Type type)
         {
             var stack = new Stack<Type>();
-            object result;
-            TryResolve(type, stack, true, out result);
-            return result;
+            return Resolve(type, stack);
         }
 
         public bool TryResolve(Type type, out object result)
@@ -73,8 +81,10 @@ namespace Tact.Practices.Base
         public object Resolve(Type type, Stack<Type> stack)
         {
             object result;
-            TryResolve(type, stack, true, out result);
-            return result;
+            if (TryResolve(type, stack, true, out result))
+                return result;
+
+            throw new InvalidOperationException("No matching registrations found");
         }
 
         public bool TryResolve(Type type, Stack<Type> stack, out object result)
@@ -85,9 +95,7 @@ namespace Tact.Practices.Base
         public object Resolve(Type type, string key)
         {
             var stack = new Stack<Type>();
-            object result;
-            TryResolve(type, key, stack, true, out result);
-            return result;
+            return Resolve(type, key, stack);
         }
 
         public bool TryResolve(Type type, string key, out object result)
@@ -99,8 +107,10 @@ namespace Tact.Practices.Base
         public object Resolve(Type type, string key, Stack<Type> stack)
         {
             object result;
-            TryResolve(type, key, stack, true, out result);
-            return result;
+            if (TryResolve(type, key, stack, true, out result))
+                return result;
+
+            throw new InvalidOperationException("No matching registrations found");
         }
 
         public bool TryResolve(Type type, string key, Stack<Type> stack, out object result)
@@ -144,11 +154,16 @@ namespace Tact.Practices.Base
             return instances;
         }
 
-        public IResolver BeginScope()
+        public IContainer BeginScope()
         {
             var scope = CreateScope();
             InitializeScope(this, scope);
             return scope;
+        }
+
+        IResolver IResolver.BeginScope()
+        {
+            return BeginScope();
         }
 
         public void Register(Type fromType, ILifetimeManager lifetimeManager)
@@ -221,10 +236,8 @@ namespace Tact.Practices.Base
                 }
 
                 foreach (var handler in ResolutionHandlers)
-                {
                     if (handler.TryResolve(this, type, stack, canThrow, out result))
                         return true;
-                }
 
                 result = null;
                 return false;
@@ -257,10 +270,8 @@ namespace Tact.Practices.Base
                 }
 
                 foreach (var resolutionHandler in ResolutionHandlers)
-                {
                     if (resolutionHandler.TryResolve(this, type, stack, canThrow, out result))
                         return true;
-                }
             }
 
             result = null;
