@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Tact.Collections;
@@ -109,7 +110,7 @@ namespace Tact.Practices.Base
             if (TryResolve(type, stack, true, out result))
                 return result;
 
-            throw new InvalidOperationException("No matching registrations found");
+            throw NewNoRegistrationFoundException(type, stack);
         }
 
         public bool TryResolve(Type type, Stack<Type> stack, out object result)
@@ -135,7 +136,7 @@ namespace Tact.Practices.Base
             if (TryResolve(type, key, stack, true, out result))
                 return result;
 
-            throw new InvalidOperationException("No matching registrations found");
+            throw NewNoRegistrationFoundException(type, stack);
         }
 
         public bool TryResolve(Type type, string key, Stack<Type> stack, out object result)
@@ -360,6 +361,33 @@ namespace Tact.Practices.Base
                 throw new InvalidOperationException("Recursive resolution detected");
 
             return new DisposablePush(type, stack);
+        }
+
+        private static InvalidOperationException NewNoRegistrationFoundException(Type type, Stack<Type> stack)
+        {
+            var sb = new StringBuilder();
+
+            sb.Append("No matching registrations found - Type: ");
+            sb.Append(type.Name);
+            sb.Append(" - Stack: ");
+
+            if (stack.Count == 0)
+                sb.Append("None");
+            else
+            {
+                var t = stack.Pop();
+                sb.Append(t.Name);
+
+                while (stack.Count > 0)
+                {
+                    t = stack.Pop();
+                    sb.Append(", ");
+                    sb.Append(t.Name);
+                }   
+            }
+
+            var message = sb.ToString();
+            return new InvalidOperationException(message);
         }
 
         private struct DisposablePush : IDisposable
