@@ -135,77 +135,7 @@ namespace Tact
         }
 
         #endregion
-
-        #region Register Per Resolve
         
-        public static void RegisterPerResolve<T>(this IContainer container, Func<IResolver, T> factory = null)
-            where T : class
-        {
-            var type = typeof(T);
-            container.RegisterPerResolve(type, factory);
-        }
-
-        public static void RegisterPerResolve(this IContainer container, Type type, Func<IResolver, object> factory = null)
-        {
-            if (container == null)
-                throw new ArgumentNullException(nameof(container));
-
-            if (factory == null)
-            {
-                container.RegisterPerResolve(type, type);
-                return;
-            }
-
-            var lifetimeManager = new PerResolveLifetimeManager(type, container, factory);
-            container.Register(type, lifetimeManager);
-        }
-        
-        public static void RegisterPerResolve<T>(this IContainer container, string key, Func<IResolver, T> factory = null)
-            where T : class
-        {
-            var type = typeof(T);
-            container.RegisterPerResolve(type, key, factory);
-        }
-
-        public static void RegisterPerResolve(this IContainer container, Type type, string key, Func<IResolver, object> factory = null)
-        {
-            if (container == null)
-                throw new ArgumentNullException(nameof(container));
-
-            if (factory == null)
-            {
-                container.RegisterPerResolve(type, type, key);
-                return;
-            }
-
-            var lifetimeManager = new PerResolveLifetimeManager(type, container, factory);
-            container.Register(type, key, lifetimeManager);
-        }
-        
-        public static void RegisterPerResolve<TFrom, TTo>(this IContainer container, string key = null)
-            where TTo : class, TFrom
-        {
-            var fromType = typeof(TFrom);
-            var toType = typeof(TTo);
-            container.RegisterPerResolve(fromType, toType, key);
-        }
-
-        public static void RegisterPerResolve(this IContainer container, Type fromType, Type toType, string key = null)
-        {
-            if (container == null)
-                throw new ArgumentNullException(nameof(container));
-
-            toType.EnsureSingleCostructor();
-            var lifetimeManager = new PerResolveLifetimeManager(toType, container);
-
-            if (string.IsNullOrWhiteSpace(key))
-                container.Register(fromType, lifetimeManager);
-            else
-                container.Register(fromType, key, lifetimeManager);
-        }
-
-        #endregion
-
         #region Register Per Scope
         
         public static void RegisterPerScope<T>(this IContainer container, Func<IResolver, T> factory = null)

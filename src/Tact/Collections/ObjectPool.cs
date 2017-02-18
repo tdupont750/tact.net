@@ -7,6 +7,7 @@ namespace Tact.Collections
     public class ObjectPool<T> : IDisposable
     {
         private readonly Func<T> _factory;
+        private readonly Action<T> _onRelease;
         private readonly T[] _pool;
         private readonly int _maxSize;
 
@@ -16,7 +17,7 @@ namespace Tact.Collections
         private int _index = -1;
         private bool _isDisposed;
 
-        public ObjectPool(int maxSize, Func<T> factory)
+        public ObjectPool(int maxSize, Func<T> factory, Action<T> onRelease = null)
         {
             if (maxSize == 0)
                 throw new ArgumentException("Max size is required", nameof(maxSize));
@@ -25,6 +26,7 @@ namespace Tact.Collections
                 throw new ArgumentNullException(nameof(factory));
 
             _factory = factory;
+            _onRelease = onRelease;
             _pool = new T[maxSize];
             _maxSize = maxSize - 1;
         }
@@ -74,6 +76,8 @@ namespace Tact.Collections
 
         public bool Release(T value)
         {
+            _onRelease?.Invoke(value);
+
             var nextTicket = EnterLock();
             var result = !_isDisposed && _index != _maxSize;
 
@@ -143,6 +147,11 @@ namespace Tact.Collections
             public void Dispose()
             {
                 _pool.Release(Value);
+            }
+
+            public static implicit operator T(UsableValue usableValue)
+            {
+                return usableValue.Value;
             }
         }
     }

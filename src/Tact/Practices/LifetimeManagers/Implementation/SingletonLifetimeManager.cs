@@ -35,12 +35,10 @@ namespace Tact.Practices.LifetimeManagers.Implementation
                 return _instance;
 
             lock (_lock)
-            {
-                if (_instance != null)
-                    return _instance;
+                if (_instance == null)
+                    _instance = _factory?.Invoke(_scope) ?? _scope.CreateInstance(_toType, stack);
 
-                return _instance = _factory?.Invoke(_scope) ?? _scope.CreateInstance(_toType, stack);
-            }
+            return _instance;
         }
 
         public Task DisposeAsync(IContainer scope, CancellationToken cancelToken)

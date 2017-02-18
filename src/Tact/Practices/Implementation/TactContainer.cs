@@ -19,30 +19,32 @@ namespace Tact.Practices.Implementation
             bool resolveList = true)
             : base(log, maxDisposeParallelization)
         {
-            ResolutionHandlers = new List<IResolutionHandler>();
+            var resolutionHandlers = new List<IResolutionHandler>();
 
             if (resolveLazy)
-                ResolutionHandlers.Add(new LazyResolutionHandler());
+                resolutionHandlers.Add(new LazyResolutionHandler());
 
             if (resolveEnumerable || resolveCollection || resolveList)
-                ResolutionHandlers.Add(new EnumerableResolutionHandler(resolveEnumerable, resolveCollection, resolveList));
+                resolutionHandlers.Add(new EnumerableResolutionHandler(resolveEnumerable, resolveCollection, resolveList));
 
             if (resolveFunc)
-                ResolutionHandlers.Add(new FuncResolutionHandler());
+                resolutionHandlers.Add(new FuncResolutionHandler());
 
             if (resolveUnregistered)
-                ResolutionHandlers.Add(new UnregisteredResolutionHandler());
+                resolutionHandlers.Add(new UnregisteredResolutionHandler());
+
+            ResolutionHandlers = resolutionHandlers;
         }
 
         public TactContainer(ILog log, 
-            IList<IResolutionHandler> resolutionHandlers,
+            IReadOnlyList<IResolutionHandler> resolutionHandlers,
             int? maxDisposeParallelization = null)
             : base(log, maxDisposeParallelization)
         {
             ResolutionHandlers = resolutionHandlers ?? new List<IResolutionHandler>();
         }
 
-        protected override IList<IResolutionHandler> ResolutionHandlers { get; }
+        protected override IReadOnlyList<IResolutionHandler> ResolutionHandlers { get; }
 
         protected override ContainerBase CreateScope()
         {

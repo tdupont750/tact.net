@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Tact.Collections;
 using Tact.Diagnostics;
 using Tact.Practices.LifetimeManagers;
 using Tact.Practices.ResolutionHandlers;
@@ -11,6 +12,8 @@ namespace Tact.Practices.Base
 {
     public abstract class ContainerBase : IContainer
     {
+        private static readonly ObjectPool<Stack<Type>> StackPool = new ObjectPool<Stack<Type>>(100, () => new Stack<Type>(), stack => stack.Clear()); 
+
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         private readonly Dictionary<Type, ILifetimeManager> _lifetimeManagerMap = new Dictionary<Type, ILifetimeManager>();
         private readonly Dictionary<Type, Dictionary<string, ILifetimeManager>> _multiRegistrationMap = new Dictionary<Type, Dictionary<string, ILifetimeManager>>();
@@ -20,7 +23,7 @@ namespace Tact.Practices.Base
         protected readonly ILog Log;
         protected readonly int? MaxDisposeParallelization;
 
-        protected abstract IList<IResolutionHandler> ResolutionHandlers { get; }
+        protected abstract IReadOnlyList<IResolutionHandler> ResolutionHandlers { get; }
 
         protected ContainerBase(ILog log, int? maxDisposeParallelization)
         {
@@ -68,14 +71,14 @@ namespace Tact.Practices.Base
 
         public object Resolve(Type type)
         {
-            var stack = new Stack<Type>();
-            return Resolve(type, stack);
+            using (var stack = StackPool.Use())
+                return Resolve(type, stack);
         }
 
         public bool TryResolve(Type type, out object result)
         {
-            var stack = new Stack<Type>();
-            return TryResolve(type, stack, false, out result);
+            using (var stack = StackPool.Use())
+                return TryResolve(type, stack, false, out result);
         }
 
         public object Resolve(Type type, Stack<Type> stack)
@@ -94,14 +97,14 @@ namespace Tact.Practices.Base
 
         public object Resolve(Type type, string key)
         {
-            var stack = new Stack<Type>();
-            return Resolve(type, key, stack);
+            using (var stack = StackPool.Use())
+                return Resolve(type, key, stack);
         }
 
         public bool TryResolve(Type type, string key, out object result)
         {
-            var stack = new Stack<Type>();
-            return TryResolve(type, key, stack, false, out result);
+            using (var stack = StackPool.Use())
+                return TryResolve(type, key, stack, false, out result);
         }
 
         public object Resolve(Type type, string key, Stack<Type> stack)
@@ -120,8 +123,8 @@ namespace Tact.Practices.Base
 
         public IEnumerable<object> ResolveAll(Type type)
         {
-            var stack = new Stack<Type>();
-            return ResolveAll(type, stack);
+            using (var stack = StackPool.Use())
+                return ResolveAll(type, stack);
         }
 
         public IEnumerable<object> ResolveAll(Type type, Stack<Type> stack)
@@ -131,9 +134,9 @@ namespace Tact.Practices.Base
             using (EnterPush(type, stack))
             using (_lock.UseReadLock())
             {
-                if (_multiRegistrationMap.ContainsKey(type))
+                Dictionary<string, ILifetimeManager> registrations;
+                if (_multiRegistrationMap.TryGetValue(type, out registrations))
                 {
-                    var registrations = _multiRegistrationMap[type];
                     foreach (var lifetimeManager in registrations.Values)
                     {
                         var instance = lifetimeManager.Resolve(stack);
@@ -170,9 +173,9 @@ namespace Tact.Practices.Base
         {
             using (_lock.UseWriteLock())
             {
-                if (_lifetimeManagerMap.ContainsKey(fromType))
+                ILifetimeManager previous;
+                if (_lifetimeManagerMap.TryGetValue(fromType, out previous))
                 {
-                    var previous = _lifetimeManagerMap[fromType];
                     Log.Debug("Type: {0} - {1} - Replaced {2}", fromType.Name, lifetimeManager.Description,
                         previous.Description);
                 }
@@ -190,8 +193,9 @@ namespace Tact.Practices.Base
 
             using (_lock.UseWriteLock())
             {
-                if (_multiRegistrationMap.ContainsKey(fromType))
-                    _multiRegistrationMap[fromType][key] = lifetimeManager;
+                Dictionary<string, ILifetimeManager> registrations;
+                if (_multiRegistrationMap.TryGetValue(fromType, out registrations))
+                    registrations[key] = lifetimeManager;
                 else
                     _multiRegistrationMap[fromType] = new Dictionary<string, ILifetimeManager> {{key, lifetimeManager}};
 
@@ -229,9 +233,10 @@ namespace Tact.Practices.Base
             using (EnterPush(type, stack))
             using (_lock.UseReadLock())
             {
-                if (_lifetimeManagerMap.ContainsKey(type))
+                ILifetimeManager lifetimeManager;
+                if (_lifetimeManagerMap.TryGetValue(type, out lifetimeManager))
                 {
-                    result = _lifetimeManagerMap[type].Resolve(stack);
+                    result = lifetimeManager.Resolve(stack);
                     return true;
                 }
 
@@ -258,16 +263,14 @@ namespace Tact.Practices.Base
             using (EnterPush(type, stack))
             using (_lock.UseReadLock())
             {
-                if (_multiRegistrationMap.ContainsKey(type))
-                {
-                    var registrations = _multiRegistrationMap[type];
+                Dictionary<string, ILifetimeManager> registrations;
+                if (_multiRegistrationMap.TryGetValue(type, out registrations))
                     foreach (var lifetimeManager in registrations)
                         if (lifetimeManager.Key == key)
                         {
                             result = lifetimeManager.Value.Resolve(stack);
                             return true;
                         }
-                }
 
                 foreach (var resolutionHandler in ResolutionHandlers)
                     if (resolutionHandler.TryResolve(this, type, stack, canThrow, out result))
