@@ -1,21 +1,11 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection;
-using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices;
 using Tact.Practices.Implementation;
-using Tact.Tests.Collections;
-using Tact.Tests.ComponentModel.DataAnnotations;
 using Tact.Tests.Console.Services;
-using Tact.Tests.Extensions;
-using Tact.Tests.Net.Http;
-using Tact.Tests.Practices;
-using Tact.Tests.Reflection;
-using Tact.Tests.Threading;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Tact.Tests.Console
 {
@@ -23,12 +13,7 @@ namespace Tact.Tests.Console
     {
         public static void Main(string[] args)
         {
-            Thread.Sleep(1000);
-            
             Demo();
-            RunTests();
-
-            Thread.Sleep(1000);
         }
         
         private static void Demo()
@@ -79,115 +64,6 @@ namespace Tact.Tests.Console
             Assert.Equal(11, logger.LogLines.Count);
 
             return container;
-        }
-
-        private static void RunTests()
-        {
-            System.Console.WriteLine("Start...");
-
-            new JsonContentTest().ReadAsString();
-
-            new PerResolveLifetimeManagerTests().RegisterPerResolve();
-
-            new PerScopeLifetimeManagerTests().RegisterPerScope();
-
-            new ResolutionHandlerTests().ClassRequired();
-            new ResolutionHandlerTests().ConstructorRequired();
-            new ResolutionHandlerTests().DoNotThrowOnFail();
-            new ResolutionHandlerTests().EnumerableResolve();
-            new ResolutionHandlerTests().FuncResolve();
-            new ResolutionHandlerTests().LazyResolve();
-            new ResolutionHandlerTests().PreventRecursion();
-            new ResolutionHandlerTests().ThrowOnFail();
-
-            new SingletonLifetimeManagerTests().RegisterSingleton();
-            new SingletonLifetimeManagerTests().RegisterSingletonInstance();
-
-            new TransientLifetimeManagerTests().RegisterTransient();
-
-            new ProxyLifetimeManagerTests().PerScopeProxy();
-            new ProxyLifetimeManagerTests().SingletonProxy();
-            new ProxyLifetimeManagerTests().KeyProxy();
-
-            new TaskExtensionTests().IgnoreCancellation().Wait();
-            new TaskExtensionTests().IgnoreCancellationWithToken().Wait();
-            new TaskExtensionTests().IgnoreCancellationWithInvalidToken().Wait();
-            new TaskExtensionTests().IgnoreCancellationWithException().Wait();
-            new TaskExtensionTests().GenericIgnoreCancellation().Wait();
-            new TaskExtensionTests().GenericIgnoreCancellationWithToken().Wait();
-            new TaskExtensionTests().GenericIgnoreCancellationWithInvalidToken().Wait();
-            new TaskExtensionTests().GenericIgnoreCancellationWithException().Wait();
-            new TaskExtensionTests().GetResult();
-
-            new TypeExtensionTests().DefaultConstructor();
-            new TypeExtensionTests().OneConstructor();
-            new TypeExtensionTests().TwoConstructors();
-
-            new EnumerableExtensionTests().WhenAll().Wait();
-            new EnumerableExtensionTests().BailAfterFirstException().Wait();
-
-            new CollectionExtensionTests().OrderedResults().Wait();
-
-            new RequireNonDefaultTests().AllErrors();
-            new RequireNonDefaultTests().NoErrors();
-            new RequireNonDefaultTests().Strings();
-            new RequireNonDefaultTests().NoAttributes();
-
-            new IsEnabledAttributeTests().ValidIsEnabled();
-            new IsEnabledAttributeTests().InvalidIsEnabled();
-            new IsEnabledAttributeTests().ValidNotEnabled();
-            new IsEnabledAttributeTests().InvalidNotEnabled();
-            new IsEnabledAttributeTests().InvalidIsEnabledModelTest();
-
-            new RegisterByAttributesTests().RegisterByAttribute();
-
-            new RegisterConditionTests().ShouldRegisterFalse();
-            new RegisterConditionTests().ShouldRegisterTrue();
-
-            new DisposableTests().AsyncDisposableTest().Wait();
-            new DisposableTests().DisposableTest().Wait();
-            new DisposableTests().NonDisposableTest().Wait();
-
-            new UsingTests().UsingTest().Wait();
-            new UsingTests().UsingThrows().Wait();
-
-            new SemaphoreSlimExtensionTests().UseAsync().Wait();
-            new ReaderWriterLockSlimExtensionTests().Use();
-            
-            new EfficientInvokerTests(new TestOutputHelper()).NoResultDelegate();
-            new EfficientInvokerTests(new TestOutputHelper()).DelegateComparison();
-            new EfficientInvokerTests(new TestOutputHelper()).MethodComparison();
-            new EfficientInvokerTests(new TestOutputHelper()).PropertyComparison();
-            new EfficientInvokerTests(new TestOutputHelper()).InvokeAsync().Wait();
-
-            new ObjectPoolTests(new TestOutputHelper()).AcquireAndRelease();
-            new ObjectPoolTests(new TestOutputHelper()).Parallelism(2).Wait();
-            new ObjectPoolTests(new TestOutputHelper()).Parallelism(4).Wait();
-            new ObjectPoolTests(new TestOutputHelper()).Parallelism(6).Wait();
-            new ObjectPoolTests(new TestOutputHelper()).Parallelism(8).Wait();
-            new ObjectPoolTests(new TestOutputHelper()).Use();
-            new ObjectPoolTests(new TestOutputHelper()).TryAcquire();
-
-            System.Console.WriteLine("...Complete");
-            System.Console.ReadLine();
-        }
-
-        public class TestOutputHelper : ITestOutputHelper
-        {
-            public ConcurrentQueue<string> Lines { get; } = new ConcurrentQueue<string>();
-
-            public void WriteLine(string message)
-            {
-                Lines.Enqueue(message);
-                System.Console.WriteLine(message);
-            }
-
-            public void WriteLine(string format, params object[] args)
-            {
-                var message = string.Format(format, args);
-                Lines.Enqueue(message);
-                System.Console.WriteLine(message);
-            }
         }
     }
 }

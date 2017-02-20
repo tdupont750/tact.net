@@ -2,7 +2,7 @@
   "version": "1.0.0-*",
 
   "dependencies": {
-    "NETStandard.Library": "1.6.0",
+    "NETStandard.Library": "1.6.1",
     "NLog": "5.0.0-beta03",
     "Tact": "1.0.0-*"
   },
@@ -17,14 +17,14 @@
 
   "authors": [ "Tom DuPont" ],
   "copyright": "2016 Tom DuPont",
-  "description": "A NLog library for Tact.NET - A tactful collection of utilities for .NET development.",
+  "description": "A WebSocket server for ASP.NET Core - A tactful collection of utilities for .NET development.",
 
   "packOptions": {
     "iconUrl": "https://sites.google.com/site/tdupont750/Tact_NET_S.png",
     "language": "en-us",
     "licenseUrl": "http://www.opensource.org/licenses/MIT",
     "projectUrl": "https://github.com/tdupont750/tact.net",
-    "title": "Tact.NET - NLog"
+    "title": "Tact.NET - AspNetCore.WebSockets.Server"
   },
 
   "scripts": {

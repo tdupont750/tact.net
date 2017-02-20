@@ -4,12 +4,12 @@
 
   "dependencies": {
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
-    "Microsoft.Extensions.Configuration": "1.1.0",
+    "Microsoft.AspNetCore.Hosting": "1.1.0",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.1.0",
     "Microsoft.NETCore.App": "1.1.0",
-    "Tact.Configuration": "1.0.0-*",
-    "Tact": "1.0.0-*",
-    "xunit": "2.2.0",
-    "Tact.Json": "1.0.0-*"
+    "Tact.AspNetCore.WebSockets.Server": "1.0.0-*",
+    "WebSocket4Net": "0.15.0-beta6",
+    "xunit": "2.2.0"
   },
 
   "frameworks": {

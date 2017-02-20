@@ -6,21 +6,22 @@
   },
 
   "dependencies": {
-    "Microsoft.Extensions.Configuration.Json": "1.0.0",
-    "Microsoft.NETCore.App": {
-      "type": "platform",
-      "version": "1.0.1"
-    },
+    "Microsoft.Extensions.Configuration.Json": "1.1.0",
+    "Microsoft.NETCore.App": "1.1.0",
     "Tact": "1.0.0-*",
-    "Tact.Tests": "1.0.0-*",
-    "xunit": "2.2.0-beta4-build3444",
-    "xunit.core": "2.2.0-beta4-build3444",
-    "xunit.runner.console": "2.2.0-beta4-build3444"
+    "Tact.Configuration": "1.0.0-*",
+    "xunit": "2.2.0",
+    "xunit.core": "2.2.0",
+    "xunit.runner.console": "2.2.0"
   },
 
   "frameworks": {
     "netcoreapp1.0": {
       "imports": "dnxcore50"
     }
+  },
+
+  "runtimes": {
+     "win10-x64": {}
   }
 }

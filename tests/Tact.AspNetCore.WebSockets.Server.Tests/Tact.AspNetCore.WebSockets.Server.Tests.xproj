@@ -6,8 +6,8 @@
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\DotNet\Microsoft.DotNet.Props" Condition="'$(VSToolsPath)' != ''" />
   <PropertyGroup Label="Globals">
-    <ProjectGuid>33f16b6b-8e20-4655-b7aa-b502b71cfcbf</ProjectGuid>
-    <RootNamespace>Tact.Tests</RootNamespace>
+    <ProjectGuid>623fa08d-ef5a-4b9c-ae72-1a15c595c721</ProjectGuid>
+    <RootNamespace>Tact.AspNetCore.WebSockets.Server.Tests</RootNamespace>
     <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)'=='' ">.\obj</BaseIntermediateOutputPath>
     <OutputPath Condition="'$(OutputPath)'=='' ">.\bin\</OutputPath>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>

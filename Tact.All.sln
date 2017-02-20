@@ -24,6 +24,10 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.NLog", "src\Tact.NLog\
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.Json", "src\Tact.Json\Tact.Json.xproj", "{8C8C0581-52BF-482B-B248-6A9E367F9C0E}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.AspNetCore.WebSockets.Server", "src\Tact.AspNetCore.WebSockets.Server\Tact.AspNetCore.WebSockets.Server.xproj", "{A1CDD115-7BB7-4EB4-B0D4-9438267ABB42}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.AspNetCore.WebSockets.Server.Tests", "tests\Tact.AspNetCore.WebSockets.Server.Tests\Tact.AspNetCore.WebSockets.Server.Tests.xproj", "{623FA08D-EF5A-4B9C-AE72-1A15C595C721}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -54,6 +58,14 @@ Global
 		{8C8C0581-52BF-482B-B248-6A9E367F9C0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C8C0581-52BF-482B-B248-6A9E367F9C0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C8C0581-52BF-482B-B248-6A9E367F9C0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1CDD115-7BB7-4EB4-B0D4-9438267ABB42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1CDD115-7BB7-4EB4-B0D4-9438267ABB42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1CDD115-7BB7-4EB4-B0D4-9438267ABB42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1CDD115-7BB7-4EB4-B0D4-9438267ABB42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{623FA08D-EF5A-4B9C-AE72-1A15C595C721}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{623FA08D-EF5A-4B9C-AE72-1A15C595C721}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{623FA08D-EF5A-4B9C-AE72-1A15C595C721}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{623FA08D-EF5A-4B9C-AE72-1A15C595C721}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,5 +77,7 @@ Global
 		{A1ACB709-4D2F-413A-BF49-3BD9488C7223} = {F3EDD686-646A-4EDD-B54B-8C32DF7F7906}
 		{3CADBED6-DB9F-48E0-97EB-79B09E53831C} = {F3EDD686-646A-4EDD-B54B-8C32DF7F7906}
 		{8C8C0581-52BF-482B-B248-6A9E367F9C0E} = {F3EDD686-646A-4EDD-B54B-8C32DF7F7906}
+		{A1CDD115-7BB7-4EB4-B0D4-9438267ABB42} = {F3EDD686-646A-4EDD-B54B-8C32DF7F7906}
+		{623FA08D-EF5A-4B9C-AE72-1A15C595C721} = {3958FA43-9C0E-40A7-8BB1-52337DAD77C4}
 	EndGlobalSection
 EndGlobal
