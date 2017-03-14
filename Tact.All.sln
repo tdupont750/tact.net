@@ -1,32 +1,29 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.4
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F3EDD686-646A-4EDD-B54B-8C32DF7F7906}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{077DC803-4FE4-4D00-9C99-A3A01E89502C}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact", "src\Tact\Tact.xproj", "{3AEC4A57-FE2E-4B87-9EB9-7A1FD3346E37}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{3958FA43-9C0E-40A7-8BB1-52337DAD77C4}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.Tests", "tests\Tact.Tests\Tact.Tests.xproj", "{33F16B6B-8E20-4655-B7AA-B502B71CFCBF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tact", "src\Tact\Tact.csproj", "{3AEC4A57-FE2E-4B87-9EB9-7A1FD3346E37}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.Tests.Console", "tests\Tact.Tests.Console\Tact.Tests.Console.xproj", "{4D1DAE9A-0020-4CEE-B482-0148F24C0E42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tact.Tests", "tests\Tact.Tests\Tact.Tests.csproj", "{33F16B6B-8E20-4655-B7AA-B502B71CFCBF}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.Configuration", "src\Tact.Configuration\Tact.Configuration.xproj", "{A1ACB709-4D2F-413A-BF49-3BD9488C7223}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tact.Tests.Console", "tests\Tact.Tests.Console\Tact.Tests.Console.csproj", "{4D1DAE9A-0020-4CEE-B482-0148F24C0E42}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.NLog", "src\Tact.NLog\Tact.NLog.xproj", "{3CADBED6-DB9F-48E0-97EB-79B09E53831C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tact.Configuration", "src\Tact.Configuration\Tact.Configuration.csproj", "{A1ACB709-4D2F-413A-BF49-3BD9488C7223}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.Json", "src\Tact.Json\Tact.Json.xproj", "{8C8C0581-52BF-482B-B248-6A9E367F9C0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tact.NLog", "src\Tact.NLog\Tact.NLog.csproj", "{3CADBED6-DB9F-48E0-97EB-79B09E53831C}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.AspNetCore.WebSockets.Server", "src\Tact.AspNetCore.WebSockets.Server\Tact.AspNetCore.WebSockets.Server.xproj", "{A1CDD115-7BB7-4EB4-B0D4-9438267ABB42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tact.Json", "src\Tact.Json\Tact.Json.csproj", "{8C8C0581-52BF-482B-B248-6A9E367F9C0E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Tact.AspNetCore.WebSockets.Server.Tests", "tests\Tact.AspNetCore.WebSockets.Server.Tests\Tact.AspNetCore.WebSockets.Server.Tests.xproj", "{623FA08D-EF5A-4B9C-AE72-1A15C595C721}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tact.AspNetCore.WebSockets.Server", "src\Tact.AspNetCore.WebSockets.Server\Tact.AspNetCore.WebSockets.Server.csproj", "{A1CDD115-7BB7-4EB4-B0D4-9438267ABB42}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tact.AspNetCore.WebSockets.Server.Tests", "tests\Tact.AspNetCore.WebSockets.Server.Tests\Tact.AspNetCore.WebSockets.Server.Tests.csproj", "{623FA08D-EF5A-4B9C-AE72-1A15C595C721}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
