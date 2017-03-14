@@ -24,12 +24,14 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public virtual string Description => $"Singleton: {_toType.Name}";
 
+        public virtual bool IsScoped => false;
+
         public virtual ILifetimeManager BeginScope(IContainer scope)
         {
-            return this;
+            throw new NotImplementedException();
         }
 
-        public object Resolve(Stack<Type> stack)
+        public object Resolve(IContainer scope, Stack<Type> stack)
         {
             if (_instance != null)
                 return _instance;

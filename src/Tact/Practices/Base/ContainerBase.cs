@@ -13,24 +13,12 @@ namespace Tact.Practices.Base
 {
     public abstract class ContainerBase : IContainer
     {
-        private const int PoolSize = 1000;
-
-        private static readonly ObjectPool<Stack<Type>> StackPool 
-            = new ObjectPool<Stack<Type>>(PoolSize, () => new Stack<Type>(), stack => stack.Clear());
-
-        private static readonly ObjectPool<Dictionary<Type, ILifetimeManager>> MapPool 
-            = new ObjectPool<Dictionary<Type, ILifetimeManager>>(PoolSize, () => new Dictionary<Type, ILifetimeManager>(), map => map.Clear());
-
-        private static readonly ObjectPool<Dictionary<Type, Dictionary<string, ILifetimeManager>>> MultiMapPool
-            = new ObjectPool<Dictionary<Type, Dictionary<string, ILifetimeManager>>>(PoolSize, () => new Dictionary<Type, Dictionary<string, ILifetimeManager>>(), map => map.Clear());
-
-        private static readonly ObjectPool<Dictionary<string, ILifetimeManager>> KeyMapPool
-            = new ObjectPool<Dictionary<string, ILifetimeManager>>(PoolSize, () => new Dictionary<string, ILifetimeManager>(), map => map.Clear());
-
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private readonly Dictionary<Type, ILifetimeManager> _lifetimeManagerMap;
+        private readonly Dictionary<Type, Dictionary<string, ILifetimeManager>> _multiRegistrationMap;
+        private readonly List<Type> _scopedKeys;
+        private readonly List<Type> _multiScopedKeys;
 
-        private Dictionary<Type, ILifetimeManager> _lifetimeManagerMap = MapPool.Acquire();
-        private Dictionary<Type, Dictionary<string, ILifetimeManager>> _multiRegistrationMap = MultiMapPool.Acquire();
         private bool _isDisposed;
 
         protected readonly ILog Log;
@@ -39,13 +27,32 @@ namespace Tact.Practices.Base
         protected abstract IReadOnlyList<IResolutionHandler> ResolutionHandlers { get; }
 
         protected ContainerBase(ILog log, int? maxDisposeParallelization)
+            : this(
+                  log,
+                  maxDisposeParallelization,
+                  new Dictionary<Type, ILifetimeManager>(),
+                  new Dictionary<Type, Dictionary<string, ILifetimeManager>>(),
+                  new List<Type>(),
+                  new List<Type>())
         {
-            if (log == null)
-                throw new ArgumentNullException(nameof(log));
+        }
 
-            Log = log;
+        protected ContainerBase(
+            ILog log, 
+            int? maxDisposeParallelization, 
+            Dictionary<Type, ILifetimeManager> lifetimeManagerMap, 
+            Dictionary<Type, Dictionary<string, ILifetimeManager>> multiRegistrationMap,
+            List<Type> scopedKeys,
+            List<Type> multiScopedKeys)
+        {
+            _lifetimeManagerMap = lifetimeManagerMap;
+            _multiRegistrationMap = multiRegistrationMap;
+            _scopedKeys = scopedKeys;
+            _multiScopedKeys = multiScopedKeys;
+
+            Log = log ?? throw new ArgumentNullException(nameof(log));
             MaxDisposeParallelization = maxDisposeParallelization;
-            
+
             this.RegisterInstance(log);
         }
 
@@ -69,18 +76,6 @@ namespace Tact.Practices.Base
                 .Where(lm => lm.RequiresDispose(this))
                 .ToArray();
 
-            // Return the multi registration entry maps to the pool
-            foreach (var keyMap in _multiRegistrationMap)
-                KeyMapPool.Release(keyMap.Value);
-
-            // Return the multi registration map to the pool
-            MultiMapPool.Release(_multiRegistrationMap);
-            _multiRegistrationMap = null;
-
-            // Return the registration map to the pool
-            MapPool.Release(_lifetimeManagerMap);
-            _lifetimeManagerMap = null;
-
             // Bail if there is nothing to dispose
             if (lifetimeManagersToDispose.Length == 0)
                 return Task.CompletedTask;
@@ -94,20 +89,19 @@ namespace Tact.Practices.Base
 
         public object Resolve(Type type)
         {
-            using (var stack = StackPool.Use())
-                return Resolve(type, stack);
+            var stack = new Stack<Type>();
+            return Resolve(type, stack);
         }
 
         public bool TryResolve(Type type, out object result)
         {
-            using (var stack = StackPool.Use())
-                return TryResolve(type, stack, false, out result);
+            var stack = new Stack<Type>();
+            return TryResolve(type, stack, false, out result);
         }
 
         public object Resolve(Type type, Stack<Type> stack)
         {
-            object result;
-            if (TryResolve(type, stack, true, out result))
+            if (TryResolve(type, stack, true, out object result))
                 return result;
 
             throw NewNoRegistrationFoundException(type, stack);
@@ -120,20 +114,19 @@ namespace Tact.Practices.Base
 
         public object Resolve(Type type, string key)
         {
-            using (var stack = StackPool.Use())
-                return Resolve(type, key, stack);
+            var stack = new Stack<Type>();
+            return Resolve(type, key, stack);
         }
 
         public bool TryResolve(Type type, string key, out object result)
         {
-            using (var stack = StackPool.Use())
-                return TryResolve(type, key, stack, false, out result);
+            var stack = new Stack<Type>();
+            return TryResolve(type, key, stack, false, out result);
         }
 
         public object Resolve(Type type, string key, Stack<Type> stack)
         {
-            object result;
-            if (TryResolve(type, key, stack, true, out result))
+            if (TryResolve(type, key, stack, true, out object result))
                 return result;
 
             throw NewNoRegistrationFoundException(type, stack);
@@ -146,8 +139,8 @@ namespace Tact.Practices.Base
 
         public IEnumerable<object> ResolveAll(Type type)
         {
-            using (var stack = StackPool.Use())
-                return ResolveAll(type, stack);
+            var stack = new Stack<Type>();
+            return ResolveAll(type, stack);
         }
 
         public IEnumerable<object> ResolveAll(Type type, Stack<Type> stack)
@@ -160,24 +153,16 @@ namespace Tact.Practices.Base
                 if (_isDisposed)
                     throw new ObjectDisposedException(GetType().Name);
 
-                Dictionary<string, ILifetimeManager> registrations;
-                if (_multiRegistrationMap.TryGetValue(type, out registrations))
-                {
+                if (_multiRegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
                     foreach (var lifetimeManager in registrations.Values)
                     {
-                        var instance = lifetimeManager.Resolve(stack);
+                        var instance = lifetimeManager.Resolve(this, stack);
                         instances.Add(instance);
                     }
-                }
-                else 
-                {
+                else
                     foreach (var resolutionHandler in ResolutionHandlers)
-                    {
-                        object instance;
-                        if (resolutionHandler.TryResolve(this, type, stack, false, out instance))
+                        if (resolutionHandler.TryResolve(this, type, stack, false, out object instance))
                             instances.Add(instance);
-                    }
-                }
             }
 
             return instances;
@@ -186,7 +171,7 @@ namespace Tact.Practices.Base
         public IContainer BeginScope()
         {
             var scope = CreateScope();
-            InitializeScope(this, scope);
+            InitializeScope(scope);
             return scope;
         }
 
@@ -202,16 +187,15 @@ namespace Tact.Practices.Base
                 if (_isDisposed)
                     throw new ObjectDisposedException(GetType().Name);
 
-                ILifetimeManager previous;
-                if (_lifetimeManagerMap.TryGetValue(fromType, out previous))
-                {
-                    Log.Debug("Type: {0} - {1} - Replaced {2}", fromType.Name, lifetimeManager.Description,
-                        previous.Description);
-                }
+                if (_lifetimeManagerMap.TryGetValue(fromType, out ILifetimeManager previous))
+                    Log.Debug("Type: {0} - {1} - Replaced {2}", fromType.Name, lifetimeManager.Description, previous.Description);
                 else
                     Log.Debug("Type: {0} - {1}", fromType.Name, lifetimeManager.Description);
 
                 _lifetimeManagerMap[fromType] = lifetimeManager;
+
+                if (lifetimeManager.IsScoped && !_scopedKeys.Contains(fromType))
+                    _scopedKeys.Add(fromType);
             }
         }
 
@@ -225,15 +209,16 @@ namespace Tact.Practices.Base
                 if (_isDisposed)
                     throw new ObjectDisposedException(GetType().Name);
 
-                Dictionary<string, ILifetimeManager> registrations;
-                if (_multiRegistrationMap.TryGetValue(fromType, out registrations))
+                if (_multiRegistrationMap.TryGetValue(fromType, out Dictionary<string, ILifetimeManager> registrations))
                     registrations[key] = lifetimeManager;
                 else
-                {
-                    var keyMap = KeyMapPool.Acquire();
-                    keyMap.Add(key, lifetimeManager);
-                    _multiRegistrationMap[fromType] = keyMap;
-                }
+                    _multiRegistrationMap[fromType] = new Dictionary<string, ILifetimeManager>
+                    {
+                        { key, lifetimeManager }
+                    };
+
+                if (lifetimeManager.IsScoped && !_multiScopedKeys.Contains(fromType))
+                    _multiScopedKeys.Add(fromType);
 
                 Log.Debug("Type: {0} - Key: {1} - {2}", fromType.Name, key, lifetimeManager.Description);
             }
@@ -258,6 +243,46 @@ namespace Tact.Practices.Base
 
         protected abstract ContainerBase CreateScope();
 
+        protected void CloneMaps(
+            out Dictionary<Type, ILifetimeManager> lifetimeManagerMap,
+            out Dictionary<Type, Dictionary<string, ILifetimeManager>> multiRegistrationMap,
+            out List<Type> scopedKeys,
+            out List<Type> multiScopedKeys)
+        {
+            using (_lock.UseReadLock())
+            {
+                lifetimeManagerMap = new Dictionary<Type, ILifetimeManager>(_lifetimeManagerMap);
+
+                multiRegistrationMap = new Dictionary<Type, Dictionary<string, ILifetimeManager>>();
+                foreach (var pair in _multiRegistrationMap)
+                    multiRegistrationMap[pair.Key] = new Dictionary<string, ILifetimeManager>(pair.Value);
+
+                scopedKeys = new List<Type>(_scopedKeys.Count);
+                scopedKeys.AddRange(_scopedKeys);
+
+                multiScopedKeys = new List<Type>(_multiScopedKeys.Count);
+                multiScopedKeys.AddRange(_multiScopedKeys);
+            }
+        }
+
+        private static void InitializeScope(ContainerBase scope)
+        {
+            for (var i = 0; i < scope._scopedKeys.Count; i++)
+            {
+                var type = scope._scopedKeys[i];
+                scope._lifetimeManagerMap[type] = scope._lifetimeManagerMap[type].BeginScope(scope);
+            }
+
+            for (var i = 0; i < scope._multiScopedKeys.Count; i++)
+            {
+                var type = scope._multiScopedKeys[i];
+                var values = scope._multiRegistrationMap[type];
+                var clones = scope._multiRegistrationMap[type] = new Dictionary<string, ILifetimeManager>(values.Count);
+                foreach (var pair in values)
+                    clones[pair.Key] = pair.Value.BeginScope(scope);
+            }
+        }
+
         private bool TryResolve(Type type, Stack<Type> stack, bool canThrow, out object result)
         {
             if (type == null)
@@ -272,10 +297,9 @@ namespace Tact.Practices.Base
                 if (_isDisposed)
                     throw new ObjectDisposedException(GetType().Name);
 
-                ILifetimeManager lifetimeManager;
-                if (_lifetimeManagerMap.TryGetValue(type, out lifetimeManager))
+                if (_lifetimeManagerMap.TryGetValue(type, out ILifetimeManager lifetimeManager))
                 {
-                    result = lifetimeManager.Resolve(stack);
+                    result = lifetimeManager.Resolve(this, stack);
                     return true;
                 }
 
@@ -305,12 +329,11 @@ namespace Tact.Practices.Base
                 if (_isDisposed)
                     throw new ObjectDisposedException(GetType().Name);
 
-                Dictionary<string, ILifetimeManager> registrations;
-                if (_multiRegistrationMap.TryGetValue(type, out registrations))
+                if (_multiRegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
                     foreach (var lifetimeManager in registrations)
                         if (lifetimeManager.Key == key)
                         {
-                            result = lifetimeManager.Value.Resolve(stack);
+                            result = lifetimeManager.Value.Resolve(this, stack);
                             return true;
                         }
 
@@ -322,39 +345,7 @@ namespace Tact.Practices.Base
             result = null;
             return false;
         }
-
-        private static void InitializeScope(ContainerBase source, ContainerBase target)
-        {
-            using (source._lock.UseReadLock())
-            using (target._lock.UseWriteLock())
-            {
-                if (source._isDisposed)
-                    throw new ObjectDisposedException(source.GetType().Name);
-
-                if (target._isDisposed)
-                    throw new ObjectDisposedException(target.GetType().Name);
-
-                foreach (var pair in source._lifetimeManagerMap)
-                {
-                    var clone = pair.Value.BeginScope(target);
-                    target._lifetimeManagerMap[pair.Key] = clone;
-                }
-
-                foreach (var pair in source._multiRegistrationMap)
-                {
-                    var clones = KeyMapPool.Acquire();
-
-                    foreach (var lifetimeManager in pair.Value)
-                    {
-                        var clone = lifetimeManager.Value.BeginScope(target);
-                        clones[lifetimeManager.Key] = clone;
-                    }
-
-                    target._multiRegistrationMap[pair.Key] = clones;
-                }
-            }
-        }
-        
+                
         private static IDisposable EnterPush(Type type, Stack<Type> stack)
         {
             if (stack.Contains(type))

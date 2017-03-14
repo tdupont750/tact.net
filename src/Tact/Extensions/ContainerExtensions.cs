@@ -326,7 +326,7 @@ namespace Tact
                 return;
             }
 
-            var lifetimeManager = new TransientLifetimeManager(type, container, factory);
+            var lifetimeManager = new TransientLifetimeManager(type, factory);
             container.Register(type, lifetimeManager);
         }
         
@@ -348,7 +348,7 @@ namespace Tact
                 return;
             }
 
-            var lifetimeManager = new TransientLifetimeManager(type, container, factory);
+            var lifetimeManager = new TransientLifetimeManager(type, factory);
             container.Register(type, key, lifetimeManager);
         }
         
@@ -366,7 +366,7 @@ namespace Tact
                 throw new ArgumentNullException(nameof(container));
 
             toType.EnsureSingleCostructor();
-            var lifetimeManager = new TransientLifetimeManager(toType, container);
+            var lifetimeManager = new TransientLifetimeManager(toType);
 
             if (string.IsNullOrWhiteSpace(key))
                 container.Register(fromType, lifetimeManager);
@@ -390,7 +390,7 @@ namespace Tact
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
 
-            var lifetimeManager = new ProxyLifetimeManager(toType, fromKey, container);
+            var lifetimeManager = new ProxyLifetimeManager(toType, fromKey);
 
             if (string.IsNullOrWhiteSpace(toKey))
                 container.Register(fromType, lifetimeManager);

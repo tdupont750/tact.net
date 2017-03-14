@@ -19,12 +19,14 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public string Description => $"Instance: {_instance.GetType().Name}";
 
+        public bool IsScoped => false;
+
         public ILifetimeManager BeginScope(IContainer scope)
         {
-            return this;
+            throw new NotImplementedException();
         }
 
-        public object Resolve(Stack<Type> stack)
+        public object Resolve(IContainer scope, Stack<Type> stack)
         {
             return _instance;
         }

@@ -9,9 +9,11 @@ namespace Tact.Practices.LifetimeManagers
     {
         string Description { get; }
 
+        bool IsScoped { get; }
+
         ILifetimeManager BeginScope(IContainer scope);
 
-        object Resolve(Stack<Type> stack);
+        object Resolve(IContainer scope, Stack<Type> stack);
 
         bool RequiresDispose(IContainer scope);
 
