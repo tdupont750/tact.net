@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 
 namespace Tact.Diagnostics.Implementation
 {
+
     public class InMemoryLog : ILog
     {
         private const LogLevel DefaultMinLogLevel = LogLevel.Trace;
@@ -77,7 +78,7 @@ namespace Tact.Diagnostics.Implementation
             LogLines.TryDequeue(out logLine);
         }
 
-        public struct LogLine
+        public class LogLine
         {
             public LogLine(LogLevel logLevel, string message, Exception exception = null)
             {

@@ -19,7 +19,7 @@ namespace Tact.ComponentModel.DataAnnotations
 
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            var key = $"{validationContext.ObjectType.FullName}.{validationContext.MemberName}";
+            var key = string.Concat(validationContext.ObjectType.FullName, ".", validationContext.MemberName);
             var property = PropertyMap.GetOrAdd(key, k => validationContext.ObjectType.GetTypeInfo().GetProperty(validationContext.MemberName));
 
             if (IsValid(value, property.PropertyType))

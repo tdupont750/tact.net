@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
+﻿using System.Diagnostics;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices.Implementation;
 using Xunit;
@@ -21,7 +18,7 @@ namespace Tact.Tests.Practices
         [Fact]
         public void PerformanceTest()
         {
-            using (var container = new TactContainer(new InMemoryLog()))
+            using (var container = new TactContainer(new EmptyLog()))
             {
                 container.RegisterPerScope<IOne, One>();
                 container.RegisterPerScope<ITwo, Two>();
@@ -37,12 +34,16 @@ namespace Tact.Tests.Practices
 
                 var sw = Stopwatch.StartNew();
 
-                for (var i = 0; i < 100000; i++)
-                    using (container.BeginScope()) { }
+                for (var i = 0; i < 1000000; i++)
+                    using (var scope = container.BeginScope())
+                    {
+                        scope.Resolve<IOne>();
+                        scope.Resolve<ITen>();
+                    }
 
                 sw.Stop();
 
-                _outputHelper.WriteLine(sw.ElapsedMilliseconds.ToString());
+                _outputHelper?.WriteLine(sw.ElapsedMilliseconds.ToString());
             }
         }
 

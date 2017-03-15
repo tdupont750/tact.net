@@ -12,8 +12,8 @@ namespace Tact.Practices.LifetimeManagers.Implementation
         private readonly bool _hasKey;
 
         public string Description => _hasKey
-            ? $"Proxy: {_toType.Name} - Proxy Key: {_toKey}"
-            : $"Proxy: {_toType.Name}";
+            ? string.Concat("Proxy: ", _toType.Name, " - Proxy Key: ", _toKey)
+            : string.Concat("Proxy: ", _toType.Name);
 
         public bool IsScoped => false;
 

@@ -1,16 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <Description>A JSON library for Tact.NET - A tactful collection of utilities for .NET development.</Description>
+    <Copyright>2016 Tom DuPont</Copyright>
     <VersionPrefix>1.0.3</VersionPrefix>
-    <TargetFrameworks>netstandard1.6</TargetFrameworks>
+    <Authors>Tom DuPont</Authors>
     <AssemblyName>Tact.Json</AssemblyName>
     <PackageId>Tact.Json</PackageId>
-    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
-    <PackageTargetFallback Condition=" '$(TargetFramework)' == 'netstandard1.6' ">$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <PackageIconUrl>https://sites.google.com/site/tdupont750/Tact_NET_S.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/tdupont750/tact.net</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>

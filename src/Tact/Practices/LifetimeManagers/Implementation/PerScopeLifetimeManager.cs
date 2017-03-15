@@ -14,7 +14,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
             _factory = factory;
         }
 
-        public override string Description => $"PerScope: {_toType.Name}";
+        public override string Description => string.Concat("PerScope: ", _toType.Name);
 
         public override bool IsScoped => true;
 

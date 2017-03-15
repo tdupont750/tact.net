@@ -10,14 +10,16 @@ namespace Tact.Practices.LifetimeManagers.Implementation
     {
         private readonly object _scope;
         private readonly object _instance;
+        private readonly string _typeName;
 
         public InstanceLifetimeManager(object instance, object scope)
         {
             _scope = scope;
             _instance = instance;
+            _typeName = instance.GetType().Name;
         }
 
-        public string Description => $"Instance: {_instance.GetType().Name}";
+        public string Description => string.Concat("Instance: ", _typeName);
 
         public bool IsScoped => false;
 

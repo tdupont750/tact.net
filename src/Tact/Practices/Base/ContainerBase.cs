@@ -35,6 +35,7 @@ namespace Tact.Practices.Base
                   new List<Type>(),
                   new List<Type>())
         {
+            this.RegisterInstance(log);
         }
 
         protected ContainerBase(
@@ -52,8 +53,6 @@ namespace Tact.Practices.Base
 
             Log = log ?? throw new ArgumentNullException(nameof(log));
             MaxDisposeParallelization = maxDisposeParallelization;
-
-            this.RegisterInstance(log);
         }
 
         public void Dispose()
@@ -68,16 +67,21 @@ namespace Tact.Practices.Base
                 if (_isDisposed) return Task.CompletedTask;
                 _isDisposed = true;
             }
+            
+            // Creating this collection with foreach is 15% faster than linq.
+            var lifetimeManagersToDispose = new List<ILifetimeManager>();
 
-            // Get all managers that need to be disposed.
-            var lifetimeManagersToDispose = _multiRegistrationMap.Values
-                .SelectMany(v => v.Values)
-                .Concat(_lifetimeManagerMap.Values)
-                .Where(lm => lm.RequiresDispose(this))
-                .ToArray();
+            foreach (var map in _multiRegistrationMap)
+                foreach (var pair in map.Value)
+                    if (pair.Value.RequiresDispose(this))
+                        lifetimeManagersToDispose.Add(pair.Value);
+
+            foreach(var pair in _lifetimeManagerMap)
+                if (pair.Value.RequiresDispose(this))
+                    lifetimeManagersToDispose.Add(pair.Value);
 
             // Bail if there is nothing to dispose
-            if (lifetimeManagersToDispose.Length == 0)
+            if (lifetimeManagersToDispose.Count == 0)
                 return Task.CompletedTask;
 
             // Dispose async
@@ -230,15 +234,15 @@ namespace Tact.Practices.Base
                 throw new ArgumentNullException(nameof(type));
 
             var constructor = type.EnsureSingleCostructor();
-            var parameterTypes = constructor.GetParameters().Select(p => p.ParameterType).ToArray();
-            var arguments = new object[parameterTypes.Length];
-            for (var i = 0; i < parameterTypes.Length; i++)
+            var parameterTypes = constructor.GetParameterTypes();
+            var arguments = new object[parameterTypes.Count];
+            for (var i = 0; i < parameterTypes.Count; i++)
             {
                 var parameterType = parameterTypes[i];
                 arguments[i] = Resolve(parameterType, stack);
             }
 
-            return Activator.CreateInstance(type, arguments);
+            return constructor.EfficientInvoke(arguments);
         }
 
         protected abstract ContainerBase CreateScope();
@@ -257,11 +261,9 @@ namespace Tact.Practices.Base
                 foreach (var pair in _multiRegistrationMap)
                     multiRegistrationMap[pair.Key] = new Dictionary<string, ILifetimeManager>(pair.Value);
 
-                scopedKeys = new List<Type>(_scopedKeys.Count);
-                scopedKeys.AddRange(_scopedKeys);
+                scopedKeys = _scopedKeys.ToList();
 
-                multiScopedKeys = new List<Type>(_multiScopedKeys.Count);
-                multiScopedKeys.AddRange(_multiScopedKeys);
+                multiScopedKeys = _multiScopedKeys.ToList();
             }
         }
 

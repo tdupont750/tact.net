@@ -22,7 +22,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
             _factory = factory;
         }
 
-        public virtual string Description => $"Singleton: {_toType.Name}";
+        public virtual string Description => string.Concat("Singleton: ", _toType.Name);
 
         public virtual bool IsScoped => false;
 

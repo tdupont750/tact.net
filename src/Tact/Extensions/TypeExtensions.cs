@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Tact.Reflection;
 
@@ -11,15 +13,18 @@ namespace Tact
 
         private const string ConstructorRequired = "There must be a single public constructor defined";
 
-        private static readonly ConcurrentDictionary<Type, Tuple<Result, ConstructorInfo>> ResultMap =
+        private static readonly ConcurrentDictionary<Type, Tuple<Result, ConstructorInfo>> ConstructorMap =
             new ConcurrentDictionary<Type, Tuple<Result, ConstructorInfo>>();
+
+        private static readonly ConcurrentDictionary<MethodBase, IReadOnlyList<Type>> ParameterMap =
+            new ConcurrentDictionary<MethodBase, IReadOnlyList<Type>>();
 
         public static bool HasSingleCostructor(this Type type)
         {
             if (type == null)
                 return false;
 
-            var result = ResultMap.GetOrAdd(type, GetConstructorInfo);
+            var result = ConstructorMap.GetOrAdd(type, GetConstructorInfo);
             return result.Item1 == Result.Valid;
         }
 
@@ -28,7 +33,7 @@ namespace Tact
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 
-            var result = ResultMap.GetOrAdd(type, GetConstructorInfo);
+            var result = ConstructorMap.GetOrAdd(type, GetConstructorInfo);
 
             switch (result.Item1)
             {
@@ -44,6 +49,16 @@ namespace Tact
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
+
+        public static IReadOnlyList<Type> GetParameterTypes(this MethodBase method)
+        {
+            return ParameterMap.GetOrAdd(method, c => c.GetParameters().Select(p => p.ParameterType).ToArray());
+        }
+
+        public static object EfficientInvoke(this ConstructorInfo constructor, params object[] args)
+        {
+            return EfficientInvoker.ForConstructor(constructor)(args);
         }
 
         public static EfficientInvoker GetMethodInvoker(this Type type, string methodName)

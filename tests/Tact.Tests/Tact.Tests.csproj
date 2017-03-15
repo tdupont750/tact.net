@@ -1,17 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>1.0.3</VersionPrefix>
     <TargetFramework>netcoreapp1.0</TargetFramework>
+    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
+    <OutputType>exe</OutputType>
+    <Description>The test library for Tact.NET - A tactful collection of utilities for .NET development.</Description>
+    <Copyright>2016 Tom DuPont</Copyright>
+    <VersionPrefix>1.0.3</VersionPrefix>
+    <Authors>Tom DuPont</Authors>
     <AssemblyName>Tact.Tests</AssemblyName>
     <PackageId>Tact.Tests</PackageId>
-    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
-    <RuntimeFrameworkVersion>1.1.1</RuntimeFrameworkVersion>
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <PackageIconUrl>https://sites.google.com/site/tdupont750/Tact_NET_S.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/tdupont750/tact.net</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <ApplicationIcon />
+    <StartupObject />
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,10 +30,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170106-08" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-beta5-build1225" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.1" />
-    <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
+    <PackageReference Include="xunit" Version="2.2.0" />
   </ItemGroup>
 
 </Project>

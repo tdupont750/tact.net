@@ -9,6 +9,9 @@ namespace Tact.Reflection
 {
     public sealed class EfficientInvoker
     {
+        private static readonly ConcurrentDictionary<ConstructorInfo, Func<object[], object>> ConstructorToWrapperMap
+            = new ConcurrentDictionary<ConstructorInfo, Func<object[], object>>();
+
         private static readonly ConcurrentDictionary<Type, EfficientInvoker> TypeToWrapperMap
             = new ConcurrentDictionary<Type, EfficientInvoker>();
 
@@ -20,6 +23,23 @@ namespace Tact.Reflection
         private EfficientInvoker(Func<object, object[], object> func)
         {
             _func = func;
+        }
+        
+        public static Func<object[], object> ForConstructor(ConstructorInfo constructor)
+        {
+            if (constructor == null)
+                throw new ArgumentNullException(nameof(constructor));
+
+            return ConstructorToWrapperMap.GetOrAdd(constructor, t =>
+            {
+                CreateParamsExpressions(constructor, out ParameterExpression argsExp, out Expression[] paramsExps);
+
+                var newExp = Expression.New(constructor, paramsExps);
+                var resultExp = Expression.Convert(newExp, typeof(object));
+                var lambdaExp = Expression.Lambda(resultExp, argsExp);
+                var lambda = lambdaExp.Compile();
+                return (Func<object[], object>)lambda;
+            });
         }
 
         public static EfficientInvoker ForDelegate(Delegate del)
@@ -89,28 +109,17 @@ namespace Tact.Reflection
 
         private static Func<object, object[], object> CreateMethodWrapper(Type type, MethodInfo method, bool isDelegate)
         {
-            var parameters = method.GetParameters();
-            var hasReturn = method.ReturnType != typeof(void);
+            CreateParamsExpressions(method, out ParameterExpression argsExp, out Expression[] paramsExps);
 
             var targetExp = Expression.Parameter(typeof(object), "target");
-            var argsExp = Expression.Parameter(typeof(object[]), "args");
-
-            var paramsExps = new Expression[parameters.Length];
-            for (var i = 0; i < parameters.Length; i++)
-            {
-                var constExp = Expression.Constant(i, typeof(int));
-                var argExp = Expression.ArrayIndex(argsExp, constExp);
-                paramsExps[i] = Expression.Convert(argExp, parameters[i].ParameterType);
-            }
-
             var castTargetExp = Expression.Convert(targetExp, type);
             var invokeExp = isDelegate
                 ? (Expression)Expression.Invoke(castTargetExp, paramsExps)
                 : Expression.Call(castTargetExp, method, paramsExps);
 
             LambdaExpression lambdaExp;
-
-            if (hasReturn)
+            
+            if (method.ReturnType != typeof(void))
             {
                 var resultExp = Expression.Convert(invokeExp, typeof(object));
                 lambdaExp = Expression.Lambda(resultExp, targetExp, argsExp);
@@ -124,6 +133,21 @@ namespace Tact.Reflection
 
             var lambda = lambdaExp.Compile();
             return (Func<object, object[], object>)lambda;
+        }
+
+        private static void CreateParamsExpressions(MethodBase method, out ParameterExpression argsExp, out Expression[] paramsExps)
+        {
+            var parameters = method.GetParameterTypes();
+
+            argsExp = Expression.Parameter(typeof(object[]), "args");
+            paramsExps = new Expression[parameters.Count];
+
+            for (var i = 0; i < parameters.Count; i++)
+            {
+                var constExp = Expression.Constant(i, typeof(int));
+                var argExp = Expression.ArrayIndex(argsExp, constExp);
+                paramsExps[i] = Expression.Convert(argExp, parameters[i]);
+            }
         }
         
         private static Func<object, object[], object> CreatePropertyWrapper(Type type, string propertyName)

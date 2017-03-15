@@ -1,28 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>The core library for Tact.NET - A tactful collection of utilities for .NET development.</Description>
-    <Copyright>2016 Tom DuPont</Copyright>
-    <Authors>Tom DuPont</Authors>
     <TargetFramework>netstandard1.6</TargetFramework>
+    <Description>An AspNetCore WebSocket library for Tact.NET - A tactful collection of utilities for .NET development.</Description>
+    <Copyright>2016 Tom DuPont</Copyright>
+    <VersionPrefix>1.0.3</VersionPrefix>
+    <Authors>Tom DuPont</Authors>
     <AssemblyName>Tact.AspNetCore.WebSockets.Server</AssemblyName>
     <PackageId>Tact.AspNetCore.WebSockets.Server</PackageId>
     <PackageIconUrl>https://sites.google.com/site/tdupont750/Tact_NET_S.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/tdupont750/tact.net</PackageProjectUrl>
     <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
-    <NetStandardImplicitPackageVersion>1.6.1</NetStandardImplicitPackageVersion>
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tact\Tact.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.WebSockets.Server" Version="0.1.0" />
   </ItemGroup>
-
-  <Target Name="PostcompileScript" AfterTargets="Build">
-    <Exec Command="dotnet pack --no-build --configuration $(Configuration)" />
-  </Target>
 
 </Project>

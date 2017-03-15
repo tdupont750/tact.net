@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 namespace Tact
 {
     using Diagnostics;
+    using System.Text;
 
     namespace Diagnostics
     {
@@ -2050,7 +2051,15 @@ namespace Tact
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static string GetFormat(string format, string memberName, string sourceFilePath, int sourceLineNumber)
         {
-            return $"{Path.GetFileNameWithoutExtension(sourceFilePath)}.{memberName}({sourceLineNumber}) - {format}";
+            var sb = new StringBuilder();
+            sb.Append(Path.GetFileNameWithoutExtension(sourceFilePath));
+            sb.Append('.');
+            sb.Append(memberName);
+            sb.Append('(');
+            sb.Append(sourceLineNumber);
+            sb.Append(") - ");
+            sb.Append(format);
+            return sb.ToString();
         }
  
         public enum LogCallSite

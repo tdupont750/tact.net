@@ -1,17 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>1.0.3</VersionPrefix>
     <TargetFramework>netcoreapp1.0</TargetFramework>
-    <AssemblyName>Tact.Tests.Console</AssemblyName>
-    <OutputType>Exe</OutputType>
-    <PackageId>Tact.Tests.Console</PackageId>
     <RuntimeIdentifiers>win10-x64</RuntimeIdentifiers>
-    <RuntimeFrameworkVersion>1.1.1</RuntimeFrameworkVersion>
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <OutputType>exe</OutputType>
+    <VersionPrefix>1.0.3</VersionPrefix>
+    <AssemblyName>Tact.Tests.Console</AssemblyName>
+    <PackageId>Tact.Tests.Console</PackageId>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,9 +28,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.1.1" />
-    <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
-    <PackageReference Include="xunit.core" Version="2.2.0" />
-    <PackageReference Include="xunit.runner.console" Version="2.2.0" />
+    <PackageReference Include="xunit" Version="2.2.0" />
   </ItemGroup>
 
 </Project>

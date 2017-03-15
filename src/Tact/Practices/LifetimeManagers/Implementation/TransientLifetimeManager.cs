@@ -16,7 +16,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
             _factory = factory;
         }
 
-        public string Description => $"Transient: {_toType.Name}";
+        public string Description => string.Concat("Transient: ", _toType.Name);
 
         public bool IsScoped => false;
 
