@@ -50,7 +50,7 @@ namespace Tact.Tests.Reflection
             var ticks1 = DelegateEfficientInvoke(func);
             Assert.Equal(Iterations * 2, count);
 
-            Assert.True(ticks1 * 10 < ticks0);
+            Assert.True(ticks1 * 5 < ticks0);
         }
         
         private long DelegateDynamicInvoke(Delegate d)

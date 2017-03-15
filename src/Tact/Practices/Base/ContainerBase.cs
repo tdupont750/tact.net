@@ -14,10 +14,7 @@ namespace Tact.Practices.Base
     public abstract class ContainerBase : IContainer
     {
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-        private readonly Dictionary<Type, ILifetimeManager> _lifetimeManagerMap;
-        private readonly Dictionary<Type, Dictionary<string, ILifetimeManager>> _multiRegistrationMap;
-        private readonly List<Type> _scopedKeys;
-        private readonly List<Type> _multiScopedKeys;
+        private readonly RegistrationMaps _maps;
 
         private bool _isDisposed;
 
@@ -27,30 +24,20 @@ namespace Tact.Practices.Base
         protected abstract IReadOnlyList<IResolutionHandler> ResolutionHandlers { get; }
 
         protected ContainerBase(ILog log, int? maxDisposeParallelization)
-            : this(
-                  log,
-                  maxDisposeParallelization,
-                  new Dictionary<Type, ILifetimeManager>(),
-                  new Dictionary<Type, Dictionary<string, ILifetimeManager>>(),
-                  new List<Type>(),
-                  new List<Type>())
+            : this(log, maxDisposeParallelization, RegistrationMaps.Create())
         {
             this.RegisterInstance(log);
         }
 
-        protected ContainerBase(
-            ILog log, 
-            int? maxDisposeParallelization, 
-            Dictionary<Type, ILifetimeManager> lifetimeManagerMap, 
-            Dictionary<Type, Dictionary<string, ILifetimeManager>> multiRegistrationMap,
-            List<Type> scopedKeys,
-            List<Type> multiScopedKeys)
+        protected ContainerBase(ILog log, int? maxDisposeParallelization, ContainerBase parentScope)
+            : this(log, maxDisposeParallelization, parentScope._maps.Clone())
         {
-            _lifetimeManagerMap = lifetimeManagerMap;
-            _multiRegistrationMap = multiRegistrationMap;
-            _scopedKeys = scopedKeys;
-            _multiScopedKeys = multiScopedKeys;
+            _maps.InitalizeScope(this);
+        }
 
+        private ContainerBase(ILog log, int? maxDisposeParallelization, RegistrationMaps maps)
+        {
+            _maps = maps ?? throw new ArgumentNullException(nameof(maps));
             Log = log ?? throw new ArgumentNullException(nameof(log));
             MaxDisposeParallelization = maxDisposeParallelization;
         }
@@ -67,18 +54,8 @@ namespace Tact.Practices.Base
                 if (_isDisposed) return Task.CompletedTask;
                 _isDisposed = true;
             }
-            
-            // Creating this collection with foreach is 15% faster than linq.
-            var lifetimeManagersToDispose = new List<ILifetimeManager>();
 
-            foreach (var map in _multiRegistrationMap)
-                foreach (var pair in map.Value)
-                    if (pair.Value.RequiresDispose(this))
-                        lifetimeManagersToDispose.Add(pair.Value);
-
-            foreach(var pair in _lifetimeManagerMap)
-                if (pair.Value.RequiresDispose(this))
-                    lifetimeManagersToDispose.Add(pair.Value);
+            var lifetimeManagersToDispose = _maps.GetLifetimeManagersToDispose(this);
 
             // Bail if there is nothing to dispose
             if (lifetimeManagersToDispose.Count == 0)
@@ -157,7 +134,7 @@ namespace Tact.Practices.Base
                 if (_isDisposed)
                     throw new ObjectDisposedException(GetType().Name);
 
-                if (_multiRegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
+                if (_maps.MultiRegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
                     foreach (var lifetimeManager in registrations.Values)
                     {
                         var instance = lifetimeManager.Resolve(this, stack);
@@ -172,12 +149,7 @@ namespace Tact.Practices.Base
             return instances;
         }
 
-        public IContainer BeginScope()
-        {
-            var scope = CreateScope();
-            InitializeScope(scope);
-            return scope;
-        }
+        public abstract IContainer BeginScope();
 
         IResolver IResolver.BeginScope()
         {
@@ -191,15 +163,18 @@ namespace Tact.Practices.Base
                 if (_isDisposed)
                     throw new ObjectDisposedException(GetType().Name);
 
-                if (_lifetimeManagerMap.TryGetValue(fromType, out ILifetimeManager previous))
+                if (_maps.RegistrationMap.TryGetValue(fromType, out ILifetimeManager previous))
                     Log.Debug("Type: {0} - {1} - Replaced {2}", fromType.Name, lifetimeManager.Description, previous.Description);
                 else
                     Log.Debug("Type: {0} - {1}", fromType.Name, lifetimeManager.Description);
 
-                _lifetimeManagerMap[fromType] = lifetimeManager;
+                _maps.RegistrationMap[fromType] = lifetimeManager;
 
-                if (lifetimeManager.IsScoped && !_scopedKeys.Contains(fromType))
-                    _scopedKeys.Add(fromType);
+                if (lifetimeManager.IsScoped && !_maps.ScopedKeys.Contains(fromType))
+                    _maps.ScopedKeys.Add(fromType);
+
+                if (lifetimeManager.IsDisposable && !_maps.DisposableKeys.Contains(fromType))
+                    _maps.DisposableKeys.Add(fromType);
             }
         }
 
@@ -213,16 +188,19 @@ namespace Tact.Practices.Base
                 if (_isDisposed)
                     throw new ObjectDisposedException(GetType().Name);
 
-                if (_multiRegistrationMap.TryGetValue(fromType, out Dictionary<string, ILifetimeManager> registrations))
+                if (_maps.MultiRegistrationMap.TryGetValue(fromType, out Dictionary<string, ILifetimeManager> registrations))
                     registrations[key] = lifetimeManager;
                 else
-                    _multiRegistrationMap[fromType] = new Dictionary<string, ILifetimeManager>
+                    _maps.MultiRegistrationMap[fromType] = new Dictionary<string, ILifetimeManager>
                     {
                         { key, lifetimeManager }
                     };
 
-                if (lifetimeManager.IsScoped && !_multiScopedKeys.Contains(fromType))
-                    _multiScopedKeys.Add(fromType);
+                if (lifetimeManager.IsScoped && !_maps.MultiScopedKeys.Contains(fromType))
+                    _maps.MultiScopedKeys.Add(fromType);
+
+                if (lifetimeManager.IsDisposable && !_maps.MultiDisposableKeys.Contains(fromType))
+                    _maps.MultiDisposableKeys.Add(fromType);
 
                 Log.Debug("Type: {0} - Key: {1} - {2}", fromType.Name, key, lifetimeManager.Description);
             }
@@ -244,47 +222,7 @@ namespace Tact.Practices.Base
 
             return constructor.EfficientInvoke(arguments);
         }
-
-        protected abstract ContainerBase CreateScope();
-
-        protected void CloneMaps(
-            out Dictionary<Type, ILifetimeManager> lifetimeManagerMap,
-            out Dictionary<Type, Dictionary<string, ILifetimeManager>> multiRegistrationMap,
-            out List<Type> scopedKeys,
-            out List<Type> multiScopedKeys)
-        {
-            using (_lock.UseReadLock())
-            {
-                lifetimeManagerMap = new Dictionary<Type, ILifetimeManager>(_lifetimeManagerMap);
-
-                multiRegistrationMap = new Dictionary<Type, Dictionary<string, ILifetimeManager>>();
-                foreach (var pair in _multiRegistrationMap)
-                    multiRegistrationMap[pair.Key] = new Dictionary<string, ILifetimeManager>(pair.Value);
-
-                scopedKeys = _scopedKeys.ToList();
-
-                multiScopedKeys = _multiScopedKeys.ToList();
-            }
-        }
-
-        private static void InitializeScope(ContainerBase scope)
-        {
-            for (var i = 0; i < scope._scopedKeys.Count; i++)
-            {
-                var type = scope._scopedKeys[i];
-                scope._lifetimeManagerMap[type] = scope._lifetimeManagerMap[type].BeginScope(scope);
-            }
-
-            for (var i = 0; i < scope._multiScopedKeys.Count; i++)
-            {
-                var type = scope._multiScopedKeys[i];
-                var values = scope._multiRegistrationMap[type];
-                var clones = scope._multiRegistrationMap[type] = new Dictionary<string, ILifetimeManager>(values.Count);
-                foreach (var pair in values)
-                    clones[pair.Key] = pair.Value.BeginScope(scope);
-            }
-        }
-
+                
         private bool TryResolve(Type type, Stack<Type> stack, bool canThrow, out object result)
         {
             if (type == null)
@@ -299,7 +237,7 @@ namespace Tact.Practices.Base
                 if (_isDisposed)
                     throw new ObjectDisposedException(GetType().Name);
 
-                if (_lifetimeManagerMap.TryGetValue(type, out ILifetimeManager lifetimeManager))
+                if (_maps.RegistrationMap.TryGetValue(type, out ILifetimeManager lifetimeManager))
                 {
                     result = lifetimeManager.Resolve(this, stack);
                     return true;
@@ -331,7 +269,7 @@ namespace Tact.Practices.Base
                 if (_isDisposed)
                     throw new ObjectDisposedException(GetType().Name);
 
-                if (_multiRegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
+                if (_maps.MultiRegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
                     foreach (var lifetimeManager in registrations)
                         if (lifetimeManager.Key == key)
                         {
@@ -381,6 +319,104 @@ namespace Tact.Practices.Base
 
             var message = sb.ToString();
             return new InvalidOperationException(message);
+        }
+
+        protected class RegistrationMaps
+        {
+            public readonly Dictionary<Type, ILifetimeManager> RegistrationMap;
+            public readonly Dictionary<Type, Dictionary<string, ILifetimeManager>> MultiRegistrationMap;
+            public readonly List<Type> ScopedKeys;
+            public readonly List<Type> MultiScopedKeys;
+            public readonly List<Type> DisposableKeys;
+            public readonly List<Type> MultiDisposableKeys;
+
+            private RegistrationMaps(
+                Dictionary<Type, ILifetimeManager> registrationMap,
+                Dictionary<Type, Dictionary<string, ILifetimeManager>> multiRegistrationMap,
+                List<Type> scopedKeys,
+                List<Type> multiScopedKeys,
+                List<Type> disposableKeys,
+                List<Type> multiDisposableKeys)
+            {
+                RegistrationMap = registrationMap;
+                MultiRegistrationMap = multiRegistrationMap;
+                ScopedKeys = scopedKeys;
+                MultiScopedKeys = multiScopedKeys;
+                DisposableKeys = disposableKeys;
+                MultiDisposableKeys = multiDisposableKeys;
+            }
+
+            public static RegistrationMaps Create()
+            {
+                return new RegistrationMaps(
+                    new Dictionary<Type, ILifetimeManager>(),
+                    new Dictionary<Type, Dictionary<string, ILifetimeManager>>(),
+                    new List<Type>(),
+                    new List<Type>(),
+                    new List<Type>(),
+                    new List<Type>());
+            }
+
+            public RegistrationMaps Clone()
+            {
+                var registrationMap = new Dictionary<Type, ILifetimeManager>(RegistrationMap);
+
+                var multiRegistrationMap = new Dictionary<Type, Dictionary<string, ILifetimeManager>>();
+                foreach (var pair in MultiRegistrationMap)
+                    multiRegistrationMap[pair.Key] = new Dictionary<string, ILifetimeManager>(pair.Value);
+
+                var scopedKeys = ScopedKeys.ToList();
+                var multiScopedKeys = MultiScopedKeys.ToList();
+
+                var disposableKeys = DisposableKeys.ToList();
+                var mutliDisposableKeys = MultiDisposableKeys.ToList();
+
+                return new RegistrationMaps(
+                    registrationMap,
+                    multiRegistrationMap,
+                    scopedKeys,
+                    multiScopedKeys,
+                    disposableKeys, 
+                    mutliDisposableKeys);
+            }
+
+            public void InitalizeScope(IContainer scope)
+            {
+                for (var i = 0; i < ScopedKeys.Count; i++)
+                {
+                    var type = ScopedKeys[i];
+                    RegistrationMap[type] = RegistrationMap[type].BeginScope(scope);
+                }
+
+                for (var i = 0; i < MultiScopedKeys.Count; i++)
+                {
+                    var type = MultiScopedKeys[i];
+                    var values = MultiRegistrationMap[type];
+                    var clones = MultiRegistrationMap[type] = new Dictionary<string, ILifetimeManager>(values.Count);
+                    foreach (var pair in values)
+                        clones[pair.Key] = pair.Value.BeginScope(scope);
+                }
+            }
+
+            public IReadOnlyList<ILifetimeManager> GetLifetimeManagersToDispose(IContainer scope)
+            {
+                // Creating this collection with foreach is 15% faster than linq.
+                var lifetimeManagersToDispose = new List<ILifetimeManager>();
+
+                foreach (var key in MultiDisposableKeys)
+                    foreach (var pair in MultiRegistrationMap[key])
+                        if (pair.Value.RequiresDispose(scope))
+                            lifetimeManagersToDispose.Add(pair.Value);
+
+                foreach (var key in DisposableKeys)
+                {
+                    var lifetimeManager = RegistrationMap[key];
+                    if (lifetimeManager.RequiresDispose(scope))
+                        lifetimeManagersToDispose.Add(lifetimeManager);
+                }
+
+                return lifetimeManagersToDispose;
+            }
         }
 
         private struct DisposablePush : IDisposable

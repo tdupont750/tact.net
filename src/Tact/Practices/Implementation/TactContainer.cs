@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Tact.Diagnostics;
 using Tact.Practices.Base;
-using Tact.Practices.LifetimeManagers;
 using Tact.Practices.ResolutionHandlers;
 using Tact.Practices.ResolutionHandlers.Implementation;
 
@@ -39,7 +38,7 @@ namespace Tact.Practices.Implementation
         }
 
         public TactContainer(
-            ILog log, 
+            ILog log,
             IReadOnlyList<IResolutionHandler> resolutionHandlers,
             int? maxDisposeParallelization = null)
             : base(log, maxDisposeParallelization)
@@ -51,39 +50,17 @@ namespace Tact.Practices.Implementation
             ILog log,
             IReadOnlyList<IResolutionHandler> resolutionHandlers,
             int? maxDisposeParallelization,
-            Dictionary<Type, ILifetimeManager> lifetimeManagerMap,
-            Dictionary<Type, Dictionary<string, ILifetimeManager>> multiRegistrationMap,
-            List<Type> scopedKeys,
-            List<Type> multiScopedKeys)
-            : base(
-                  log, 
-                  maxDisposeParallelization,
-                  lifetimeManagerMap,
-                  multiRegistrationMap,
-                  scopedKeys,
-                  multiScopedKeys)
+            TactContainer parentScope)
+            : base(log, maxDisposeParallelization, parentScope)
         {
             ResolutionHandlers = resolutionHandlers;
         }
 
-        protected override IReadOnlyList<IResolutionHandler> ResolutionHandlers { get; }
-
-        protected override ContainerBase CreateScope()
+        public override IContainer BeginScope()
         {
-            CloneMaps(
-                out Dictionary<Type, ILifetimeManager> lifetimeManagerMap,
-                out Dictionary<Type, Dictionary<string, ILifetimeManager>> multiRegistrationMap,
-                out List<Type> scopedKeys,
-                out List<Type> multiScopedKeys);
-
-            return new TactContainer(
-                Log, 
-                ResolutionHandlers, 
-                MaxDisposeParallelization, 
-                lifetimeManagerMap, 
-                multiRegistrationMap,
-                scopedKeys,
-                multiScopedKeys);
+            return new TactContainer(Log, ResolutionHandlers, MaxDisposeParallelization, this);
         }
+
+        protected override IReadOnlyList<IResolutionHandler> ResolutionHandlers { get; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Tact.Threading;
@@ -8,6 +9,8 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 {
     public class SingletonLifetimeManager : ILifetimeManager
     {
+        private static readonly TypeInfo DisposableTypeInfo = typeof(IDisposable).GetTypeInfo();
+
         private readonly object _lock = new object();
         private readonly Type _toType;
         private readonly IContainer _scope;
@@ -25,6 +28,8 @@ namespace Tact.Practices.LifetimeManagers.Implementation
         public virtual string Description => string.Concat("Singleton: ", _toType.Name);
 
         public virtual bool IsScoped => false;
+
+        public bool IsDisposable => DisposableTypeInfo.IsAssignableFrom(_toType);
 
         public virtual ILifetimeManager BeginScope(IContainer scope)
         {

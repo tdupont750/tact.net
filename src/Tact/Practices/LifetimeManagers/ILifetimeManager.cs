@@ -11,6 +11,8 @@ namespace Tact.Practices.LifetimeManagers
 
         bool IsScoped { get; }
 
+        bool IsDisposable { get; }
+
         ILifetimeManager BeginScope(IContainer scope);
 
         object Resolve(IContainer scope, Stack<Type> stack);

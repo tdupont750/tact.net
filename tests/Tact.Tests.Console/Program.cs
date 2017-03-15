@@ -13,9 +13,11 @@ namespace Tact.Tests.Console
     {
         public static void Main(string[] args)
         {
-            Demo();
+            PerformanceTests.Container();
+
+            //Demo();
         }
-        
+
         private static void Demo()
         {
             var expectedThings = new List<int> {1, 2};

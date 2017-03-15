@@ -1,23 +1,17 @@
 ﻿using System.Diagnostics;
+using System.Threading;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices.Implementation;
-using Xunit;
-using Xunit.Abstractions;
 
-namespace Tact.Tests.Practices
+namespace Tact.Tests.Console
 {
-    public class TactContainerTests
+    public static class PerformanceTests
     {
-        private readonly ITestOutputHelper _outputHelper;
-
-        public TactContainerTests(ITestOutputHelper outputHelper)
+        public static void Container()
         {
-            _outputHelper = outputHelper;
-        }
+            Thread.Sleep(2000);
+            System.Console.WriteLine("Start");
 
-        [Fact]
-        public void PerformanceTest()
-        {
             using (var container = new TactContainer(new EmptyLog()))
             {
                 container.RegisterPerScope<IOne, One>();
@@ -32,19 +26,29 @@ namespace Tact.Tests.Practices
                 container.RegisterSingleton<INine, Nine>();
                 container.RegisterSingleton<ITen, Ten>();
 
-                var sw = Stopwatch.StartNew();
+                var sw1 = Stopwatch.StartNew();
+                using (var scope = container.BeginScope())
+                {
+                    scope.Resolve<IOne>();
+                    scope.Resolve<ITen>();
+                }
+                sw1.Stop();
 
+                var sw2 = Stopwatch.StartNew();
                 for (var i = 0; i < 1000000; i++)
                     using (var scope = container.BeginScope())
                     {
                         scope.Resolve<IOne>();
                         scope.Resolve<ITen>();
                     }
+                sw2.Stop();
 
-                sw.Stop();
-
-                _outputHelper?.WriteLine(sw.ElapsedMilliseconds.ToString());
+                System.Console.WriteLine(sw1.ElapsedMilliseconds.ToString());
+                System.Console.WriteLine(sw2.ElapsedMilliseconds.ToString());
             }
+
+            System.Console.WriteLine("Stop");
+            Thread.Sleep(2000);
         }
 
         private interface IOne { }

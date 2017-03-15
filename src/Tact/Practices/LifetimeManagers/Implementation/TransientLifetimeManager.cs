@@ -20,6 +20,8 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public bool IsScoped => false;
 
+        public bool IsDisposable => false;
+
         public ILifetimeManager BeginScope(IContainer scope)
         {
             throw new NotImplementedException();
@@ -32,13 +34,12 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public Task DisposeAsync(IContainer scope, CancellationToken cancelToken)
         {
-            // Nothing to do dispose
-            return Task.CompletedTask;
+            throw new NotImplementedException();
         }
 
         public bool RequiresDispose(IContainer scope)
         {
-            return false;
+            throw new NotImplementedException();
         }
     }
 }
