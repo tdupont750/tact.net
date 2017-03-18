@@ -22,7 +22,8 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
         
         public bool TryResolve(
             IContainer container, 
-            Type type, 
+            Type type,
+            string key,
             Stack<Type> stack,
             bool canThrow,
             out object result)
@@ -35,15 +36,15 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
 
             var innerType = type.GenericTypeArguments[0];
             var method = CreateFuncMethodInfo.MakeGenericMethod(innerType);
-            result = method.Invoke(this, new object[] { container });
+            result = method.Invoke(this, new object[] { container, key });
             return true;
         }
 
         // ReSharper disable once UnusedMember.Local
-        private Func<T> CreateFunc<T>(IContainer container)
+        private Func<T> CreateFunc<T>(IContainer container, string key)
         {
             var type = typeof(T);
-            return () => (T)container.Resolve(type);
+            return () => (T)container.Resolve(type, key);
         }
     }
 }

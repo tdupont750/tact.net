@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,6 +22,12 @@ namespace Tact.Practices.LifetimeManagers.Implementation
         public bool IsScoped => false;
 
         public bool IsDisposable => false;
+
+        public ILifetimeManager CloneWithGenericArguments(Type[] genericArguments)
+        {
+            var newToType = _toType.GetGenericTypeDefinition().MakeGenericType(genericArguments);
+            return new TransientLifetimeManager(newToType, _factory);
+        }
 
         public ILifetimeManager BeginScope(IContainer scope)
         {

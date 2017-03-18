@@ -11,6 +11,13 @@ namespace Tact.Practices.LifetimeManagers.Implementation
         private readonly string _toKey;
         private readonly bool _hasKey;
 
+        public ProxyLifetimeManager(Type toType, string toKey)
+        {
+            _toType = toType;
+            _toKey = toKey;
+            _hasKey = !string.IsNullOrWhiteSpace(_toKey);
+        }
+
         public string Description => _hasKey
             ? string.Concat("Proxy: ", _toType.Name, " - Proxy Key: ", _toKey)
             : string.Concat("Proxy: ", _toType.Name);
@@ -19,13 +26,12 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public bool IsDisposable => false;
 
-        public ProxyLifetimeManager(Type toType, string toKey)
+        public ILifetimeManager CloneWithGenericArguments(Type[] genericArguments)
         {
-            _toType = toType;
-            _toKey = toKey;
-            _hasKey = !string.IsNullOrWhiteSpace(_toKey);
+            var newToType = _toType.GetGenericTypeDefinition().MakeGenericType(genericArguments);
+            return new ProxyLifetimeManager(newToType, _toKey);
         }
-
+        
         public ILifetimeManager BeginScope(IContainer scope)
         {
             throw new NotImplementedException();

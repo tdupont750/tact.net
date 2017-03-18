@@ -23,6 +23,7 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
         public bool TryResolve(
             IContainer container, 
             Type type, 
+            string key,
             Stack<Type> stack,
             bool canThrow,
             out object result)
@@ -35,15 +36,15 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
 
             var innerType = type.GenericTypeArguments[0];
             var method = CreateLazyMethodInfo.MakeGenericMethod(innerType);
-            result = method.Invoke(this, new object[] { container });
+            result = method.Invoke(this, new object[] { container, key });
             return true;
         }
 
         // ReSharper disable once UnusedMember.Local
-        private Lazy<T> CreateLazy<T>(IContainer container)
+        private Lazy<T> CreateLazy<T>(IContainer container, string key)
         {
             var type = typeof(T);
-            return new Lazy<T>(() => (T)container.Resolve(type));
+            return new Lazy<T>(() => (T)container.Resolve(type, key));
         }
     }
 }

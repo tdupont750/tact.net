@@ -9,6 +9,7 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
         public bool TryResolve(
             IContainer container, 
             Type type, 
+            string key,
             Stack<Type> stack,
             bool canThrow,
             out object result)

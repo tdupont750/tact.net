@@ -93,6 +93,65 @@ namespace Tact.Tests.Practices
             }
         }
 
+        [Fact]
+        public void PreventRecursion()
+        {
+            using (var resolver = new TactContainer(new InMemoryLog()))
+            {
+                resolver.RegisterTransient<Seven>();
+                Assert.Throws<InvalidOperationException>(() => resolver.Resolve<Seven>());
+            }
+        }
+
+        [Fact]
+        public void GenericClassResolve()
+        {
+            using (var resolver = new TactContainer(new InMemoryLog()))
+            {
+                Assert.Throws<InvalidOperationException>(() => resolver.Resolve<Seven>());
+
+                var eightInt = resolver.Resolve<Eight<int>>();
+                Assert.Equal(typeof(int), eightInt.Type);
+
+                var eightBool = resolver.Resolve<Eight<bool>>();
+                Assert.Equal(typeof(bool), eightBool.Type);
+            }
+        }
+
+        [Fact]
+        public void GenericInterfaceResolve()
+        {
+            using (var resolver = new TactContainer(new InMemoryLog()))
+            {
+                resolver.RegisterTransient(typeof(IEight<>), typeof(Eight<>));
+
+                Assert.Throws<InvalidOperationException>(() => resolver.Resolve<Seven>());
+
+                var eightInt = resolver.Resolve<IEight<int>>();
+                Assert.Equal(typeof(int), eightInt.Type);
+
+                var eightBool = resolver.Resolve<IEight<bool>>();
+                Assert.Equal(typeof(bool), eightBool.Type);
+            }
+        }
+
+        [Fact]
+        public void IncludeUnkeyedInResolveAll()
+        {
+            using (var resolver = new TactContainer(new InMemoryLog(), includeUnkeyedInResolveAll: true))
+            {
+                resolver.RegisterSingleton<IOne, One>();
+
+                var a = resolver.ResolveAll<IOne>().ToList();
+                Assert.Equal(1, a.Count);
+
+                resolver.RegisterSingleton<IOne, One>("Doh");
+
+                var b = resolver.ResolveAll<IOne>().ToList();
+                Assert.Equal(2, b.Count);
+            }
+        }
+
         private interface IOne
         {
             bool IsDisposed { get; }
@@ -150,23 +209,22 @@ namespace Tact.Tests.Practices
             }
         }
 
-        [Fact]
-        public void PreventRecursion()
-        {
-            using (var resolver = new TactContainer(new InMemoryLog()))
-            {
-                resolver.RegisterTransient<Seven>();
-                Assert.Throws<InvalidOperationException>(() => resolver.Resolve<Seven>());
-            }
-
-        }
-
         private class Seven
         {
             // ReSharper disable once UnusedParameter.Local
             public Seven(Seven seven)
             {
             }
+        }
+
+        private interface IEight<T>
+        {
+            Type Type { get; }
+        }
+
+        private class Eight<T> : IEight<T>
+        {
+            public Type Type => typeof(T);
         }
     }
 }

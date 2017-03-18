@@ -12,24 +12,31 @@ namespace Tact.Practices.LifetimeManagers.Implementation
         private static readonly TypeInfo DisposableTypeInfo = typeof(IDisposable).GetTypeInfo();
 
         private readonly object _lock = new object();
-        private readonly Type _toType;
-        private readonly IContainer _scope;
-        private readonly Func<IResolver, object> _factory;
+
+        protected readonly Type ToType;
+        protected readonly IContainer Scope;
+        protected readonly Func<IResolver, object> Factory;
 
         private volatile object _instance;
 
         public SingletonLifetimeManager(Type toType, IContainer scope, Func<IResolver, object> factory = null)
         {
-            _toType = toType;
-            _scope = scope;
-            _factory = factory;
+            ToType = toType;
+            Scope = scope;
+            Factory = factory;
         }
 
-        public virtual string Description => string.Concat("Singleton: ", _toType.Name);
+        public virtual string Description => string.Concat("Singleton: ", ToType.Name);
 
         public virtual bool IsScoped => false;
 
-        public bool IsDisposable => DisposableTypeInfo.IsAssignableFrom(_toType);
+        public bool IsDisposable => DisposableTypeInfo.IsAssignableFrom(ToType);
+
+        public virtual ILifetimeManager CloneWithGenericArguments(Type[] genericArguments)
+        {
+            var newToType = ToType.GetGenericTypeDefinition().MakeGenericType(genericArguments);
+            return new SingletonLifetimeManager(newToType, Scope, Factory);
+        }
 
         public virtual ILifetimeManager BeginScope(IContainer scope)
         {
@@ -43,7 +50,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
             lock (_lock)
                 if (_instance == null)
-                    _instance = _factory?.Invoke(_scope) ?? _scope.CreateInstance(_toType, stack);
+                    _instance = Factory?.Invoke(Scope) ?? Scope.CreateInstance(ToType, stack);
 
             return _instance;
         }
@@ -62,7 +69,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
                     if (_instance == null)
                         return false;
 
-            if (!ReferenceEquals(_scope, scope))
+            if (!ReferenceEquals(Scope, scope))
                 return false;
 
             if (ReferenceEquals(_instance, scope))

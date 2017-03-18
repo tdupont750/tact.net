@@ -13,6 +13,8 @@ namespace Tact.Practices.LifetimeManagers
 
         bool IsDisposable { get; }
 
+        ILifetimeManager CloneWithGenericArguments(Type[] genericArguments);
+
         ILifetimeManager BeginScope(IContainer scope);
 
         object Resolve(IContainer scope, Stack<Type> stack);

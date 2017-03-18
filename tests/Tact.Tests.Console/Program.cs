@@ -13,9 +13,9 @@ namespace Tact.Tests.Console
     {
         public static void Main(string[] args)
         {
-            PerformanceTests.Container();
+            // PerformanceTests.Container();
 
-            //Demo();
+            Demo();
         }
 
         private static void Demo()
@@ -67,6 +67,5 @@ namespace Tact.Tests.Console
 
             return container;
         }
-
     }
 }

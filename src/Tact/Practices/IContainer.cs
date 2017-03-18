@@ -11,8 +11,6 @@ namespace Tact.Practices
         void Register(Type type, ILifetimeManager lifetimeManager);
         void Register(Type type, string key, ILifetimeManager lifetimeManager);
 
-        object CreateInstance(Type type, Stack<Type> stack);
-
         object Resolve(Type type, Stack<Type> stack);
         object Resolve(Type type, string name, Stack<Type> stack);
 
@@ -20,5 +18,9 @@ namespace Tact.Practices
         bool TryResolve(Type type, string name, Stack<Type> stack, out object result);
 
         IEnumerable<object> ResolveAll(Type type, Stack<Type> stack);
+
+        object CreateInstance(Type type, Stack<Type> stack);
+
+        bool TryResolveGenericType(Type genericType, Type[] genericArguments, string key, Stack<Type> stack, out object result);
     }
 }

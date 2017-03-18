@@ -21,9 +21,14 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public string Description => string.Concat("Instance: ", _typeName);
 
+        public bool IsScoped => false;
+
         public bool IsDisposable => _instance is IDisposable;
 
-        public bool IsScoped => false;
+        public ILifetimeManager CloneWithGenericArguments(Type[] genericArguments)
+        {
+            throw new NotImplementedException();
+        }
 
         public ILifetimeManager BeginScope(IContainer scope)
         {

@@ -17,8 +17,10 @@ namespace Tact.Practices.Implementation
             bool resolveUnregistered = true,
             bool resolveEnumerable = true,
             bool resolveCollection = true,
-            bool resolveList = true)
-            : base(log, maxDisposeParallelization)
+            bool resolveList = true,
+            bool resolveGenerics = true,
+            bool includeUnkeyedInResolveAll = false)
+            : base(log, maxDisposeParallelization, includeUnkeyedInResolveAll)
         {
             var resolutionHandlers = new List<IResolutionHandler>();
 
@@ -34,14 +36,18 @@ namespace Tact.Practices.Implementation
             if (resolveUnregistered)
                 resolutionHandlers.Add(new UnregisteredResolutionHandler());
 
+            if (resolveGenerics)
+                resolutionHandlers.Add(new GenericResolutionHandler());
+
             ResolutionHandlers = resolutionHandlers;
         }
 
         public TactContainer(
             ILog log,
             IReadOnlyList<IResolutionHandler> resolutionHandlers,
-            int? maxDisposeParallelization = null)
-            : base(log, maxDisposeParallelization)
+            int? maxDisposeParallelization = null,
+            bool includeUnkeyedInResolveAll = false)
+            : base(log, maxDisposeParallelization, includeUnkeyedInResolveAll)
         {
             ResolutionHandlers = resolutionHandlers ?? throw new ArgumentNullException(nameof(resolutionHandlers));
         }
@@ -50,15 +56,16 @@ namespace Tact.Practices.Implementation
             ILog log,
             IReadOnlyList<IResolutionHandler> resolutionHandlers,
             int? maxDisposeParallelization,
+            bool includeUnkeyedInResolveAll,
             TactContainer parentScope)
-            : base(log, maxDisposeParallelization, parentScope)
+            : base(log, maxDisposeParallelization, includeUnkeyedInResolveAll, parentScope)
         {
             ResolutionHandlers = resolutionHandlers;
         }
 
         public override IContainer BeginScope()
         {
-            return new TactContainer(Log, ResolutionHandlers, MaxDisposeParallelization, this);
+            return new TactContainer(Log, ResolutionHandlers, MaxDisposeParallelization, IncludeUnkeyedInResovleAll, this);
         }
 
         protected override IReadOnlyList<IResolutionHandler> ResolutionHandlers { get; }

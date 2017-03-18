@@ -20,23 +20,25 @@ namespace Tact.Practices.Base
 
         protected readonly ILog Log;
         protected readonly int? MaxDisposeParallelization;
+        protected readonly bool IncludeUnkeyedInResovleAll;
 
         protected abstract IReadOnlyList<IResolutionHandler> ResolutionHandlers { get; }
 
-        protected ContainerBase(ILog log, int? maxDisposeParallelization)
-            : this(log, maxDisposeParallelization, RegistrationMaps.Create())
+        protected ContainerBase(ILog log, int? maxDisposeParallelization, bool includeUnkeyedInResovleAll)
+            : this(log, maxDisposeParallelization, includeUnkeyedInResovleAll, RegistrationMaps.Create())
         {
             this.RegisterInstance(log);
         }
 
-        protected ContainerBase(ILog log, int? maxDisposeParallelization, ContainerBase parentScope)
-            : this(log, maxDisposeParallelization, parentScope._maps.Clone())
+        protected ContainerBase(ILog log, int? maxDisposeParallelization, bool includeUnkeyedInResovleAll, ContainerBase parentScope)
+            : this(log, maxDisposeParallelization, includeUnkeyedInResovleAll, parentScope._maps.Clone())
         {
             _maps.InitalizeScope(this);
         }
 
-        private ContainerBase(ILog log, int? maxDisposeParallelization, RegistrationMaps maps)
+        private ContainerBase(ILog log, int? maxDisposeParallelization, bool includeUnkeyedInResovleAll, RegistrationMaps maps)
         {
+            IncludeUnkeyedInResovleAll = includeUnkeyedInResovleAll;
             _maps = maps ?? throw new ArgumentNullException(nameof(maps));
             Log = log ?? throw new ArgumentNullException(nameof(log));
             MaxDisposeParallelization = maxDisposeParallelization;
@@ -70,33 +72,40 @@ namespace Tact.Practices.Base
 
         public object Resolve(Type type)
         {
+            var key = string.Empty;
             var stack = new Stack<Type>();
-            return Resolve(type, stack);
+            return TryResolve(type, key, stack, true, out object result)
+                ? result
+                : throw NewNoRegistrationFoundException(type, stack);
         }
 
         public bool TryResolve(Type type, out object result)
         {
+            var key = string.Empty;
             var stack = new Stack<Type>();
-            return TryResolve(type, stack, false, out result);
+            return TryResolve(type, key, stack, false, out result);
         }
 
         public object Resolve(Type type, Stack<Type> stack)
         {
-            if (TryResolve(type, stack, true, out object result))
-                return result;
-
-            throw NewNoRegistrationFoundException(type, stack);
+            var key = string.Empty;
+            return TryResolve(type, key, stack, true, out object result)
+                ? result
+                : throw NewNoRegistrationFoundException(type, stack);
         }
 
         public bool TryResolve(Type type, Stack<Type> stack, out object result)
         {
-            return TryResolve(type, stack, false, out result);
+            var key = string.Empty;
+            return TryResolve(type, key, stack, false, out result);
         }
 
         public object Resolve(Type type, string key)
         {
             var stack = new Stack<Type>();
-            return Resolve(type, key, stack);
+            return TryResolve(type, key, stack, true, out object result)
+                ? result
+                : throw NewNoRegistrationFoundException(type, stack);
         }
 
         public bool TryResolve(Type type, string key, out object result)
@@ -107,10 +116,9 @@ namespace Tact.Practices.Base
 
         public object Resolve(Type type, string key, Stack<Type> stack)
         {
-            if (TryResolve(type, key, stack, true, out object result))
-                return result;
-
-            throw NewNoRegistrationFoundException(type, stack);
+            return TryResolve(type, key, stack, true, out object result)
+                ? result
+                : throw NewNoRegistrationFoundException(type, stack);
         }
 
         public bool TryResolve(Type type, string key, Stack<Type> stack, out object result)
@@ -129,21 +137,27 @@ namespace Tact.Practices.Base
             var instances = new List<object>();
 
             using (EnterPush(type, stack))
-            using (_lock.UseReadLock())
             {
-                if (_isDisposed)
-                    throw new ObjectDisposedException(GetType().Name);
+                using (_lock.UseReadLock())
+                {
+                    if (_isDisposed)
+                        throw new ObjectDisposedException(GetType().Name);
 
-                if (_maps.MultiRegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
-                    foreach (var lifetimeManager in registrations.Values)
+                    if (_maps.RegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
                     {
-                        var instance = lifetimeManager.Resolve(this, stack);
-                        instances.Add(instance);
-                    }
-                else
-                    foreach (var resolutionHandler in ResolutionHandlers)
-                        if (resolutionHandler.TryResolve(this, type, stack, false, out object instance))
+                        foreach (var lifetimeManager in registrations.Values)
+                        {
+                            var instance = lifetimeManager.Resolve(this, stack);
                             instances.Add(instance);
+                        }
+
+                        return instances;
+                    }
+                }
+
+                foreach (var resolutionHandler in ResolutionHandlers)
+                    if (resolutionHandler.TryResolve(this, type, string.Empty, stack, false, out object instance))
+                        instances.Add(instance);
             }
 
             return instances;
@@ -158,29 +172,12 @@ namespace Tact.Practices.Base
 
         public void Register(Type fromType, ILifetimeManager lifetimeManager)
         {
-            using (_lock.UseWriteLock())
-            {
-                if (_isDisposed)
-                    throw new ObjectDisposedException(GetType().Name);
-
-                if (_maps.RegistrationMap.TryGetValue(fromType, out ILifetimeManager previous))
-                    Log.Debug("Type: {0} - {1} - Replaced {2}", fromType.Name, lifetimeManager.Description, previous.Description);
-                else
-                    Log.Debug("Type: {0} - {1}", fromType.Name, lifetimeManager.Description);
-
-                _maps.RegistrationMap[fromType] = lifetimeManager;
-
-                if (lifetimeManager.IsScoped && !_maps.ScopedKeys.Contains(fromType))
-                    _maps.ScopedKeys.Add(fromType);
-
-                if (lifetimeManager.IsDisposable && !_maps.DisposableKeys.Contains(fromType))
-                    _maps.DisposableKeys.Add(fromType);
-            }
+            Register(fromType, string.Empty, lifetimeManager);
         }
 
         public void Register(Type fromType, string key, ILifetimeManager lifetimeManager)
         {
-            if (string.IsNullOrWhiteSpace(key))
+            if (key == null)
                 throw new ArgumentException("Required", nameof(key));
 
             using (_lock.UseWriteLock())
@@ -188,21 +185,27 @@ namespace Tact.Practices.Base
                 if (_isDisposed)
                     throw new ObjectDisposedException(GetType().Name);
 
-                if (_maps.MultiRegistrationMap.TryGetValue(fromType, out Dictionary<string, ILifetimeManager> registrations))
+                if (_maps.RegistrationMap.TryGetValue(fromType, out Dictionary<string, ILifetimeManager> registrations))
                     registrations[key] = lifetimeManager;
                 else
-                    _maps.MultiRegistrationMap[fromType] = new Dictionary<string, ILifetimeManager>
+                    _maps.RegistrationMap[fromType] = new Dictionary<string, ILifetimeManager>
                     {
                         { key, lifetimeManager }
                     };
 
-                if (lifetimeManager.IsScoped && !_maps.MultiScopedKeys.Contains(fromType))
-                    _maps.MultiScopedKeys.Add(fromType);
+                if (lifetimeManager.IsScoped && !_maps.ScopedKeys.Contains(fromType))
+                    _maps.ScopedKeys.Add(fromType);
 
-                if (lifetimeManager.IsDisposable && !_maps.MultiDisposableKeys.Contains(fromType))
-                    _maps.MultiDisposableKeys.Add(fromType);
+                if (lifetimeManager.IsDisposable && !_maps.DisposableKeys.Contains(fromType))
+                    _maps.DisposableKeys.Add(fromType);
+            }
 
-                Log.Debug("Type: {0} - Key: {1} - {2}", fromType.Name, key, lifetimeManager.Description);
+            if (Log.IsEnabled(LogLevel.Debug))
+            {
+                if (string.IsNullOrWhiteSpace(key))
+                    Log.Debug("Type: {0} - {1}", fromType.Name, lifetimeManager.Description);
+                else
+                    Log.Debug("Type: {0} - Key: {1} - {2}", fromType.Name, key, lifetimeManager.Description);
             }
         }
 
@@ -222,34 +225,56 @@ namespace Tact.Practices.Base
 
             return constructor.EfficientInvoke(arguments);
         }
-                
-        private bool TryResolve(Type type, Stack<Type> stack, bool canThrow, out object result)
+
+        public bool TryResolveGenericType(Type genericType, Type[] genericArguments, string key, Stack<Type> stack, out object result)
         {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
+            if (genericType == null)
+                throw new ArgumentNullException(nameof(genericType));
+
+            if (genericArguments == null)
+                throw new ArgumentNullException(nameof(genericArguments));
+
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
 
             if (stack == null)
                 throw new ArgumentNullException(nameof(stack));
 
-            using (EnterPush(type, stack))
+            var type = genericType.MakeGenericType(genericArguments);
+            ILifetimeManager clone = null;
+
             using (_lock.UseReadLock())
             {
                 if (_isDisposed)
                     throw new ObjectDisposedException(GetType().Name);
 
-                if (_maps.RegistrationMap.TryGetValue(type, out ILifetimeManager lifetimeManager))
-                {
-                    result = lifetimeManager.Resolve(this, stack);
-                    return true;
-                }
+                if (_maps.RegistrationMap.TryGetValue(genericType, out Dictionary<string, ILifetimeManager> registrations))
+                    foreach (var lifetimeManager in registrations)
+                        if (lifetimeManager.Key == key)
+                        {
+                            clone = lifetimeManager.Value.CloneWithGenericArguments(genericArguments);
+                            break;
+                        }
+            }
 
-                foreach (var handler in ResolutionHandlers)
-                    if (handler.TryResolve(this, type, stack, canThrow, out result))
-                        return true;
-
+            if (clone == null)
+            {
                 result = null;
                 return false;
             }
+
+            var previousType = stack.Pop();
+            if (previousType != type)
+                throw new InvalidOperationException();
+
+            using (EnterPush(genericType, stack))
+            {
+                Register(type, key, clone);
+                result = Resolve(type, key, stack);
+            }
+
+            stack.Push(previousType);
+            return true;
         }
 
         private bool TryResolve(Type type, string key, Stack<Type> stack, bool canThrow, out object result)
@@ -264,21 +289,23 @@ namespace Tact.Practices.Base
                 throw new ArgumentNullException(nameof(stack));
 
             using (EnterPush(type, stack))
-            using (_lock.UseReadLock())
             {
-                if (_isDisposed)
-                    throw new ObjectDisposedException(GetType().Name);
+                using (_lock.UseReadLock())
+                {
+                    if (_isDisposed)
+                        throw new ObjectDisposedException(GetType().Name);
 
-                if (_maps.MultiRegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
-                    foreach (var lifetimeManager in registrations)
-                        if (lifetimeManager.Key == key)
-                        {
-                            result = lifetimeManager.Value.Resolve(this, stack);
-                            return true;
-                        }
+                    if (_maps.RegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
+                        foreach (var lifetimeManager in registrations)
+                            if (lifetimeManager.Key == key)
+                            {
+                                result = lifetimeManager.Value.Resolve(this, stack);
+                                return true;
+                            }
+                }
 
-                foreach (var resolutionHandler in ResolutionHandlers)
-                    if (resolutionHandler.TryResolve(this, type, stack, canThrow, out result))
+                foreach (var handler in ResolutionHandlers)
+                    if (handler.TryResolve(this, type, key, stack, canThrow, out result))
                         return true;
             }
 
@@ -323,61 +350,41 @@ namespace Tact.Practices.Base
 
         protected class RegistrationMaps
         {
-            public readonly Dictionary<Type, ILifetimeManager> RegistrationMap;
-            public readonly Dictionary<Type, Dictionary<string, ILifetimeManager>> MultiRegistrationMap;
+            public readonly Dictionary<Type, Dictionary<string, ILifetimeManager>> RegistrationMap;
             public readonly List<Type> ScopedKeys;
-            public readonly List<Type> MultiScopedKeys;
             public readonly List<Type> DisposableKeys;
-            public readonly List<Type> MultiDisposableKeys;
 
             private RegistrationMaps(
-                Dictionary<Type, ILifetimeManager> registrationMap,
-                Dictionary<Type, Dictionary<string, ILifetimeManager>> multiRegistrationMap,
+                Dictionary<Type, Dictionary<string, ILifetimeManager>> registrationMap,
                 List<Type> scopedKeys,
-                List<Type> multiScopedKeys,
-                List<Type> disposableKeys,
-                List<Type> multiDisposableKeys)
+                List<Type> disposableKeys)
             {
                 RegistrationMap = registrationMap;
-                MultiRegistrationMap = multiRegistrationMap;
                 ScopedKeys = scopedKeys;
-                MultiScopedKeys = multiScopedKeys;
                 DisposableKeys = disposableKeys;
-                MultiDisposableKeys = multiDisposableKeys;
             }
 
             public static RegistrationMaps Create()
             {
                 return new RegistrationMaps(
-                    new Dictionary<Type, ILifetimeManager>(),
                     new Dictionary<Type, Dictionary<string, ILifetimeManager>>(),
-                    new List<Type>(),
-                    new List<Type>(),
                     new List<Type>(),
                     new List<Type>());
             }
 
             public RegistrationMaps Clone()
             {
-                var registrationMap = new Dictionary<Type, ILifetimeManager>(RegistrationMap);
-
-                var multiRegistrationMap = new Dictionary<Type, Dictionary<string, ILifetimeManager>>();
-                foreach (var pair in MultiRegistrationMap)
-                    multiRegistrationMap[pair.Key] = new Dictionary<string, ILifetimeManager>(pair.Value);
+                var registrationMap = new Dictionary<Type, Dictionary<string, ILifetimeManager>>(RegistrationMap.Count);
+                foreach (var pair in RegistrationMap)
+                    registrationMap[pair.Key] = new Dictionary<string, ILifetimeManager>(pair.Value);
 
                 var scopedKeys = ScopedKeys.ToList();
-                var multiScopedKeys = MultiScopedKeys.ToList();
-
                 var disposableKeys = DisposableKeys.ToList();
-                var mutliDisposableKeys = MultiDisposableKeys.ToList();
 
                 return new RegistrationMaps(
                     registrationMap,
-                    multiRegistrationMap,
                     scopedKeys,
-                    multiScopedKeys,
-                    disposableKeys, 
-                    mutliDisposableKeys);
+                    disposableKeys);
             }
 
             public void InitalizeScope(IContainer scope)
@@ -385,14 +392,8 @@ namespace Tact.Practices.Base
                 for (var i = 0; i < ScopedKeys.Count; i++)
                 {
                     var type = ScopedKeys[i];
-                    RegistrationMap[type] = RegistrationMap[type].BeginScope(scope);
-                }
-
-                for (var i = 0; i < MultiScopedKeys.Count; i++)
-                {
-                    var type = MultiScopedKeys[i];
-                    var values = MultiRegistrationMap[type];
-                    var clones = MultiRegistrationMap[type] = new Dictionary<string, ILifetimeManager>(values.Count);
+                    var values = RegistrationMap[type];
+                    var clones = RegistrationMap[type] = new Dictionary<string, ILifetimeManager>(values.Count);
                     foreach (var pair in values)
                         clones[pair.Key] = pair.Value.BeginScope(scope);
                 }
@@ -403,18 +404,11 @@ namespace Tact.Practices.Base
                 // Creating this collection with foreach is 15% faster than linq.
                 var lifetimeManagersToDispose = new List<ILifetimeManager>();
 
-                foreach (var key in MultiDisposableKeys)
-                    foreach (var pair in MultiRegistrationMap[key])
+                foreach (var key in DisposableKeys)
+                    foreach (var pair in RegistrationMap[key])
                         if (pair.Value.RequiresDispose(scope))
                             lifetimeManagersToDispose.Add(pair.Value);
-
-                foreach (var key in DisposableKeys)
-                {
-                    var lifetimeManager = RegistrationMap[key];
-                    if (lifetimeManager.RequiresDispose(scope))
-                        lifetimeManagersToDispose.Add(lifetimeManager);
-                }
-
+                
                 return lifetimeManagersToDispose;
             }
         }
