@@ -181,7 +181,7 @@ namespace Tact.Tests.Reflection
             Assert.Equal(Iterations * 3, _obj.Count);
 
             Assert.True(ticks1 < ticks0);
-            Assert.True(ticks2 * 6 < ticks0);
+            Assert.True(ticks2 * 5 < ticks0);
         }
 
         private long PropertyInfoInvoke()
