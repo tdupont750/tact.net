@@ -305,6 +305,21 @@ namespace Tact
             container.Register(lifetimeManager, fromType, toKey);
         }
 
+        public static void RegisterProxy<TFrom>(this IContainer container, Func<IResolver, object> factory)
+        {
+            var fromType = typeof(TFrom);
+            container.RegisterProxy(fromType, factory);
+        }
+
+        public static void RegisterProxy(this IContainer container, Type fromType, Func<IResolver, object> factory)
+        {
+            if (container == null)
+                throw new ArgumentNullException(nameof(container));
+
+            var lifetimeManager = new ProxyLifetimeManager(factory);
+            container.Register(lifetimeManager, fromType);
+        }
+
         #endregion
     }
 }
