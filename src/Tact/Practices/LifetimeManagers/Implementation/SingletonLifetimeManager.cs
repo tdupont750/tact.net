@@ -10,8 +10,8 @@ namespace Tact.Practices.LifetimeManagers.Implementation
     public class SingletonLifetimeManager : ILifetimeManager
     {
         private static readonly TypeInfo DisposableTypeInfo = typeof(IDisposable).GetTypeInfo();
-
-        private readonly object _lock = new object();
+        
+        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
 
         protected readonly Type ToType;
         protected readonly IContainer Scope;
@@ -45,12 +45,10 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public object Resolve(IContainer scope, Stack<Type> stack)
         {
-            if (_instance != null)
-                return _instance;
-
-            lock (_lock)
-                if (_instance == null)
-                    _instance = Factory?.Invoke(Scope) ?? Scope.CreateInstance(stack, ToType);
+            if (_instance == null)
+                using (_lock.UseWriteLock())
+                    if (_instance == null)
+                        _instance = Factory?.Invoke(Scope) ?? Scope.CreateInstance(stack, ToType);
 
             return _instance;
         }
@@ -65,7 +63,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
         public bool RequiresDispose(IContainer scope)
         {
             if (_instance == null)
-                lock (_lock)
+                using (_lock.UseReadLock())
                     if (_instance == null)
                         return false;
 
