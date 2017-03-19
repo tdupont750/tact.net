@@ -5,13 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
+using Tact.AspNetCore.Demo.Services;
+using Tact.AspNetCore.Demo.Services.Implementation;
 using Tact.Diagnostics;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices;
 using Tact.Practices.Base;
-using Tact.Practices.Implementation;
 using Tact.Practices.ResolutionHandlers;
 
 namespace Tact.AspNetCore.Demo.Service
@@ -48,6 +48,9 @@ namespace Tact.AspNetCore.Demo.Service
             Container.RegisterCollection(services);
 
             return Container;
+
+            // services.AddSingleton<IHelloService, HelloService>();
+            // return services.BuildServiceProvider();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)

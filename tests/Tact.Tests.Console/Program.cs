@@ -13,6 +13,7 @@ namespace Tact.Tests.Console
     {
         public static void Main(string[] args)
         {
+            // PerformanceTests.WebRequests();
             // PerformanceTests.Container();
 
             Demo();

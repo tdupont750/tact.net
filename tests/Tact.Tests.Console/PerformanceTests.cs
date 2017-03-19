@@ -1,5 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net.Http;
 using System.Threading;
+using System.Threading.Tasks;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices.Implementation;
 
@@ -7,6 +10,48 @@ namespace Tact.Tests.Console
 {
     public static class PerformanceTests
     {
+        private static int _requestCount;
+
+        public static void WebRequests(string url = null)
+        {
+            const string defaultUrl = "http://localhost:8080/api/demo/hello/tom";
+
+            WebRequests(025, 4000, url ?? defaultUrl).Wait();
+            WebRequests(050, 2000, url ?? defaultUrl).Wait();
+            WebRequests(100, 1000, url ?? defaultUrl).Wait();
+            WebRequests(200, 0500, url ?? defaultUrl).Wait();
+        }
+
+        private static async Task WebRequests(int parallel, int count, string url)
+        {
+            _requestCount = 0;
+
+            var sw = Stopwatch.StartNew();
+
+            var tasks = new List<Task>();
+            for (var i = 0; i < parallel; i++)
+                tasks.Add(MakeRequests(count, url));
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
+
+            sw.Stop();
+
+            System.Console.WriteLine($"{parallel} * {count} = { (int)(((float)_requestCount / sw.ElapsedMilliseconds) * 1000)} rps");
+        }
+
+        private static async Task MakeRequests(int count, string url)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                for (var i = 0; i < count; i++)
+                    using (var x = await httpClient.GetAsync(url).ConfigureAwait(false))
+                    {
+                        x.EnsureSuccessStatusCode();
+                        Interlocked.Increment(ref _requestCount);
+                    }
+            }
+        }
+
         public static void Container()
         {
             Thread.Sleep(2000);
