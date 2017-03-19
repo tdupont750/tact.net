@@ -7,20 +7,20 @@ namespace Tact.Practices
     public interface IContainer : IResolver
     {
         new IContainer BeginScope();
+        
+        void Register(ILifetimeManager lifetimeManager, Type type, string key = null);
 
-        void Register(Type type, ILifetimeManager lifetimeManager);
-        void Register(Type type, string key, ILifetimeManager lifetimeManager);
+        object Resolve(Stack<Type> stack, Type type, string key = null);
+        bool TryResolve(out object result, Stack<Type> stack, Type type, string key = null);
 
-        object Resolve(Type type, Stack<Type> stack);
-        object Resolve(Type type, string name, Stack<Type> stack);
+        bool CanResolve(Stack<Type> stack, Type type, string key = null);
+        bool CanCreateInstance(Stack<Type> stack, Type type);
 
-        bool TryResolve(Type type, Stack<Type> stack, out object result);
-        bool TryResolve(Type type, string name, Stack<Type> stack, out object result);
+        IEnumerable<object> ResolveAll(Stack<Type> stack, Type type);
 
-        IEnumerable<object> ResolveAll(Type type, Stack<Type> stack);
+        object CreateInstance(Stack<Type> stack, Type type);
+        bool TryCreateInstance(out object result, Stack<Type> stack, Type type);
 
-        object CreateInstance(Type type, Stack<Type> stack);
-
-        bool TryResolveGenericType(Type genericType, Type[] genericArguments, string key, Stack<Type> stack, out object result);
+        bool TryResolveGenericType(out object result, Stack<Type> stack, Type genericType, Type[] genericArguments, string key = null);
     }
 }

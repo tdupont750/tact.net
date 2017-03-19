@@ -39,9 +39,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public object Resolve(IContainer scope, Stack<Type> stack)
         {
-            return _hasKey 
-                ? scope.Resolve(_toType, _toKey, stack) 
-                : scope.Resolve(_toType, stack);
+            return scope.Resolve(stack, _toType, _toKey);
         }
 
         public Task DisposeAsync(IContainer scope, CancellationToken cancelToken)

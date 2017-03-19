@@ -7,12 +7,10 @@ namespace Tact.Practices
     public interface IResolver : IAsyncDisposable
     {
         IResolver BeginScope();
+        
+        object Resolve(Type type, string key = null);
 
-        object Resolve(Type type);
-        object Resolve(Type type, string key);
-
-        bool TryResolve(Type type, out object result);
-        bool TryResolve(Type type, string key, out object result);
+        bool TryResolve(out object result, Type type, string key = null);
 
         IEnumerable<object> ResolveAll(Type type);
     }

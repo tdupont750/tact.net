@@ -50,7 +50,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
             lock (_lock)
                 if (_instance == null)
-                    _instance = Factory?.Invoke(Scope) ?? Scope.CreateInstance(ToType, stack);
+                    _instance = Factory?.Invoke(Scope) ?? Scope.CreateInstance(stack, ToType);
 
             return _instance;
         }

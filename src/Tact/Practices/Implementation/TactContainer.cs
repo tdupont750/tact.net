@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Tact.Diagnostics;
 using Tact.Practices.Base;
 using Tact.Practices.ResolutionHandlers;
-using Tact.Practices.ResolutionHandlers.Implementation;
 
 namespace Tact.Practices.Implementation
 {
@@ -22,24 +21,14 @@ namespace Tact.Practices.Implementation
             bool includeUnkeyedInResolveAll = false)
             : base(log, maxDisposeParallelization, includeUnkeyedInResolveAll)
         {
-            var resolutionHandlers = new List<IResolutionHandler>();
-
-            if (resolveLazy)
-                resolutionHandlers.Add(new LazyResolutionHandler());
-
-            if (resolveEnumerable || resolveCollection || resolveList)
-                resolutionHandlers.Add(new EnumerableResolutionHandler(resolveEnumerable, resolveCollection, resolveList));
-
-            if (resolveFunc)
-                resolutionHandlers.Add(new FuncResolutionHandler());
-
-            if (resolveUnregistered)
-                resolutionHandlers.Add(new UnregisteredResolutionHandler());
-
-            if (resolveGenerics)
-                resolutionHandlers.Add(new GenericResolutionHandler());
-
-            ResolutionHandlers = resolutionHandlers;
+            ResolutionHandlers = CreateDefaultHandlers(
+                resolveLazy,
+                resolveFunc,
+                resolveUnregistered,
+                resolveEnumerable,
+                resolveCollection,
+                resolveList,
+                resolveGenerics);
         }
 
         public TactContainer(

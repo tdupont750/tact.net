@@ -23,7 +23,7 @@ namespace Tact
 
             var type = typeof(T);
             object objResult;
-            if (resolver.TryResolve(type, out objResult))
+            if (resolver.TryResolve(out objResult, type))
             {
                 result = (T) objResult;
                 return true;
@@ -49,7 +49,7 @@ namespace Tact
 
             var type = typeof(T);
             object objResult;
-            if (resolver.TryResolve(type, key, out objResult))
+            if (resolver.TryResolve(out objResult, type, key))
             {
                 result = (T)objResult;
                 return true;

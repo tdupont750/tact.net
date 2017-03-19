@@ -36,7 +36,7 @@ namespace Tact.Practices.LifetimeManagers.Implementation
 
         public object Resolve(IContainer scope, Stack<Type> stack)
         {
-            return _factory?.Invoke(scope) ?? scope.CreateInstance(_toType, stack);
+            return _factory?.Invoke(scope) ?? scope.CreateInstance(stack, _toType);
         }
 
         public Task DisposeAsync(IContainer scope, CancellationToken cancelToken)

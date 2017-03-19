@@ -21,12 +21,12 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
         }
         
         public bool TryResolve(
-            IContainer container, 
+            out object result,
+            IContainer container,
+            Stack<Type> stack,
             Type type,
             string key,
-            Stack<Type> stack,
-            bool canThrow,
-            out object result)
+            bool canThrow)
         {
             if (!type.FullName.StartsWith(FuncPrefix))
             {

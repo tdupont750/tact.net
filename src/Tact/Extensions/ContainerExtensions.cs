@@ -138,36 +138,14 @@ namespace Tact
         
         #region Register Per Scope
         
-        public static void RegisterPerScope<T>(this IContainer container, Func<IResolver, T> factory = null)
-            where T : class
-        {
-            var type = typeof(T);
-            container.RegisterPerScope(type, factory);
-        }
-
-        public static void RegisterPerScope(this IContainer container, Type type, Func<IResolver, object> factory = null)
-        {
-            if (container == null)
-                throw new ArgumentNullException(nameof(container));
-
-            if (factory == null)
-            {
-                container.RegisterPerScope(type, type);
-                return;
-            }
-
-            var lifetimeManager = new PerScopeLifetimeManager(type, container, factory);
-            container.Register(type, lifetimeManager);
-        }
-        
-        public static void RegisterPerScope<T>(this IContainer container, string key, Func<IResolver, T> factory = null)
+        public static void RegisterPerScope<T>(this IContainer container, string key = null, Func<IResolver, T> factory = null)
             where T : class
         {
             var type = typeof(T);
             container.RegisterPerScope(type, key, factory);
         }
 
-        public static void RegisterPerScope(this IContainer container, Type type, string key, Func<IResolver, object> factory = null)
+        public static void RegisterPerScope(this IContainer container, Type type, string key = null, Func<IResolver, object> factory = null)
         {
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
@@ -179,7 +157,7 @@ namespace Tact
             }
 
             var lifetimeManager = new PerScopeLifetimeManager(type, container, factory);
-            container.Register(type, key, lifetimeManager);
+            container.Register(lifetimeManager, type, key);
         }
         
         public static void RegisterPerScope<TFrom, TTo>(this IContainer container, string key = null)
@@ -195,13 +173,8 @@ namespace Tact
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
 
-            toType.EnsureSingleCostructor();
             var lifetimeManager = new PerScopeLifetimeManager(toType, container);
-
-            if (string.IsNullOrWhiteSpace(key))
-                container.Register(fromType, lifetimeManager);
-            else
-                container.Register(fromType, key, lifetimeManager);
+            container.Register(lifetimeManager, fromType, key);
         }
 
         #endregion
@@ -214,11 +187,7 @@ namespace Tact
                 throw new ArgumentNullException(nameof(container));
 
             var type = typeof(T);
-
-            if (string.IsNullOrWhiteSpace(key))
-                container.RegisterInstance(type, value);
-            else
-                container.RegisterInstance(type, value, key);
+            container.RegisterInstance(type, value, key);
         }
 
         public static void RegisterInstance(this IContainer container, Type type, object value, string key = null)
@@ -227,47 +196,21 @@ namespace Tact
                 throw new ArgumentNullException(nameof(container));
 
             var lifetimeManager = new InstanceLifetimeManager(value, container);
-
-            if (string.IsNullOrWhiteSpace(key))
-                container.Register(type, lifetimeManager);
-            else
-                container.Register(type, key, lifetimeManager);
+            container.Register(lifetimeManager, type, key);
         }
 
         #endregion
 
         #region Register Singleton
         
-        public static void RegisterSingleton<T>(this IContainer container, Func<IResolver, T> factory = null)
-            where T : class
-        {
-            var type = typeof(T);
-            container.RegisterSingleton(type, factory);
-        }
-
-        public static void RegisterSingleton(this IContainer container, Type type, Func<IResolver, object> factory = null)
-        {
-            if (container == null)
-                throw new ArgumentNullException(nameof(container));
-
-            if (factory == null)
-            {
-                container.RegisterSingleton(type, type);
-                return;
-            }
-
-            var lifetimeManager = new SingletonLifetimeManager(type, container, factory);
-            container.Register(type, lifetimeManager);
-        }
-        
-        public static void RegisterSingleton<T>(this IContainer container, string key, Func<IResolver, T> factory = null)
+        public static void RegisterSingleton<T>(this IContainer container, string key = null, Func<IResolver, T> factory = null)
             where T : class
         {
             var type = typeof(T);
             container.RegisterSingleton(type, key, factory);
         }
 
-        public static void RegisterSingleton(this IContainer container, Type type, string key, Func<IResolver, object> factory = null)
+        public static void RegisterSingleton(this IContainer container, Type type, string key = null, Func<IResolver, object> factory = null)
         {
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
@@ -279,7 +222,7 @@ namespace Tact
             }
 
             var lifetimeManager = new SingletonLifetimeManager(type, container, factory);
-            container.Register(type, key, lifetimeManager);
+            container.Register(lifetimeManager, type, key);
         }
         
         public static void RegisterSingleton<TFrom, TTo>(this IContainer container, string key = null)
@@ -294,50 +237,23 @@ namespace Tact
         {
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
-
-            toType.EnsureSingleCostructor();
+            
             var lifetimeManager = new SingletonLifetimeManager(toType, container);
-
-            if (string.IsNullOrWhiteSpace(key))
-                container.Register(fromType, lifetimeManager);
-            else
-                container.Register(fromType, key, lifetimeManager);
+            container.Register(lifetimeManager, fromType, key);
         }
 
         #endregion
 
         #region Register Transient
         
-        public static void RegisterTransient<T>(this IContainer container, Func<IResolver, T> factory = null)
-            where T : class
-        {
-            var type = typeof(T);
-            container.RegisterTransient(type, factory);
-        }
-
-        public static void RegisterTransient(this IContainer container, Type type, Func<IResolver, object> factory = null)
-        {
-            if (container == null)
-                throw new ArgumentNullException(nameof(container));
-
-            if (factory == null)
-            {
-                container.RegisterTransient(type, type);
-                return;
-            }
-
-            var lifetimeManager = new TransientLifetimeManager(type, factory);
-            container.Register(type, lifetimeManager);
-        }
-        
-        public static void RegisterTransient<T>(this IContainer container, string key, Func<IResolver, T> factory = null)
+        public static void RegisterTransient<T>(this IContainer container, string key = null, Func<IResolver, T> factory = null)
             where T : class
         {
             var type = typeof(T);
             container.RegisterTransient(type, key, factory);
         }
 
-        public static void RegisterTransient(this IContainer container, Type type, string key, Func<IResolver, object> factory = null)
+        public static void RegisterTransient(this IContainer container, Type type, string key = null, Func<IResolver, object> factory = null)
         {
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
@@ -349,7 +265,7 @@ namespace Tact
             }
 
             var lifetimeManager = new TransientLifetimeManager(type, factory);
-            container.Register(type, key, lifetimeManager);
+            container.Register(lifetimeManager, type, key);
         }
         
         public static void RegisterTransient<TFrom, TTo>(this IContainer container, string key = null)
@@ -365,13 +281,8 @@ namespace Tact
             if (container == null)
                 throw new ArgumentNullException(nameof(container));
 
-            toType.EnsureSingleCostructor();
             var lifetimeManager = new TransientLifetimeManager(toType);
-
-            if (string.IsNullOrWhiteSpace(key))
-                container.Register(fromType, lifetimeManager);
-            else
-                container.Register(fromType, key, lifetimeManager);
+            container.Register(lifetimeManager, fromType, key);
         }
 
         #endregion
@@ -391,11 +302,7 @@ namespace Tact
                 throw new ArgumentNullException(nameof(container));
 
             var lifetimeManager = new ProxyLifetimeManager(toType, fromKey);
-
-            if (string.IsNullOrWhiteSpace(toKey))
-                container.Register(fromType, lifetimeManager);
-            else
-                container.Register(fromType, toKey, lifetimeManager);
+            container.Register(lifetimeManager, fromType, toKey);
         }
 
         #endregion

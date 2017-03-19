@@ -19,7 +19,7 @@ namespace Tact
             if (!result)
                 throw new TimeoutException("Unable to obtain a read lock");
 
-            return new ReaderWriterLockSlimWrapper(lockSlim, false);
+            return new ReaderWriterLockSlimWrapper(lockSlim, LockType.Read);
         }
 
         public static IDisposable UseReadLock(this ReaderWriterLockSlim lockSlim)
@@ -28,7 +28,33 @@ namespace Tact
                 throw new ArgumentNullException(nameof(lockSlim));
 
             lockSlim.EnterReadLock();
-            return new ReaderWriterLockSlimWrapper(lockSlim, false);
+            return new ReaderWriterLockSlimWrapper(lockSlim, LockType.Read);
+        }
+
+        public static IDisposable UseUpgradeableReadLock(this ReaderWriterLockSlim lockSlim, int millisecondsTimeout)
+        {
+            return lockSlim.UseUpgradeableReadLock(TimeSpan.FromMilliseconds(millisecondsTimeout));
+        }
+
+        public static IDisposable UseUpgradeableReadLock(this ReaderWriterLockSlim lockSlim, TimeSpan timeout)
+        {
+            if (lockSlim == null)
+                throw new ArgumentNullException(nameof(lockSlim));
+
+            var result = lockSlim.TryEnterUpgradeableReadLock(timeout);
+            if (!result)
+                throw new TimeoutException("Unable to obtain a read lock");
+
+            return new ReaderWriterLockSlimWrapper(lockSlim, LockType.Upgradable);
+        }
+
+        public static IDisposable UseUpgradeableReadLock(this ReaderWriterLockSlim lockSlim)
+        {
+            if (lockSlim == null)
+                throw new ArgumentNullException(nameof(lockSlim));
+
+            lockSlim.EnterUpgradeableReadLock();
+            return new ReaderWriterLockSlimWrapper(lockSlim, LockType.Upgradable);
         }
 
         public static IDisposable UseWriteLock(this ReaderWriterLockSlim lockSlim, int millisecondsTimeout)
@@ -45,7 +71,7 @@ namespace Tact
             if (!result)
                 throw new TimeoutException("Unable to obtain a write lock");
 
-            return new ReaderWriterLockSlimWrapper(lockSlim, true);
+            return new ReaderWriterLockSlimWrapper(lockSlim, LockType.Write);
         }
 
         public static IDisposable UseWriteLock(this ReaderWriterLockSlim lockSlim)
@@ -54,26 +80,43 @@ namespace Tact
                 throw new ArgumentNullException(nameof(lockSlim));
 
             lockSlim.EnterWriteLock();
-            return new ReaderWriterLockSlimWrapper(lockSlim, true);
+            return new ReaderWriterLockSlimWrapper(lockSlim, LockType.Write);
+        }
+
+        private enum LockType : short
+        {
+            Read,
+            Write,
+            Upgradable
         }
 
         private struct ReaderWriterLockSlimWrapper : IDisposable
         {
             private readonly ReaderWriterLockSlim _lockSlim;
-            private readonly bool _isWrite;
+            private readonly LockType _lockType;
 
-            public ReaderWriterLockSlimWrapper(ReaderWriterLockSlim lockSlim, bool isWrite)
+            public ReaderWriterLockSlimWrapper(ReaderWriterLockSlim lockSlim, LockType lockType)
             {
                 _lockSlim = lockSlim;
-                _isWrite = isWrite;
+                _lockType = lockType;
             }
 
             public void Dispose()
             {
-                if (_isWrite)
-                    _lockSlim.ExitWriteLock();
-                else
-                    _lockSlim.ExitReadLock();
+                switch (_lockType)
+                {
+                    case LockType.Read:
+                        _lockSlim.ExitReadLock();
+                        break;
+
+                    case LockType.Write:
+                        _lockSlim.ExitWriteLock();
+                        break;
+
+                    case LockType.Upgradable:
+                        _lockSlim.EnterUpgradeableReadLock();
+                        break;
+                }
             }
         }
     }

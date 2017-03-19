@@ -41,12 +41,12 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
         }
 
         public bool TryResolve(
+            out object result,
             IContainer container,
+            Stack<Type> stack,
             Type type,
             string key,
-            Stack<Type> stack,
-            bool canThrow,
-            out object result)
+            bool canThrow)
         {
             if ((_resolveEnumerable && type.FullName.StartsWith(IEnumerablePrefix))
                 || (_resolveCollection && type.FullName.StartsWith(ICollectionPrefix))
@@ -69,7 +69,7 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
             Stack<Type> stack)
         {
             var type = typeof(T);
-            return container.ResolveAll(type, stack).Cast<T>().ToList();
+            return container.ResolveAll(stack, type).Cast<T>().ToList();
         }
     }
 }

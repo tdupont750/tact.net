@@ -70,29 +70,7 @@ namespace Tact.Tests.Practices
                 Assert.Same(b, c);
             }
         }
-
-        [Fact]
-        public void ConstructorRequired()
-        {
-            using (var resolver = new TactContainer(new InMemoryLog()))
-            {
-                Assert.Throws<InvalidOperationException>(() => resolver.RegisterSingleton<Six>());
-                Assert.Throws<InvalidOperationException>(() => resolver.RegisterPerScope<Six>());
-                Assert.Throws<InvalidOperationException>(() => resolver.RegisterTransient<Six>());
-            }
-        }
-
-        [Fact]
-        public void ClassRequired()
-        {
-            using (var resolver = new TactContainer(new InMemoryLog()))
-            {
-                Assert.Throws<InvalidOperationException>(() => resolver.RegisterSingleton<IOne>());
-                Assert.Throws<InvalidOperationException>(() => resolver.RegisterPerScope<IOne>());
-                Assert.Throws<InvalidOperationException>(() => resolver.RegisterTransient<IOne>());
-            }
-        }
-
+        
         [Fact]
         public void PreventRecursion()
         {
@@ -132,23 +110,6 @@ namespace Tact.Tests.Practices
 
                 var eightBool = resolver.Resolve<IEight<bool>>();
                 Assert.Equal(typeof(bool), eightBool.Type);
-            }
-        }
-
-        [Fact]
-        public void IncludeUnkeyedInResolveAll()
-        {
-            using (var resolver = new TactContainer(new InMemoryLog(), includeUnkeyedInResolveAll: true))
-            {
-                resolver.RegisterSingleton<IOne, One>();
-
-                var a = resolver.ResolveAll<IOne>().ToList();
-                Assert.Equal(1, a.Count);
-
-                resolver.RegisterSingleton<IOne, One>("Doh");
-
-                var b = resolver.ResolveAll<IOne>().ToList();
-                Assert.Equal(2, b.Count);
             }
         }
 

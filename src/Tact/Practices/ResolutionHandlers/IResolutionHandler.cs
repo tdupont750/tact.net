@@ -5,6 +5,6 @@ namespace Tact.Practices.ResolutionHandlers
 {
     public interface IResolutionHandler
     {
-        bool TryResolve(IContainer container, Type type, string key, Stack<Type> stack, bool canThrow, out object result);
+        bool TryResolve(out object result, IContainer container, Stack<Type> stack, Type type, string key, bool canThrow);
     }
 }

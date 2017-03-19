@@ -7,12 +7,12 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
     public class UnregisteredResolutionHandler : IResolutionHandler
     {
         public bool TryResolve(
-            IContainer container, 
-            Type type, 
-            string key,
+            out object result,
+            IContainer container,
             Stack<Type> stack,
-            bool canThrow,
-            out object result)
+            Type type,
+            string key,
+            bool canThrow)
         {
             var typeInfo = type.GetTypeInfo();
             if (!typeInfo.IsClass)
@@ -21,14 +21,13 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
                 return false;
             }
 
-            if (!canThrow && !type.HasSingleCostructor())
+            if (canThrow)
             {
-                result = null;
-                return false;
+                result = container.CreateInstance(stack, type);
+                return true;
             }
 
-            result = container.CreateInstance(type, stack);
-            return true;
+            return container.TryCreateInstance(out result, stack, type);
         }
     }
 }

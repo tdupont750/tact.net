@@ -1,18 +1,53 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Tact.Collections;
 using Tact.Diagnostics;
 using Tact.Practices.LifetimeManagers;
 using Tact.Practices.ResolutionHandlers;
+using Tact.Practices.ResolutionHandlers.Implementation;
 
 namespace Tact.Practices.Base
 {
     public abstract class ContainerBase : IContainer
     {
+        protected static List<IResolutionHandler> CreateDefaultHandlers(
+            bool resolveLazy = true,
+            bool resolveFunc = true,
+            bool resolveUnregistered = true,
+            bool resolveEnumerable = true,
+            bool resolveCollection = true,
+            bool resolveList = true,
+            bool resolveGenerics = true)
+        {
+            var resolutionHandlers = new List<IResolutionHandler>();
+
+            if (resolveLazy)
+                resolutionHandlers.Add(new LazyResolutionHandler());
+
+            if (resolveEnumerable || resolveCollection || resolveList)
+                resolutionHandlers.Add(new EnumerableResolutionHandler(resolveEnumerable, resolveCollection, resolveList));
+
+            if (resolveFunc)
+                resolutionHandlers.Add(new FuncResolutionHandler());
+
+            if (resolveUnregistered)
+                resolutionHandlers.Add(new UnregisteredResolutionHandler());
+
+            if (resolveGenerics)
+                resolutionHandlers.Add(new GenericResolutionHandler());
+
+            return resolutionHandlers;
+        }
+
+        private static readonly ConcurrentDictionary<Type, ConstructorInfo> ConstructorMap = new ConcurrentDictionary<Type, ConstructorInfo>();
+
+        private static int _keySeed;
+
         private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         private readonly RegistrationMaps _maps;
 
@@ -70,99 +105,6 @@ namespace Tact.Practices.Base
                 MaxDisposeParallelization);
         }
 
-        public object Resolve(Type type)
-        {
-            var key = string.Empty;
-            var stack = new Stack<Type>();
-            return TryResolve(type, key, stack, true, out object result)
-                ? result
-                : throw NewNoRegistrationFoundException(type, stack);
-        }
-
-        public bool TryResolve(Type type, out object result)
-        {
-            var key = string.Empty;
-            var stack = new Stack<Type>();
-            return TryResolve(type, key, stack, false, out result);
-        }
-
-        public object Resolve(Type type, Stack<Type> stack)
-        {
-            var key = string.Empty;
-            return TryResolve(type, key, stack, true, out object result)
-                ? result
-                : throw NewNoRegistrationFoundException(type, stack);
-        }
-
-        public bool TryResolve(Type type, Stack<Type> stack, out object result)
-        {
-            var key = string.Empty;
-            return TryResolve(type, key, stack, false, out result);
-        }
-
-        public object Resolve(Type type, string key)
-        {
-            var stack = new Stack<Type>();
-            return TryResolve(type, key, stack, true, out object result)
-                ? result
-                : throw NewNoRegistrationFoundException(type, stack);
-        }
-
-        public bool TryResolve(Type type, string key, out object result)
-        {
-            var stack = new Stack<Type>();
-            return TryResolve(type, key, stack, false, out result);
-        }
-
-        public object Resolve(Type type, string key, Stack<Type> stack)
-        {
-            return TryResolve(type, key, stack, true, out object result)
-                ? result
-                : throw NewNoRegistrationFoundException(type, stack);
-        }
-
-        public bool TryResolve(Type type, string key, Stack<Type> stack, out object result)
-        {
-            return TryResolve(type, key, stack, false, out result);
-        }
-
-        public IEnumerable<object> ResolveAll(Type type)
-        {
-            var stack = new Stack<Type>();
-            return ResolveAll(type, stack);
-        }
-
-        public IEnumerable<object> ResolveAll(Type type, Stack<Type> stack)
-        {
-            var instances = new List<object>();
-
-            using (EnterPush(type, stack))
-            {
-                using (_lock.UseReadLock())
-                {
-                    if (_isDisposed)
-                        throw new ObjectDisposedException(GetType().Name);
-
-                    if (_maps.RegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
-                    {
-                        foreach (var lifetimeManager in registrations.Values)
-                        {
-                            var instance = lifetimeManager.Resolve(this, stack);
-                            instances.Add(instance);
-                        }
-
-                        return instances;
-                    }
-                }
-
-                foreach (var resolutionHandler in ResolutionHandlers)
-                    if (resolutionHandler.TryResolve(this, type, string.Empty, stack, false, out object instance))
-                        instances.Add(instance);
-            }
-
-            return instances;
-        }
-
         public abstract IContainer BeginScope();
 
         IResolver IResolver.BeginScope()
@@ -170,15 +112,70 @@ namespace Tact.Practices.Base
             return BeginScope();
         }
 
-        public void Register(Type fromType, ILifetimeManager lifetimeManager)
+        public object Resolve(Type type, string key = null)
         {
-            Register(fromType, string.Empty, lifetimeManager);
+            var stack = new Stack<Type>();
+            return TryResolve(out object result, stack, type, key, true)
+                ? result
+                : throw NewNoRegistrationFoundException(stack, type);
         }
 
-        public void Register(Type fromType, string key, ILifetimeManager lifetimeManager)
+        public object Resolve(Stack<Type> stack, Type type, string key = null)
+        {
+            return TryResolve(out object result, stack, type, key, true)
+                ? result
+                : throw NewNoRegistrationFoundException(stack, type);
+        }
+
+        public bool TryResolve(out object result, Type type, string key = null)
+        {
+            var stack = new Stack<Type>();
+            return TryResolve(out result, stack, type, key, false);
+        }
+
+        public bool TryResolve(out object result, Stack<Type> stack, Type type, string key = null)
+        {
+            return TryResolve(out result, stack, type, key, false);
+        }
+
+        public IEnumerable<object> ResolveAll(Type type)
+        {
+            var stack = new Stack<Type>();
+            return ResolveAll(stack, type);
+        }
+        
+        public IEnumerable<object> ResolveAll(Stack<Type> stack, Type type)
+        {
+            var lifetimeManagers = new List<ILifetimeManager>();
+            using (_lock.UseReadLock())
+            {
+                if (_isDisposed)
+                    throw new ObjectDisposedException(GetType().Name);
+
+                if (_maps.RegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
+                    foreach (var pair in registrations)
+                        if (IncludeUnkeyedInResovleAll || pair.Key != string.Empty)
+                            lifetimeManagers.Add(pair.Value);
+            }
+
+            var instances = new List<object>();
+            using (EnterPush(stack, type))
+            {
+                foreach (var lifetimeManager in lifetimeManagers)
+                    instances.Add(lifetimeManager.Resolve(this, stack));
+
+                foreach (var resolutionHandler in ResolutionHandlers)
+                    if (resolutionHandler.TryResolve(out object instance, this, stack, type, string.Empty, false))
+                        instances.Add(instance);
+            }
+
+            return instances;
+        }
+        
+        public void Register(ILifetimeManager lifetimeManager, Type fromType, string key = null)
         {
             if (key == null)
-                throw new ArgumentException("Required", nameof(key));
+                key = string.Empty;
 
             using (_lock.UseWriteLock())
             {
@@ -186,7 +183,12 @@ namespace Tact.Practices.Base
                     throw new ObjectDisposedException(GetType().Name);
 
                 if (_maps.RegistrationMap.TryGetValue(fromType, out Dictionary<string, ILifetimeManager> registrations))
+                {
+                    if (IncludeUnkeyedInResovleAll && registrations.ContainsKey(key) && key == string.Empty)
+                        key = $"_unkeyed_{Interlocked.Increment(ref _keySeed)}";
+
                     registrations[key] = lifetimeManager;
+                }
                 else
                     _maps.RegistrationMap[fromType] = new Dictionary<string, ILifetimeManager>
                     {
@@ -209,24 +211,46 @@ namespace Tact.Practices.Base
             }
         }
 
-        public object CreateInstance(Type type, Stack<Type> stack)
+        public object CreateInstance(Stack<Type> stack, Type type)
+        {
+            if (stack == null)
+                throw new ArgumentNullException(nameof(stack));
+
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            TryCreateInstance(out object result, stack, type, true);
+            return result;
+        }
+
+        public bool TryCreateInstance(out object result, Stack<Type> stack, Type type)
+        {
+            if (stack == null)
+                throw new ArgumentNullException(nameof(stack));
+
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            return TryCreateInstance(out result, stack, type, false);
+        }
+
+        public bool CanResolve(Stack<Type> stack, Type type, string key = null)
+        {
+            return TryResolve(out object result, stack, type, key, false, true);
+        }
+
+        public bool CanCreateInstance(Stack<Type> stack, Type type)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 
-            var constructor = type.EnsureSingleCostructor();
-            var parameterTypes = constructor.GetParameterTypes();
-            var arguments = new object[parameterTypes.Count];
-            for (var i = 0; i < parameterTypes.Count; i++)
-            {
-                var parameterType = parameterTypes[i];
-                arguments[i] = Resolve(parameterType, stack);
-            }
+            if (stack == null)
+                throw new ArgumentNullException(nameof(stack));
 
-            return constructor.EfficientInvoke(arguments);
+            return GetConstructor(stack, type) != null;
         }
 
-        public bool TryResolveGenericType(Type genericType, Type[] genericArguments, string key, Stack<Type> stack, out object result)
+        public bool TryResolveGenericType(out object result, Stack<Type> stack, Type genericType, Type[] genericArguments, string key = null)
         {
             if (genericType == null)
                 throw new ArgumentNullException(nameof(genericType));
@@ -234,14 +258,13 @@ namespace Tact.Practices.Base
             if (genericArguments == null)
                 throw new ArgumentNullException(nameof(genericArguments));
 
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
-
             if (stack == null)
                 throw new ArgumentNullException(nameof(stack));
 
-            var type = genericType.MakeGenericType(genericArguments);
-            ILifetimeManager clone = null;
+            if (key == null)
+                key = string.Empty;
+
+            ILifetimeManager lifetimeManager = null;
 
             using (_lock.UseReadLock())
             {
@@ -249,71 +272,130 @@ namespace Tact.Practices.Base
                     throw new ObjectDisposedException(GetType().Name);
 
                 if (_maps.RegistrationMap.TryGetValue(genericType, out Dictionary<string, ILifetimeManager> registrations))
-                    foreach (var lifetimeManager in registrations)
-                        if (lifetimeManager.Key == key)
+                    foreach (var pair in registrations)
+                        if (pair.Key == key)
                         {
-                            clone = lifetimeManager.Value.CloneWithGenericArguments(genericArguments);
+                            lifetimeManager = pair.Value;
                             break;
                         }
             }
 
-            if (clone == null)
+            if (lifetimeManager == null)
             {
                 result = null;
                 return false;
             }
 
+            var type = genericType.MakeGenericType(genericArguments);
             var previousType = stack.Pop();
             if (previousType != type)
                 throw new InvalidOperationException();
-
-            using (EnterPush(genericType, stack))
-            {
-                Register(type, key, clone);
-                result = Resolve(type, key, stack);
-            }
-
+            
+            var clone = lifetimeManager.CloneWithGenericArguments(genericArguments);
+            Register(clone, type, key);
+            result = Resolve(stack, type, key);
+            
             stack.Push(previousType);
             return true;
         }
 
-        private bool TryResolve(Type type, string key, Stack<Type> stack, bool canThrow, out object result)
+        private ConstructorInfo GetConstructor(Stack<Type> stack, Type type)
+        {
+            return ConstructorMap.GetOrAdd(type, t =>
+            {
+                return t
+                    .GetTypeInfo()
+                    .GetConstructors()
+                    .OrderByDescending(c => c.GetParameterTypes().Count)
+                    .FirstOrDefault(c =>
+                    {
+                        var parameterTypes = c.GetParameterTypes();
+                        for (var i = 0; i < parameterTypes.Count; i++)
+                            if (!CanResolve(stack, parameterTypes[i]))
+                                return false;
+
+                        return true;
+                    });
+            });
+        }
+
+        private bool TryResolve(out object result, Stack<Type> stack, Type type, string key, bool canThrow, bool returnNull = false)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
-
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
-
+            
             if (stack == null)
                 throw new ArgumentNullException(nameof(stack));
 
-            using (EnterPush(type, stack))
+            if (key == null)
+                key = string.Empty;
+
+            using (EnterPush(stack, type))
             {
+                ILifetimeManager lifetimeManager = null;
+
                 using (_lock.UseReadLock())
                 {
                     if (_isDisposed)
                         throw new ObjectDisposedException(GetType().Name);
 
                     if (_maps.RegistrationMap.TryGetValue(type, out Dictionary<string, ILifetimeManager> registrations))
-                        foreach (var lifetimeManager in registrations)
-                            if (lifetimeManager.Key == key)
+                        foreach (var pair in registrations)
+                            if (pair.Key == key)
                             {
-                                result = lifetimeManager.Value.Resolve(this, stack);
-                                return true;
+                                lifetimeManager = pair.Value;
+                                break;
                             }
                 }
 
+                if (lifetimeManager != null)
+                {
+                    result = returnNull ? null : lifetimeManager.Resolve(this, stack);
+                    return true;
+                }
+
                 foreach (var handler in ResolutionHandlers)
-                    if (handler.TryResolve(this, type, key, stack, canThrow, out result))
+                    if (handler.TryResolve(out result, this, stack, type, key, canThrow))
                         return true;
             }
 
             result = null;
             return false;
         }
-                
-        private static IDisposable EnterPush(Type type, Stack<Type> stack)
+
+        private bool TryCreateInstance(out object result, Stack<Type> stack, Type type, bool canThrow)
+        {
+            var constructor = GetConstructor(stack, type);
+            if (constructor == null)
+            {
+                if (canThrow)
+                    throw new InvalidOperationException();
+
+                result = null;
+                return false;
+            }
+
+            var parameterTypes = constructor.GetParameterTypes();
+            var arguments = new object[parameterTypes.Count];
+            for (var i = 0; i < parameterTypes.Count; i++)
+            {
+                var parameterType = parameterTypes[i];
+                arguments[i] = Resolve(stack, parameterType);
+            }
+
+            try
+            {
+                result = constructor.EfficientInvoke(arguments);
+                return true;
+            }
+            catch (Exception) when (!canThrow)
+            {
+                result = null;
+                return false;
+            }
+        }
+
+        private static IDisposable EnterPush(Stack<Type> stack, Type type)
         {
             if (stack.Contains(type))
                 throw new InvalidOperationException("Recursive resolution detected");
@@ -321,7 +403,7 @@ namespace Tact.Practices.Base
             return new DisposablePush(type, stack);
         }
 
-        private static InvalidOperationException NewNoRegistrationFoundException(Type type, Stack<Type> stack)
+        private static InvalidOperationException NewNoRegistrationFoundException(Stack<Type> stack, Type type)
         {
             var sb = new StringBuilder();
 
@@ -347,7 +429,7 @@ namespace Tact.Practices.Base
             var message = sb.ToString();
             return new InvalidOperationException(message);
         }
-
+        
         protected class RegistrationMaps
         {
             public readonly Dictionary<Type, Dictionary<string, ILifetimeManager>> RegistrationMap;
