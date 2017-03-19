@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 using Tact.Diagnostics;
 using Tact.Diagnostics.Implementation;
@@ -27,12 +28,12 @@ namespace Tact.AspNetCore.Demo.Service
                 .Build();
 
             var log = new EmptyLog();
-            Container = new TactContainer(log, includeUnkeyedInResolveAll: true);
+            Container = new AspNetCoreContainer(log);
         }
 
         public IConfigurationRoot Configuration { get; }
 
-        public IContainer Container { get; }
+        private AspNetCoreContainer Container { get; }
 
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
@@ -44,10 +45,9 @@ namespace Tact.AspNetCore.Demo.Service
             };
 
             Container.RegisterByAttribute(assemblies);
+            Container.RegisterCollection(services);
 
-            var serviceProvider = new TactServiceProvider(Container);
-            serviceProvider.RegisterCollection(services);
-            return serviceProvider;
+            return Container;
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -105,20 +105,20 @@ namespace Tact.AspNetCore.Demo.Service
 
             protected override IReadOnlyList<IResolutionHandler> ResolutionHandlers { get; }
 
-            public IServiceProvider ServiceProvider => this;
+            IServiceProvider IServiceScope.ServiceProvider => this;
 
             public override IContainer BeginScope()
             {
                 return CreateScope();
             }
 
-            public object GetService(Type serviceType)
+            object IServiceProvider.GetService(Type serviceType)
             {
                 TryResolve(out object service, serviceType);
                 return service;
             }
 
-            public object GetRequiredService(Type serviceType)
+            object ISupportRequiredService.GetRequiredService(Type serviceType)
             {
                 return Resolve(serviceType);
             }
@@ -127,90 +127,47 @@ namespace Tact.AspNetCore.Demo.Service
             {
                 return CreateScope();
             }
-            
-            private AspNetCoreContainer CreateScope()
-            {
-                return new AspNetCoreContainer(Log, ResolutionHandlers, MaxDisposeParallelization, this);
-            }
-        }
-
-        private class TactServiceProvider : IServiceProvider, ISupportRequiredService, IServiceScopeFactory, IServiceScope
-        {
-            private readonly IContainer _container;
-
-            private bool _isDisposed;
-
-            public TactServiceProvider(IContainer container)
-            {
-                _container = container;
-            }
-
-            public IServiceProvider ServiceProvider => this;
-
-            public object GetService(Type serviceType)
-            {
-                _container.TryResolve(out object service, serviceType);
-                return service;
-            }
-
-            public object GetRequiredService(Type serviceType)
-            {
-                return _container.Resolve(serviceType);
-            }
-
-            public IServiceScope CreateScope()
-            {
-                var scope = _container.BeginScope();
-                return new TactServiceProvider(scope);
-            }
 
             public void RegisterCollection(IServiceCollection services)
             {
-                // _container.RegisterSingleton(factory: r => (IServiceProvider)r);
-                // _container.RegisterSingleton(factory: r => (ISupportRequiredService)r);
-                // _container.RegisterSingleton(factory: r => (IServiceScopeFactory)r);
+                this.RegisterProxy<IServiceProvider>(r => (IServiceProvider)r);
+                this.RegisterProxy<ISupportRequiredService>(r => (ISupportRequiredService)r);
+                this.RegisterProxy<IServiceScopeFactory>(r => (IServiceScopeFactory)r);
+                this.RegisterProxy<IServiceScope>(r => (IServiceScope)r);
 
-                _container.RegisterInstance<IServiceProvider>(this);
-                _container.RegisterInstance<ISupportRequiredService>(this);
-                _container.RegisterInstance<IServiceScopeFactory>(this);
-                
                 foreach (var service in services)
                 {
                     switch (service.Lifetime)
                     {
                         case ServiceLifetime.Singleton:
                             if (service.ImplementationInstance != null)
-                                _container.RegisterInstance(service.ServiceType, service.ImplementationInstance);
+                                this.RegisterInstance(service.ServiceType, service.ImplementationInstance);
                             else if (service.ImplementationFactory != null)
-                                _container.RegisterSingleton(service.ServiceType, factory: r => service.ImplementationFactory(this));
+                                this.RegisterSingleton(service.ServiceType, factory: r => service.ImplementationFactory(this));
                             else
-                                _container.RegisterSingleton(service.ServiceType, service.ImplementationType);
+                                this.RegisterSingleton(service.ServiceType, service.ImplementationType);
                             break;
 
                         case ServiceLifetime.Scoped:
                             if (service.ImplementationFactory != null)
-                                _container.RegisterPerScope(service.ServiceType, factory: r => service.ImplementationFactory(this));
+                                this.RegisterPerScope(service.ServiceType, factory: r => service.ImplementationFactory(this));
                             else
-                                _container.RegisterPerScope(service.ServiceType, service.ImplementationType);
+                                this.RegisterPerScope(service.ServiceType, service.ImplementationType);
                             break;
 
                         case ServiceLifetime.Transient:
                             if (service.ImplementationFactory != null)
-                                _container.RegisterTransient(service.ServiceType, factory: r => service.ImplementationFactory(this));
+                                this.RegisterTransient(service.ServiceType, factory: r => service.ImplementationFactory(this));
                             else
-                                _container.RegisterTransient(service.ServiceType, service.ImplementationType);
+                                this.RegisterTransient(service.ServiceType, service.ImplementationType);
                             break;
                     }
                 }
             }
 
-            public void Dispose()
+            private AspNetCoreContainer CreateScope()
             {
-                if (_isDisposed)
-                    return;
-
-                _isDisposed = true;
-                _container.Dispose();
+                return new AspNetCoreContainer(Log, ResolutionHandlers, MaxDisposeParallelization, this);
             }
         }
     }
