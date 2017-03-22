@@ -40,6 +40,18 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
             _resolveList = resolveList;
         }
 
+        public bool CanResolve(IContainer container, Stack<Type> stack, Type type, string key)
+        {
+            return TryResolve(
+                out object result,
+                container,
+                stack,
+                type,
+                key,
+                false,
+                true);
+        }
+
         public bool TryResolve(
             out object result,
             IContainer container,
@@ -48,14 +60,38 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
             string key,
             bool canThrow)
         {
+            return TryResolve(
+                out result,
+                container,
+                stack,
+                type,
+                key,
+                canThrow,
+                false);
+        }
+
+        private bool TryResolve(
+            out object result,
+            IContainer container,
+            Stack<Type> stack,
+            Type type,
+            string key,
+            bool canThrow,
+            bool returnNull)
+        {
             if ((_resolveEnumerable && type.FullName.StartsWith(IEnumerablePrefix))
                 || (_resolveCollection && type.FullName.StartsWith(ICollectionPrefix))
                 || (_resolveList && type.FullName.StartsWith(IListPrefix))
                 || (_resolveList && type.FullName.StartsWith(ListPrefix)))
             {
-                var innerType = type.GenericTypeArguments[0];
-                var method = CreateEnumerableMethodInfo.MakeGenericMethod(innerType);
-                result = method.Invoke(this, new object[] {container, stack});
+                if (returnNull)
+                    result = null;
+                else
+                {
+                    var innerType = type.GenericTypeArguments[0];
+                    var method = CreateEnumerableMethodInfo.MakeGenericMethod(innerType);
+                    result = method.Invoke(this, new object[] { container, stack });
+                }
                 return true;
             }
 

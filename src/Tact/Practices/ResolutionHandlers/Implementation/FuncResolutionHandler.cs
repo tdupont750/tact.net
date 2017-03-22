@@ -19,7 +19,19 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
                 .GetMethods(BindingFlags.Instance | BindingFlags.NonPublic)
                 .Single(m => m.Name == nameof(CreateFunc) && m.IsGenericMethod);
         }
-        
+
+        public bool CanResolve(IContainer container, Stack<Type> stack, Type type, string key)
+        {
+            return TryResolve(
+                out object result,
+                container,
+                stack,
+                type,
+                key,
+                false,
+                true);
+        }
+
         public bool TryResolve(
             out object result,
             IContainer container,
@@ -28,10 +40,35 @@ namespace Tact.Practices.ResolutionHandlers.Implementation
             string key,
             bool canThrow)
         {
+            return TryResolve(
+                out result,
+                container,
+                stack,
+                type,
+                key,
+                canThrow,
+                false);
+        }
+
+        private bool TryResolve(
+            out object result,
+            IContainer container,
+            Stack<Type> stack,
+            Type type,
+            string key,
+            bool canThrow,
+            bool returnNull)
+        {
             if (!type.FullName.StartsWith(FuncPrefix))
             {
                 result = null;
                 return false;
+            }
+
+            if (returnNull)
+            {
+                result = null;
+                return true;
             }
 
             var innerType = type.GenericTypeArguments[0];
