@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <Description>The core library for Tact.NET RPC - A tactful collection of utilities for .NET development.</Description>
+    <Copyright>2016 Tom DuPont</Copyright>
+    <VersionPrefix>1.0.3</VersionPrefix>
+    <Authors>Tom DuPont</Authors>
+    <AssemblyName>Tact.Rpc</AssemblyName>
+    <PackageId>Tact.Rpc</PackageId>
+    <PackageIconUrl>https://sites.google.com/site/tdupont750/Tact_NET_S.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/tdupont750/tact.net</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\src\Tact\Tact.csproj" />
+  </ItemGroup>
+
+</Project>
