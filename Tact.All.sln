@@ -55,6 +55,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "rpc\demo\Cons
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tact.Rpc.Json", "rpc\src\Tact.Rpc.Json\Tact.Rpc.Json.csproj", "{30391A4F-CAAD-4335-AA21-CAC8A88FC640}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tact.Rpc.Client.Http", "rpc\src\Tact.Rpc.Client.Http\Tact.Rpc.Client.Http.csproj", "{636E0664-40CF-42CB-A7DF-C52E94C56A05}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -133,6 +135,10 @@ Global
 		{30391A4F-CAAD-4335-AA21-CAC8A88FC640}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30391A4F-CAAD-4335-AA21-CAC8A88FC640}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30391A4F-CAAD-4335-AA21-CAC8A88FC640}.Release|Any CPU.Build.0 = Release|Any CPU
+		{636E0664-40CF-42CB-A7DF-C52E94C56A05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{636E0664-40CF-42CB-A7DF-C52E94C56A05}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{636E0664-40CF-42CB-A7DF-C52E94C56A05}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{636E0664-40CF-42CB-A7DF-C52E94C56A05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -162,5 +168,6 @@ Global
 		{6B106FE6-0F60-47DA-B0C8-3274B2108DA6} = {DEFF8A1B-AE75-4B83-B656-26414F0211FA}
 		{B6B27D0E-F7CC-4596-A898-A44284680225} = {DEFF8A1B-AE75-4B83-B656-26414F0211FA}
 		{30391A4F-CAAD-4335-AA21-CAC8A88FC640} = {30572F1F-E178-4B79-A40F-DFBAD09CF968}
+		{636E0664-40CF-42CB-A7DF-C52E94C56A05} = {30572F1F-E178-4B79-A40F-DFBAD09CF968}
 	EndGlobalSection
 EndGlobal

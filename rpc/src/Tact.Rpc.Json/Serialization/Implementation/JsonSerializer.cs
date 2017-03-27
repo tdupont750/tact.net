@@ -4,7 +4,7 @@ using Tact.Practices.LifetimeManagers.Attributes;
 
 namespace Tact.Rpc.Serialization.Implementation
 {
-    [RegisterSingleton(typeof(ISerializer))]
+    [RegisterSingleton(typeof(ISerializer), "JSON")]
     public class JsonSerializer : ISerializer
     {
         public string MediaType => "application/json";

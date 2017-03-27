@@ -18,11 +18,11 @@ namespace Tact.Rpc.Hosts.Implementation
     {
         private readonly IWebHost _webHost;
 
-        public HttpHost(HttpServerConfig config, IResolver resolver, IReadOnlyList<IApplicationPart> applicationParts)
+        public HttpHost(IResolver resolver, HttpHostConfig hostConfig, IReadOnlyList<IApplicationPart> applicationParts)
         {
             _webHost = new WebHostBuilder()
                 .UseKestrel()
-                .UseUrls(config.HostUrl)
+                .UseUrls(hostConfig.Urls.ToArray())
                 .ConfigureServices(services =>
                 {
                     services.AddSingleton(resolver);
@@ -59,7 +59,8 @@ namespace Tact.Rpc.Hosts.Implementation
         {
             public bool ShouldRegister(IContainer container, Type toType)
             {
-                return container.TryResolve(out HttpServerConfig config) && config.IsEnabled;
+                var config = container.Resolve<HttpHostConfig>();
+                return config.IsEnabled;
             }
         }
     }

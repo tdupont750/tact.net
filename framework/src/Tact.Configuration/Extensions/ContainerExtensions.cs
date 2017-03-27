@@ -36,8 +36,7 @@ namespace Tact
             if(container == null)
                 throw new ArgumentNullException(nameof(container));
 
-            ILog logger;
-            container.TryResolve(out logger);
+            container.TryResolve(out ILog logger);
 
             foreach (var type in types)
             {

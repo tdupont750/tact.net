@@ -1,36 +1,36 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Demo.Rpc.Models;
 using Tact.Practices.LifetimeManagers.Attributes;
-using Demo.Rpc.Configuration;
-using Tact.Practices.LifetimeManagers;
-using Tact;
+using Demo.Rpc.Services.Base;
+using Tact.Practices;
+using Tact.Rpc.Serialization;
+using Tact.Rpc.Practices;
 
 namespace Demo.Rpc.Services.Implementation
 {
-    [RegisterCondition, RegisterSingleton(typeof(IHelloService))]
-    public class HelloServiceHttpClient : IHelloService
+    [RegisterHttpClientCondition(ServiceName), RegisterSingleton(typeof(IHelloService))]
+    public class HelloServiceHttpClient : HttpClientBase, IHelloService
     {
         private const string ServiceName = "HelloService";
 
-        private readonly IHttpConnection _httpConnection;
-
-        public HelloServiceHttpClient(IHttpConnection httpConnection)
+        public HelloServiceHttpClient(IResolver resolver)
+            : base(resolver, ServiceName)
         {
-            _httpConnection = httpConnection;
+        }
+
+        private HelloServiceHttpClient(string hostUrl, ISerializer serializer)
+            : base(ServiceName, hostUrl, serializer)
+        {
+        }
+
+        public HelloServiceHttpClient Create(string hostUrl, ISerializer serializer)
+        {
+            return new HelloServiceHttpClient(hostUrl, serializer);
         }
 
         public Task<HelloResponse> SayHelloAsync(HelloRequest helloRequest)
         {
-            return _httpConnection.SendAsync<HelloRequest, HelloResponse>(helloRequest, ServiceName, "SayHello");
-        }
-
-        public class RegisterConditionAttribute : Attribute, IRegisterConditionAttribute
-        {
-            public bool ShouldRegister(Tact.Practices.IContainer container, Type toType)
-            {
-                return container.TryResolve(out HttpClientConfig config) && config.IsEnabled;
-            }
+            return SendAsync<HelloRequest, HelloResponse>(helloRequest, "SayHello");
         }
     }
 }

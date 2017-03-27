@@ -37,7 +37,6 @@
     </None>
     <None Update="AppSettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <DependentUpon>AppSettings.json</DependentUpon>
     </None>
     <None Update="AppSettings.Server.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

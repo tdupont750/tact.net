@@ -37,6 +37,8 @@ namespace ConsoleApp
                     .AddJsonFile($"AppSettings.{clientMode}.json")
                     .Build();
 
+                container.RegisterInstance<IConfiguration>(config);
+
                 var assemblies = config.GetContainerAssemblies();
                 
                 container.ConfigureByAttribute(config, assemblies);
