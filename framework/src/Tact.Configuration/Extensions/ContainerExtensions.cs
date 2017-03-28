@@ -10,6 +10,30 @@ namespace Tact
 {
     public static class ContainerExtensions
     {
+        public static IConfiguration BuildConfiguration(this IContainer container, Func<IConfiguration> func)
+        {
+            var config = func();
+            container.RegisterInstance(config);
+            return config;
+        }
+
+        public static IConfiguration BuildConfiguration(this IContainer container, Func<ConfigurationBuilder, IConfiguration> func)
+        {
+            var configBuilder = new ConfigurationBuilder();
+            var config = func(configBuilder);
+            container.RegisterInstance(config);
+            return config;
+        }
+
+        public static IConfiguration BuildConfiguration(this IContainer container, Action<ConfigurationBuilder> action)
+        {
+            var configBuilder = new ConfigurationBuilder();
+            action(configBuilder);
+            var config = configBuilder.Build();
+            container.RegisterInstance<IConfiguration>(config);
+            return config;
+        }
+
         public static void ConfigureByAttribute(this IContainer container, IConfiguration configuration, params Assembly[] assemblies)
         {
             container.ConfigureByAttribute<IRegisterConfigurationAttribute>(configuration, assemblies);

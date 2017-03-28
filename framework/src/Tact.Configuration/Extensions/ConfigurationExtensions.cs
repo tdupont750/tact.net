@@ -9,12 +9,12 @@ namespace Tact
 {
     public static class ConfigurationExtensions
     {
-        public static Assembly[] GetContainerAssemblies(this IConfiguration config)
+        public static Assembly[] LoadAssembliesFromConfig(this IConfiguration config)
         {
-            return config.GetContainerAssemblies("ContainerAssemblies");
+            return config.LoadAssembliesFromConfig("ContainerAssemblies");
         }
 
-        public static Assembly[] GetContainerAssemblies(this IConfiguration config, params string[] configPaths)
+        public static Assembly[] LoadAssembliesFromConfig(this IConfiguration config, params string[] configPaths)
         {
             var names = new List<string>();
 

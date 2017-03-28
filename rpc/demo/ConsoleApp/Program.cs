@@ -22,6 +22,7 @@ namespace ConsoleApp
 
         public static int Main(string[] args)
         {
+            // Determine what mode the application is running in.
             if (!Enum.TryParse(args.FirstOrDefault() ?? "Both", out ClientMode clientMode))
             {
                 var modes = string.Join(", ", Enum.GetNames(typeof(ClientMode)));
@@ -29,22 +30,30 @@ namespace ConsoleApp
                 return -1;
             }
 
-            var log = new EmptyLog();
+            // Step 1 - Create a logger.
+            var log = new InMemoryLog();
+
+            // Step 2 - Create a container.
             using (var container = new TactContainer(log))
             {
-                var config = new ConfigurationBuilder()
+                // Step 3 - Read and aggregate configuration files.
+                var config = container.BuildConfiguration(cb => cb
                     .AddJsonFile("AppSettings.json")
-                    .AddJsonFile($"AppSettings.{clientMode}.json")
-                    .Build();
-
-                container.RegisterInstance<IConfiguration>(config);
-
-                var assemblies = config.GetContainerAssemblies();
+                    .AddJsonFile($"AppSettings.{clientMode}.json"));
                 
+                // Step 4 - Load assemblies from the configuration.
+                var assemblies = config.LoadAssembliesFromConfig();
+                
+                // Step 5 - Create and validate configuration objects.
                 container.ConfigureByAttribute(config, assemblies);
-                container.RegisterByAttribute(assemblies);
-                container.InitializeByAttribute(assemblies);
 
+                // Step 6 - Register services by reflection using attributes.
+                container.RegisterByAttribute(assemblies);
+
+                // Step 7 - Initialize / start services in the container.
+                container.InitializeByAttribute(assemblies);
+                
+                // Wait for the user to press enter to exit the application.
                 if (clientMode == ClientMode.Server)
                     PressEnterTask.Value.Wait();
                 else
