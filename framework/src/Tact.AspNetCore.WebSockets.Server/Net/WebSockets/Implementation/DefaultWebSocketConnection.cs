@@ -16,8 +16,7 @@ namespace Tact.Net.WebSockets.Implementation
 
         public DefaultWebSocketConnection(HttpContext httpContext)
         {
-            if (httpContext == null) throw new ArgumentNullException(nameof(httpContext));
-            HttpContext = httpContext;
+            HttpContext = httpContext ?? throw new ArgumentNullException(nameof(httpContext));
         }
 
         public HttpContext HttpContext { get; }
@@ -59,8 +58,7 @@ namespace Tact.Net.WebSockets.Implementation
 
         private void OnOpenWrapper(WebSocket webSocket)
         {
-            if (webSocket == null) throw new ArgumentNullException(nameof(webSocket));
-            _webSocket = webSocket;
+            _webSocket = webSocket ?? throw new ArgumentNullException(nameof(webSocket));
             _onOpen?.Invoke(webSocket);
         }
     }
