@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,14 @@ namespace Tact.Rpc.Hosts.Implementation
                 {
                     services.AddSingleton(resolver);
 
-                    var mvc = services.AddMvc();
+                    var mvc = services.AddMvc(o =>
+                    {
+                        var inputFormatter = resolver.Resolve<IInputFormatter>();
+                        o.InputFormatters.Insert(0, inputFormatter);
+
+                        var outputFormatter = resolver.Resolve<IOutputFormatter>();
+                        o.OutputFormatters.Insert(0, outputFormatter);
+                    });
                     
                     var assemblies = applicationParts
                         .Select(a => a.Assembly)

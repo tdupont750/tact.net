@@ -35,15 +35,16 @@ namespace Demo.Rpc.Services.Base
         protected async Task<TResponse> SendAsync<TRequest, TResponse>(TRequest request, string method)
         {
             var uri = $"{_hostUrl}rpc/{_serviceName}/{method}";
-            var seralizedRequest = _serializer.Serialize(request);
+            var seralizedRequest = _serializer.SerializeToString(request);
 
-            using (var content = new StringContent(seralizedRequest, _serializer.Encoding, _serializer.MediaType))
+            using (var content = new StringContent(seralizedRequest, _serializer.Encoding, _serializer.ContentType))
             using (var response = await _httpClient.PostAsync(uri, content).ConfigureAwait(false))
             {
                 response.EnsureSuccessStatusCode();
 
                 var seralizedResponse = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                return _serializer.Deserialize<TResponse>(seralizedResponse);
+                var responseType = typeof(TResponse);
+                return (TResponse)_serializer.Deserialize(responseType, seralizedResponse);
             }
         }
     }
