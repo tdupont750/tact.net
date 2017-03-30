@@ -10,13 +10,12 @@ namespace Tact.Rpc.Serialization
         string ContentType { get; }
         Encoding Encoding { get; }
 
-        object Deserialize(Type type, string value, bool isEnvelope = false);
-        object Deserialize(Type type, byte[] value, bool isEnvelope = false);
-        Task<object> DeserializeAsync(Type type, Stream stream, bool isEnvelope = false);
+        object Deserialize(Type type, string value);
+        object Deserialize(Type type, byte[] value);
+        Task<object> DeserializeAsync(Type type, Stream stream);
 
-        string SerializeToString(object obj, bool useEnvelope = false);
-        byte[] SerializeToBytes(object obj, bool useEnvelope = false);
-        Task SerializeToStreamAsync(object obj, Stream stream, bool useEnvelope = false);
-
+        string SerializeToString(object obj);
+        byte[] SerializeToBytes(object obj);
+        Task SerializeToStreamAsync(object obj, Stream stream);
     }
 }

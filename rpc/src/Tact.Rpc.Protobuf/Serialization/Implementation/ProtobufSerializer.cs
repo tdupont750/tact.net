@@ -16,76 +16,58 @@ namespace Tact.Rpc.Serialization.Implementation
     public class ProtobufSerializer : ISerializer
     {
         private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
-        private static readonly HashSet<Type> RegisteredTypes = new HashSet<Type> { typeof(Envelope) };
+        private static readonly HashSet<Type> RegisteredTypes = new HashSet<Type>();
         private static readonly RuntimeTypeModel RuntimeTypeModel = TypeModel.Create();
         
         public string ContentType => "application/protobuf";
 
         public Encoding Encoding => Encoding.UTF8;
 
-        public object Deserialize(Type type, string value, bool isEnvelope = false)
+        public object Deserialize(Type type, string value)
         {
             var bytes = Encoding.GetBytes(value);
-            return Deserialize(type, bytes, isEnvelope);
+            return Deserialize(type, bytes);
         }
 
-        public object Deserialize(Type type, byte[] value, bool isEnvelope = false)
+        public object Deserialize(Type type, byte[] value)
         {
             TryRegisterType(type);
             
             using (var memoryStream = new MemoryStream(value))
-                return RuntimeTypeModel.Deserialize(memoryStream, null, type);
+                return RuntimeTypeModel.DeserializeWithLengthPrefix(memoryStream, null, type, PrefixStyle.Base128, 0);
         }
 
-        public Task<object> DeserializeAsync(Type type, Stream stream, bool isEnvelope = false)
+        public Task<object> DeserializeAsync(Type type, Stream stream)
         {
             TryRegisterType(type);
-            var result = RuntimeTypeModel.Deserialize(stream, null, type);
+            var result = RuntimeTypeModel.DeserializeWithLengthPrefix(stream, null, type, PrefixStyle.Base128, 0);
             return Task.FromResult(result);
         }
 
-        public string SerializeToString(object obj, bool useEnvelope = false)
+        public string SerializeToString(object obj)
         {
-            var bytes = SerializeToBytes(obj, useEnvelope);
+            var bytes = SerializeToBytes(obj);
             return Encoding.GetString(bytes);
         }
 
-        public byte[] SerializeToBytes(object obj, bool useEnvelope = false)
+        public byte[] SerializeToBytes(object obj)
         {
             var type = obj.GetType();
             TryRegisterType(type);
 
             using (var stream = new MemoryStream())
             {
-                RuntimeTypeModel.Serialize(stream, obj);
-                var bytes = stream.ToArray();
-
-                return useEnvelope
-                    ? SerializeToBytes(new Envelope
-                    {
-                        Type = type.Name,
-                        Content = bytes
-                    })
-                    : bytes;
+                RuntimeTypeModel.SerializeWithLengthPrefix(stream, obj, type, PrefixStyle.Base128, 0);
+                return stream.ToArray();
             }
         }
 
-        public Task SerializeToStreamAsync(object obj, Stream stream, bool useEnvelope = false)
+        public Task SerializeToStreamAsync(object obj, Stream stream)
         {
             var type = obj.GetType();
             TryRegisterType(type);
 
-            if (useEnvelope)
-            {
-                var bytes = SerializeToBytes(obj);
-                obj = new Envelope
-                {
-                    Type = type.Name,
-                    Content = bytes
-                };
-            }
-
-            RuntimeTypeModel.Serialize(stream, obj);
+            RuntimeTypeModel.SerializeWithLengthPrefix(stream, obj, type, PrefixStyle.Base128, 0);
             return Task.CompletedTask;
         }
         
@@ -121,16 +103,6 @@ namespace Tact.Rpc.Serialization.Implementation
                 metaType.CompileInPlace();
                 RegisteredTypes.Add(type);
             }
-        }
-
-        [ProtoContract]
-        private class Envelope
-        {
-            [ProtoMember(1)]
-            public string Type { get; set; }
-
-            [ProtoMember(2)]
-            public byte[] Content { get; set; }
         }
     }
 }

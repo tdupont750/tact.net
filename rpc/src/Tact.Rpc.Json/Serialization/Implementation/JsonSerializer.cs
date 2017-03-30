@@ -14,24 +14,18 @@ namespace Tact.Rpc.Serialization.Implementation
 
         public Encoding Encoding => Encoding.UTF8;
         
-        public object Deserialize(Type type, string value, bool isEnvelope = false)
+        public object Deserialize(Type type, string value)
         {
-            if (isEnvelope)
-            {
-                var envelope = JsonConvert.DeserializeObject<Envelope>(value);
-                return envelope.Content;
-            }
-
             return JsonConvert.DeserializeObject(value, type);
         }
 
-        public object Deserialize(Type type, byte[] value, bool isEnvelope = false)
+        public object Deserialize(Type type, byte[] value)
         {
             var json = Encoding.GetString(value);
-            return Deserialize(type, json, isEnvelope);
+            return Deserialize(type, json);
         }
 
-        public async Task<object> DeserializeAsync(Type type, Stream stream, bool isEnvelope = false)
+        public async Task<object> DeserializeAsync(Type type, Stream stream)
         {
             string json;
 
@@ -40,41 +34,27 @@ namespace Tact.Rpc.Serialization.Implementation
                     .ReadToEndAsync()
                     .ConfigureAwait(false);
 
-            return Deserialize(type, json, isEnvelope);
+            return Deserialize(type, json);
         }
 
-        public string SerializeToString(object obj, bool useEnvelope = false)
+        public string SerializeToString(object obj)
         {
-            if (useEnvelope)
-                obj = new Envelope
-                {
-                    Type = obj.GetType().Name,
-                    Content = obj
-                };
-
             return JsonConvert.SerializeObject(obj);
         }
 
-        public byte[] SerializeToBytes(object obj, bool useEnvelope = false)
+        public byte[] SerializeToBytes(object obj)
         {
-            var json = SerializeToString(obj, useEnvelope);
+            var json = SerializeToString(obj);
             return Encoding.GetBytes(json);
         }
 
-        public async Task SerializeToStreamAsync(object obj, Stream stream, bool useEnvelope = false)
+        public async Task SerializeToStreamAsync(object obj, Stream stream)
         {
-            var json = SerializeToString(obj, useEnvelope);
+            var json = SerializeToString(obj);
             using (var streamWriter = new StreamWriter(stream))
                 await streamWriter
                     .WriteAsync(json)
                     .ConfigureAwait(false);
-        }
-
-        private class Envelope
-        {
-            public string Type { get; set; }
-
-            public object Content { get; set; }
         }
     }
 }
