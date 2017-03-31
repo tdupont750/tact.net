@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Tact.Diagnostics;
@@ -81,12 +82,18 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
             connection.OnMessage = m => Task.Run(() => HandleRequestAsync(connection, m), connection.HttpContext.RequestAborted);
         }
 
+        private Task HandleRequestAsync(IWebSocketConnection connection, string message)
+        {
+            var bytes = Encoding.UTF8.GetBytes(message);
+            return HandleRequestAsync(connection, bytes);
+        }
+
         private async Task HandleRequestAsync(IWebSocketConnection connection, byte[] requestBytes)
         {
             using (var stream = new MemoryStream(requestBytes))
             {
-                var callInfo = (RemoteCallInfo)await _serializer
-                    .DeserializeAsync(typeof(RemoteCallInfo), stream)
+                var callInfo = await _serializer
+                    .DeserializeAsync<RemoteCallInfo>(stream)
                     .ConfigureAwait(false);
 
                 var callInfoPosition = stream.Position;
@@ -117,11 +124,6 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
                         break;
                     }
             }
-        }
-
-        private Task HandleRequestAsync(IWebSocketConnection connection, string message)
-        {
-            throw new NotImplementedException();
         }
     }
 }

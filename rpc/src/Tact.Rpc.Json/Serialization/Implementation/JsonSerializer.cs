@@ -10,6 +10,8 @@ namespace Tact.Rpc.Serialization.Implementation
     [RegisterSingleton(typeof(ISerializer), "JSON")]
     public class JsonSerializer : ISerializer
     {
+        private readonly Newtonsoft.Json.JsonSerializer _jsonSerializer = new Newtonsoft.Json.JsonSerializer();
+
         public string ContentType => "application/json";
 
         public Encoding Encoding => Encoding.UTF8;
@@ -25,16 +27,19 @@ namespace Tact.Rpc.Serialization.Implementation
             return Deserialize(type, json);
         }
 
-        public async Task<object> DeserializeAsync(Type type, Stream stream)
+        public Task<object> DeserializeAsync(Type type, Stream stream)
         {
-            string json;
+            using (var sr = new StreamReader(stream))
+            using (var jr = new JsonTextReader(sr))
+            {
+                var result = _jsonSerializer.Deserialize(jr, type);
+                
+                // https://github.com/JamesNK/Newtonsoft.Json/issues/803
+                if (stream is MemoryStream memoryStream)
+                    memoryStream.Position = jr.LinePosition;
 
-            using (var streamReader = new StreamReader(stream))
-                json = await streamReader
-                    .ReadToEndAsync()
-                    .ConfigureAwait(false);
-
-            return Deserialize(type, json);
+                return Task.FromResult(result);
+            }
         }
 
         public string SerializeToString(object obj)

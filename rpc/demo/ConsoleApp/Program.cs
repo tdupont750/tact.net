@@ -13,7 +13,7 @@ namespace ConsoleApp
 {
     public static class Program
     {
-        public enum ClientMode
+        public enum AppMode
         {
             Both,
             Client,
@@ -23,9 +23,9 @@ namespace ConsoleApp
         public static int Main(string[] args)
         {
             // Determine what mode the application is running in.
-            if (!Enum.TryParse(args.FirstOrDefault() ?? "Both", out ClientMode clientMode))
+            if (!Enum.TryParse(args.FirstOrDefault() ?? "Both", out AppMode appMode))
             {
-                var modes = string.Join(", ", Enum.GetNames(typeof(ClientMode)));
+                var modes = string.Join(", ", Enum.GetNames(typeof(AppMode)));
                 Console.WriteLine($"First argument must specify a mode: {modes}");
                 return -1;
             }
@@ -39,7 +39,7 @@ namespace ConsoleApp
                 // Step 3 - Read and aggregate configuration files.
                 var config = container.BuildConfiguration(cb => cb
                     .AddJsonFile("AppSettings.json")
-                    .AddJsonFile($"AppSettings.{clientMode}.json"));
+                    .AddJsonFile($"AppSettings.{appMode}.json"));
                 
                 // Step 4 - Load assemblies from the configuration.
                 var assemblies = config.LoadAssembliesFromConfig();
@@ -52,20 +52,23 @@ namespace ConsoleApp
 
                 // Step 7 - Initialize / start services in the container.
                 container.InitializeByAttribute(assemblies);
-                
+
                 // Wait for the user to press enter to exit the application.
-                if (clientMode == ClientMode.Server)
-                    PressEnterTask.Value.Wait();
-                else
-                    TestApplication(container).Wait();
+                TestApplication(container, appMode).Wait();
             }
 
             return 0;
         }
         
-        private static async Task TestApplication(IResolver resolver)
+        private static async Task TestApplication(IContainer container, AppMode appMode)
         {
-            var client = resolver.Resolve<IHelloService>();
+            if (appMode == AppMode.Server)
+            {
+                await PressEnterTask.Value.ConfigureAwait(false);
+                return;
+            }
+
+            var client = container.Resolve<IHelloService>();
 
             while(true)
             {
