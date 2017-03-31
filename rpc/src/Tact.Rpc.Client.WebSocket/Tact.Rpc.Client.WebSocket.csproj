@@ -1,7 +1,30 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.4</TargetFramework>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <RootNamespace>Tact.Rpc</RootNamespace>
+    <Description>The WebSocket Client library for Tact.NET RPC - A tactful collection of utilities for .NET development.</Description>
+    <Copyright>2016 Tom DuPont</Copyright>
+    <VersionPrefix>1.0.3</VersionPrefix>
+    <Authors>Tom DuPont</Authors>
+    <AssemblyName>Tact.Rpc.Client.WebSocket</AssemblyName>
+    <PackageId>Tact.Rpc.Client.WebSocket</PackageId>
+    <PackageIconUrl>https://sites.google.com/site/tdupont750/Tact_NET_S.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/tdupont750/tact.net</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\src\Tact.Configuration\Tact.Configuration.csproj" />
+    <ProjectReference Include="..\..\..\framework\src\Tact\Tact.csproj" />
+    <ProjectReference Include="..\Tact.Rpc\Tact.Rpc.csproj" />
+  </ItemGroup>
+  
 </Project>
