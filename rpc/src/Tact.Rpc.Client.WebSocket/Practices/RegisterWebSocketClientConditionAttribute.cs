@@ -7,7 +7,7 @@ using Tact.Rpc.Configuration;
 
 namespace Tact.Rpc.Practices
 {
-    class RegisterWebSocketClientConditionAttribute : Attribute, IRegisterConditionAttribute
+    public class RegisterWebSocketClientConditionAttribute : Attribute, IRegisterConditionAttribute
     {
         private readonly string _serviceName;
 

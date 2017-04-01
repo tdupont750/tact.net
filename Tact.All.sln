@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tact.Rpc.Client.WebSocket",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.Rpc.Server.WebSocket", "rpc\demo\Demo.Rpc.Server.WebSocket\Demo.Rpc.Server.WebSocket.csproj", "{B1CC4E62-2D7B-49C3-8E44-328050061AC4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Demo.Rpc.Client.WebSocket", "rpc\demo\Demo.Rpc.Client.WebSocket\Demo.Rpc.Client.WebSocket.csproj", "{17FEDA24-64DB-4E32-B287-445564327BC8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -163,6 +165,10 @@ Global
 		{B1CC4E62-2D7B-49C3-8E44-328050061AC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1CC4E62-2D7B-49C3-8E44-328050061AC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1CC4E62-2D7B-49C3-8E44-328050061AC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17FEDA24-64DB-4E32-B287-445564327BC8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17FEDA24-64DB-4E32-B287-445564327BC8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17FEDA24-64DB-4E32-B287-445564327BC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17FEDA24-64DB-4E32-B287-445564327BC8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -197,5 +203,6 @@ Global
 		{B873D3D9-C2E8-4E2C-A6FC-B0C7F0FD284B} = {30572F1F-E178-4B79-A40F-DFBAD09CF968}
 		{147E70A5-8E8F-488C-A453-47DF2A113EEC} = {30572F1F-E178-4B79-A40F-DFBAD09CF968}
 		{B1CC4E62-2D7B-49C3-8E44-328050061AC4} = {DEFF8A1B-AE75-4B83-B656-26414F0211FA}
+		{17FEDA24-64DB-4E32-B287-445564327BC8} = {DEFF8A1B-AE75-4B83-B656-26414F0211FA}
 	EndGlobalSection
 EndGlobal

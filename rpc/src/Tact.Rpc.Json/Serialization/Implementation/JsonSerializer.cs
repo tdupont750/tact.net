@@ -29,7 +29,7 @@ namespace Tact.Rpc.Serialization.Implementation
 
         public Task<object> DeserializeAsync(Type type, Stream stream)
         {
-            using (var sr = new StreamReader(stream))
+            using (var sr = new StreamReader(stream, Encoding, true, 1024, true))
             using (var jr = new JsonTextReader(sr))
             {
                 var result = _jsonSerializer.Deserialize(jr, type);

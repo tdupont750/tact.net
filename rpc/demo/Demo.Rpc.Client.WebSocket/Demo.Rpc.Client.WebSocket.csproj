@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <RootNamespace>Demo.Rpc</RootNamespace>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\src\Tact.Configuration\Tact.Configuration.csproj" />
+    <ProjectReference Include="..\..\..\framework\src\Tact\Tact.csproj" />
+    <ProjectReference Include="..\..\src\Tact.Rpc.Client.WebSocket\Tact.Rpc.Client.WebSocket.csproj" />
+    <ProjectReference Include="..\..\src\Tact.Rpc\Tact.Rpc.csproj" />
+    <ProjectReference Include="..\Demo.Rpc\Demo.Rpc.csproj" />
+  </ItemGroup>
+
+</Project>

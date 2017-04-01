@@ -22,6 +22,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Net.WebSockets.Client" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\..\framework\src\Tact.Configuration\Tact.Configuration.csproj" />
     <ProjectReference Include="..\..\..\framework\src\Tact\Tact.csproj" />
     <ProjectReference Include="..\Tact.Rpc\Tact.Rpc.csproj" />

@@ -11,6 +11,7 @@ using Tact.Diagnostics;
 using Tact.Net.WebSockets;
 using Tact.Practices;
 using Tact.Practices.LifetimeManagers;
+using Tact.Practices.LifetimeManagers.Attributes;
 using Tact.Rpc.Configuration;
 using Tact.Rpc.Hosts;
 using Tact.Rpc.Models;
@@ -18,6 +19,7 @@ using Tact.Rpc.Serialization;
 
 namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
 {
+    [RegisterCondition, RegisterSingleton(typeof(IHost), nameof(WebSocketHost))]
     public class WebSocketHost : IHost
     {
         private readonly IWebHost _webHost;
@@ -42,7 +44,7 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
                 })
                 .Configure(app =>
                 {
-                    var handler = new WebSocketHandler("rpc/ws", OnConnection);
+                    var handler = new WebSocketHandler(string.Empty, OnConnection);
                     app.UseWebSockets().UseWebSocketHandler(handler);
                 })
                 .Build();
@@ -57,15 +59,6 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
         {
             _webHost.Start();
             return Task.CompletedTask;
-        }
-
-        public class RegisterConditionAttribute : Attribute, IRegisterConditionAttribute
-        {
-            public bool ShouldRegister(IContainer container, Type toType)
-            {
-                var config = container.Resolve<WebSocketHostConfig>();
-                return config.IsEnabled;
-            }
         }
 
         private void OnConnection(IWebSocketConnection connection)
@@ -90,39 +83,59 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
 
         private async Task HandleRequestAsync(IWebSocketConnection connection, byte[] requestBytes)
         {
-            using (var stream = new MemoryStream(requestBytes))
+            try
             {
-                var callInfo = await _serializer
-                    .DeserializeAsync<RemoteCallInfo>(stream)
-                    .ConfigureAwait(false);
+                using (var stream = new MemoryStream())
+                {
+                    stream.Write(requestBytes, 0, requestBytes.Length);
 
-                var callInfoPosition = stream.Position;
+                    stream.Position = 0;
 
-                foreach (var endpoint in _endpoints)
-                    if (endpoint.CanHandle(callInfo, out Type type))
-                    {
-                        var model = await _serializer
-                            .DeserializeAsync(type, stream)
-                            .ConfigureAwait(false);
+                    var callInfo = await _serializer
+                        .DeserializeAsync<RemoteCallInfo>(stream)
+                        .ConfigureAwait(false);
 
-                        var result = await endpoint
-                            .HandleAsync(callInfo, model)
-                            .ConfigureAwait(false);
+                    var callInfoPosition = stream.Position;
 
-                        stream.Position = callInfoPosition;
+                    foreach (var endpoint in _endpoints)
+                        if (endpoint.CanHandle(callInfo, out Type type))
+                        {
+                            var model = await _serializer
+                                .DeserializeAsync(type, stream)
+                                .ConfigureAwait(false);
 
-                        await _serializer
-                            .SerializeToStreamAsync(result, stream)
-                            .ConfigureAwait(false);
+                            var result = await endpoint
+                                .HandleAsync(callInfo, model)
+                                .ConfigureAwait(false);
 
-                        var resultBytes = stream.ToArray();
+                            stream.Position = callInfoPosition;
 
-                        await connection
-                            .SendAsync(resultBytes, connection.HttpContext.RequestAborted)
-                            .ConfigureAwait(false);
+                            await _serializer
+                                .SerializeToStreamAsync(result, stream)
+                                .ConfigureAwait(false);
 
-                        break;
-                    }
+                            var resultBytes = stream.ToArray();
+
+                            await connection
+                                .SendAsync(resultBytes, connection.HttpContext.RequestAborted)
+                                .ConfigureAwait(false);
+
+                            break;
+                        }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public class RegisterConditionAttribute : Attribute, IRegisterConditionAttribute
+        {
+            public bool ShouldRegister(IContainer container, Type toType)
+            {
+                var config = container.Resolve<WebSocketHostConfig>();
+                return config.IsEnabled;
             }
         }
     }

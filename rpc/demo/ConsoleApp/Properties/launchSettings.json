@@ -2,7 +2,7 @@
   "profiles": {
     "ConsoleApp": {
       "commandName": "Project",
-      "commandLineArgs": "Server"
+      "commandLineArgs": "Client"
     }
   }
 }

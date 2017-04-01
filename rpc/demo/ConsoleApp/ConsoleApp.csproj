@@ -21,6 +21,7 @@
     <ProjectReference Include="..\..\src\Tact.Rpc.Protobuf\Tact.Rpc.Protobuf.csproj" />
     <ProjectReference Include="..\..\src\Tact.Rpc.Json\Tact.Rpc.Json.csproj" />
     <ProjectReference Include="..\..\src\Tact.Rpc\Tact.Rpc.csproj" />
+    <ProjectReference Include="..\Demo.Rpc.Client.WebSocket\Demo.Rpc.Client.WebSocket.csproj" />
     <ProjectReference Include="..\Demo.Rpc.Server.WebSocket\Demo.Rpc.Server.WebSocket.csproj" />
     <ProjectReference Include="..\Demo.Rpc\Demo.Rpc.csproj" />
     <ProjectReference Include="..\Demo.Rpc.Client.Http\Demo.Rpc.Client.Http.csproj" />

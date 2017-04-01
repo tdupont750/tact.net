@@ -68,9 +68,12 @@ namespace ConsoleApp
                 return;
             }
 
-            var client = container.Resolve<IHelloService>();
+            var helloService = container.Resolve<IHelloService>();
+            var mathService = container.Resolve<IMathService>();
 
-            while(true)
+            var y = 0;
+
+            while (true)
             {
                 var delayTask = Task.Delay(1000);
                 
@@ -79,11 +82,17 @@ namespace ConsoleApp
                 if (PressEnterTask.Value.IsCompleted)
                     return;
 
-                var response = await client
+                var helloResponse = await helloService
                     .SayHelloAsync(new HelloRequest { Name = "Tom" })
                     .ConfigureAwait(false);
 
-                Console.WriteLine($"{DateTime.Now.Minute}:{DateTime.Now.Second} - {response.Message}");
+                Console.WriteLine($"{DateTime.Now.Minute}:{DateTime.Now.Second} - Say: {helloResponse.Message}");
+
+                var sumResponse = await mathService
+                    .SumAsync(new SumRequest { X = 1, Y = y++ })
+                    .ConfigureAwait(false);
+
+                Console.WriteLine($"{DateTime.Now.Minute}:{DateTime.Now.Second} - Sum: {sumResponse.Sum}");
             }
         }
 
