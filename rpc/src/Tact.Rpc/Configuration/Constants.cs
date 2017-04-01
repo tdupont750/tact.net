@@ -2,7 +2,7 @@
 {
     public static class Constants
     {
-        private const string ConfigPathPrefix = "TactRpcConfig.";
+        private const string ConfigPathPrefix = "Tact.Rpc.";
 
         public const string ConfigServicesPathPrefix = ConfigPathPrefix + "Services.";
 

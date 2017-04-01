@@ -11,7 +11,7 @@ namespace Tact
     {
         public static Assembly[] LoadAssembliesFromConfig(this IConfiguration config)
         {
-            return config.LoadAssembliesFromConfig("ContainerAssemblies");
+            return config.LoadAssembliesFromConfig("Tact.Assemblies");
         }
 
         public static Assembly[] LoadAssembliesFromConfig(this IConfiguration config, params string[] configPaths)
