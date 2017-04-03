@@ -8,11 +8,11 @@ using Tact.Practices;
 namespace Demo.Rpc.Controllers
 {
     [Route("rpc/[controller]")]
-    public class MathController : Controller
+    public class MathServiceController : Controller
     {
         private readonly IMathService _mathService;
 
-        public MathController(IResolver resolver)
+        public MathServiceController(IResolver resolver)
         {
             _mathService = resolver.Resolve<IMathService>();
         }
