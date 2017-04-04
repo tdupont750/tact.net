@@ -14,8 +14,5 @@ namespace Tact.Rpc.Configuration
 
         [Required, MinLength(1)]
         public List<string> Urls { get; set; }
-
-        [Required(AllowEmptyStrings = false)]
-        public string Serializer { get; set; }
     }
 }

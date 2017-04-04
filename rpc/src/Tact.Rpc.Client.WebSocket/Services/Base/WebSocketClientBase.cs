@@ -30,7 +30,10 @@ namespace Tact.Rpc.Services.Base
             _serviceName = serviceName;
             _hostUrl = config.Url;
             _serializer = resolver.Resolve<ISerializer>(config.Serializer);
+
             _client = new ClientWebSocket();
+            _client.Options.SetRequestHeader("content-type", _serializer.ContentType);
+
             _semaphore = new SemaphoreSlim(1, 1);
             _responseMap = new ConcurrentDictionary<string, Tuple<Type, TaskCompletionSource<object>>>();
         }

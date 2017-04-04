@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,17 +24,17 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
     public class WebSocketHost : IHost
     {
         private readonly IWebHost _webHost;
-        private readonly ISerializer _serializer;
         private readonly IReadOnlyList<IWebSocketEndpoint> _endpoints;
+        private readonly IReadOnlyList<ISerializer> _serializers;
         private readonly ILog _log;
 
-        public WebSocketHost(IResolver resolver, IReadOnlyList<IWebSocketEndpoint> endpoints, WebSocketHostConfig hostConfig, ILog log)
+        public WebSocketHost(IResolver resolver, IReadOnlyList<IWebSocketEndpoint> endpoints, IReadOnlyList<ISerializer> serializers, WebSocketHostConfig hostConfig, ILog log)
         {
             _log = log;
 
             _endpoints = endpoints;
 
-            _serializer = resolver.Resolve<ISerializer>(hostConfig.Serializer);
+            _serializers = serializers;
 
             _webHost = new WebHostBuilder()
                 .UseKestrel()
@@ -85,13 +86,17 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
         {
             try
             {
+                var serializer = _serializers
+                    .FirstOrDefault(s => connection.HttpContext.Request.ContentType
+                    .StartsWith(s.ContentType, StringComparison.OrdinalIgnoreCase));
+
                 using (var stream = new MemoryStream())
                 {
                     stream.Write(requestBytes, 0, requestBytes.Length);
 
                     stream.Position = 0;
 
-                    var callInfo = await _serializer
+                    var callInfo = await serializer
                         .DeserializeAsync<RemoteCallInfo>(stream)
                         .ConfigureAwait(false);
 
@@ -100,7 +105,7 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
                     foreach (var endpoint in _endpoints)
                         if (endpoint.CanHandle(callInfo, out Type type))
                         {
-                            var model = await _serializer
+                            var model = await serializer
                                 .DeserializeAsync(type, stream)
                                 .ConfigureAwait(false);
 
@@ -110,7 +115,7 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
 
                             stream.Position = callInfoPosition;
 
-                            await _serializer
+                            await serializer
                                 .SerializeToStreamAsync(result, stream)
                                 .ConfigureAwait(false);
 
