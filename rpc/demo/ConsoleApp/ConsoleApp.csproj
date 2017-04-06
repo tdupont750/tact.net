@@ -20,13 +20,13 @@
     <ProjectReference Include="..\..\..\framework\src\Tact.Configuration\Tact.Configuration.csproj" />
     <ProjectReference Include="..\..\src\Tact.Rpc.Protobuf\Tact.Rpc.Protobuf.csproj" />
     <ProjectReference Include="..\..\src\Tact.Rpc.Json\Tact.Rpc.Json.csproj" />
+    <ProjectReference Include="..\..\src\Tact.Rpc.Server.Http\Tact.Rpc.Server.Http.csproj" />
+    <ProjectReference Include="..\..\src\Tact.Rpc.Server.WebSocket\Tact.Rpc.Server.WebSocket.csproj" />
     <ProjectReference Include="..\..\src\Tact.Rpc\Tact.Rpc.csproj" />
     <ProjectReference Include="..\Demo.Rpc.Client.WebSocket\Demo.Rpc.Client.WebSocket.csproj" />
-    <ProjectReference Include="..\Demo.Rpc.Server.WebSocket\Demo.Rpc.Server.WebSocket.csproj" />
     <ProjectReference Include="..\Demo.Rpc\Demo.Rpc.csproj" />
     <ProjectReference Include="..\Demo.Rpc.Client.Http\Demo.Rpc.Client.Http.csproj" />
     <ProjectReference Include="..\Demo.Rpc.Server\Demo.Rpc.Server.csproj" />
-    <ProjectReference Include="..\Demo.Rpc.Server.Http\Demo.Rpc.Server.Http.csproj" />
   </ItemGroup>
 
   <ItemGroup>

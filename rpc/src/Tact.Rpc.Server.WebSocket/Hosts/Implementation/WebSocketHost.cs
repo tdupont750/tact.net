@@ -16,6 +16,7 @@ using Tact.Practices.LifetimeManagers.Attributes;
 using Tact.Rpc.Configuration;
 using Tact.Rpc.Hosts;
 using Tact.Rpc.Models;
+using Tact.Rpc.Practices;
 using Tact.Rpc.Serialization;
 
 namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
@@ -23,16 +24,19 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
     [RegisterCondition, RegisterSingleton(typeof(IHost), nameof(WebSocketHost))]
     public class WebSocketHost : IHost
     {
+        private readonly IResolver _resolver;
         private readonly IWebHost _webHost;
-        private readonly IReadOnlyList<IWebSocketEndpoint> _endpoints;
+        private readonly IReadOnlyList<RpcServiceInfo> _rpcServices;
         private readonly IReadOnlyList<ISerializer> _serializers;
         private readonly ILog _log;
 
-        public WebSocketHost(IResolver resolver, IReadOnlyList<IWebSocketEndpoint> endpoints, IReadOnlyList<ISerializer> serializers, WebSocketHostConfig hostConfig, ILog log)
+        public WebSocketHost(IResolver resolver, IReadOnlyList<RpcServiceInfo> rpcServices, IReadOnlyList<ISerializer> serializers, WebSocketHostConfig hostConfig, ILog log)
         {
+            _resolver = resolver;
+
             _log = log;
 
-            _endpoints = endpoints;
+            _rpcServices = rpcServices;
 
             _serializers = serializers;
 
@@ -102,15 +106,15 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
 
                     var callInfoPosition = stream.Position;
 
-                    foreach (var endpoint in _endpoints)
-                        if (endpoint.CanHandle(callInfo, out Type type))
+                    foreach (var rpcService in _rpcServices)
+                        if (rpcService.CanHandle(callInfo.Service, callInfo.Method, out Type type))
                         {
                             var model = await serializer
                                 .DeserializeAsync(type, stream)
                                 .ConfigureAwait(false);
-
-                            var result = await endpoint
-                                .HandleAsync(callInfo, model)
+                            
+                            var result = await rpcService
+                                .HandleAsync(_resolver, callInfo.Method, model)
                                 .ConfigureAwait(false);
 
                             stream.Position = callInfoPosition;
