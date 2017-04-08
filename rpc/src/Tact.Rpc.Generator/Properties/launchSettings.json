@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Tact.Rpc.Generator": {
+      "commandName": "Project",
+      "commandLineArgs": "/CurrentDirectory=D:\\Code\\Github\\tact.net\\rpc\\demo\\Demo.Rpc"
+    }
+  }
+}

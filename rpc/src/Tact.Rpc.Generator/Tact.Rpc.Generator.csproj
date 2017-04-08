@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <PackageTargetFallback>portable-net45+win8+wp8+wpa81</PackageTargetFallback>
+    <AssemblyName>dotnet-tactrpcgen</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\src\Tact.Configuration\Tact.Configuration.csproj" />
+    <ProjectReference Include="..\..\..\framework\src\Tact\Tact.csproj" />
+    <ProjectReference Include="..\Tact.Rpc\Tact.Rpc.csproj" />
+  </ItemGroup>
+
+</Project>

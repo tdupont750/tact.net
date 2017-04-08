@@ -140,6 +140,12 @@ namespace Tact
             if (config == null)
                 throw new ArgumentNullException(nameof(config));
 
+            if (configPaths.Length == 0 || configPaths.All(p => string.IsNullOrWhiteSpace(p)))
+            {
+                config.Bind(value);
+                return;
+            }
+
             var sections = config.GetSections(configPaths);
             foreach (var section in sections)
                 section.Bind(value);
