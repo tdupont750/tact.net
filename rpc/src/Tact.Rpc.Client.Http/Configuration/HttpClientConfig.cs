@@ -1,14 +1,19 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Tact.ComponentModel.DataAnnotations;
+using Tact.Rpc.Clients;
 using Tact.Rpc.Configuration;
+using Tact.Rpc.Practices;
 
 namespace Demo.Rpc.Configuration
 {
-    public class HttpClientConfig
+    [RpcClientConfiguration(ProtocolName)]
+    public class HttpClientConfig : IRpcClientConfig
     {
+        public const string ProtocolName = "HTTP";
+
         [IsValidationEnabled]
-        public bool IsEnabled => Mode == ServiceMode.Remote && "HTTP".Equals(Protocol, StringComparison.OrdinalIgnoreCase);
+        public bool IsEnabled => Mode == ServiceMode.Remote && ProtocolName.Equals(Protocol, StringComparison.OrdinalIgnoreCase);
 
         public ServiceMode Mode { get; set; }
 

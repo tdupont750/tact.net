@@ -4,12 +4,14 @@
     {
         private const string ConfigPathPrefix = "Tact.Rpc.";
 
-        public const string ConfigServicesPathPrefix = ConfigPathPrefix + "Services.";
+        public const string DefaultsConfigKey = "DefaultValues";
 
-        public const string DefaultServicesConfigPath = ConfigServicesPathPrefix + "DefaultValues";
+        public const string ServiceConfigPathPrefix = ConfigPathPrefix + "Services";
 
-        public const string ConfigHostsPathPrefix = ConfigPathPrefix + "Hosts.";
+        public const string ServiceConfigDefaults = ServiceConfigPathPrefix + "." + DefaultsConfigKey;
 
-        public const string DefaultHostsConfigPath = ConfigHostsPathPrefix + "DefaultValues";
+        public const string HostsConfigPathPrefix = ConfigPathPrefix + "Hosts";
+
+        public const string HostsConfigDefaults = HostsConfigPathPrefix + "." + DefaultsConfigKey;
     }
 }

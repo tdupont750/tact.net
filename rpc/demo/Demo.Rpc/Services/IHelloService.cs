@@ -4,7 +4,7 @@ using Tact.Rpc.Practices;
 
 namespace Demo.Rpc.Services
 {
-    [RpcService]
+    [RpcServiceDefinition]
     public interface IHelloService
     {
         Task<HelloResponse> SayHelloAsync(HelloRequest helloRequest);

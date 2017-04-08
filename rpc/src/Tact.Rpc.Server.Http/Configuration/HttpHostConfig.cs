@@ -6,7 +6,7 @@ using Tact.Configuration.Attributes;
 
 namespace Tact.Rpc.Configuration
 {
-    [RegisterConfiguration(Constants.ConfigHostsPathPrefix + "HTTP", Constants.DefaultHostsConfigPath)]
+    [RegisterConfiguration(Constants.HostsConfigPathPrefix + ".HTTP", Constants.HostsConfigDefaults)]
     public class HttpHostConfig
     {
         [IsValidationEnabled]

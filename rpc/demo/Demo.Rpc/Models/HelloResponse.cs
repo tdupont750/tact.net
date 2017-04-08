@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Demo.Rpc.Models
+﻿namespace Demo.Rpc.Models
 {
     public class HelloResponse
     {

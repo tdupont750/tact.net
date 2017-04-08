@@ -6,7 +6,7 @@ using Tact.Configuration.Attributes;
 
 namespace Tact.Rpc.Configuration
 {
-    [RegisterConfiguration(Constants.ConfigHostsPathPrefix + "WebSocket", Constants.DefaultHostsConfigPath)]
+    [RegisterConfiguration(Constants.HostsConfigPathPrefix + ".WebSocket", Constants.HostsConfigDefaults)]
     public class WebSocketHostConfig
     {
         [IsValidationEnabled]

@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 using Tact.Practices;
 using Tact.Reflection;
 
-namespace Tact.Rpc.Practices
+namespace Tact.Rpc.Services.Implementation
 {
-    public class RpcServiceInfo
+    public class RpcHandler : IRpcHandler
     {
         private readonly Dictionary<string, Tuple<Lazy<EfficientInvoker>, Type>> _methods;
 
         private readonly Type _type;
 
-        public RpcServiceInfo(Type type)
+        public RpcHandler(Type type)
         {
             _type = type;
 

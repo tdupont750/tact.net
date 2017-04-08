@@ -4,17 +4,15 @@ using System.IO;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
-using Tact.Practices;
 using Tact.Rpc.Configuration;
 using Tact.Rpc.Models;
 using Tact.Rpc.Serialization;
 
-namespace Tact.Rpc.Services.Base
+namespace Tact.Rpc.Clients.Implementation
 {
-    public abstract class WebSocketClientBase
+    public class WebSocketRpcClient : IRpcClient
     {
-        private readonly string _serviceName;
-        private readonly string _hostUrl;
+        private readonly WebSocketClientConfig _config;
         private readonly ISerializer _serializer;
         private readonly ClientWebSocket _client;
         private readonly SemaphoreSlim _semaphore;
@@ -23,13 +21,10 @@ namespace Tact.Rpc.Services.Base
         private volatile Task _receiveTask;
         private volatile bool _isConnected;
 
-        protected WebSocketClientBase(IResolver resolver, string serviceName)
+        public WebSocketRpcClient(ISerializer serializer, WebSocketClientConfig config)
         {
-            var config = resolver.Resolve<WebSocketClientConfig>(serviceName);
-
-            _serviceName = serviceName;
-            _hostUrl = config.Url;
-            _serializer = resolver.Resolve<ISerializer>(config.Serializer);
+            _config = config;
+            _serializer = serializer;
 
             _client = new ClientWebSocket();
             _client.Options.SetRequestHeader("content-type", _serializer.ContentType);
@@ -38,13 +33,13 @@ namespace Tact.Rpc.Services.Base
             _responseMap = new ConcurrentDictionary<string, Tuple<Type, TaskCompletionSource<object>>>();
         }
 
-        protected async Task<TResponse> SendAsync<TRequest, TResponse>(TRequest request, string method)
+        public async Task<TResponse> SendAsync<TRequest, TResponse>(string service, string method, TRequest request)
         {
             if (!_isConnected)
                 using (await _semaphore.UseAsync().ConfigureAwait(false))
                     if (!_isConnected)
                     {
-                        var uri = new Uri(_hostUrl);
+                        var uri = new Uri(_config.Url);
                         await _client
                             .ConnectAsync(uri, CancellationToken.None)
                             .ConfigureAwait(false);
@@ -55,7 +50,7 @@ namespace Tact.Rpc.Services.Base
 
             var callInfo = new RemoteCallInfo
             {
-                Service = _serviceName,
+                Service = service,
                 Method = method,
                 Id = Guid.NewGuid().ToString()
             };
@@ -94,7 +89,7 @@ namespace Tact.Rpc.Services.Base
 
                     if (!received.EndOfMessage)
                         continue;
-                    
+
                     memoryStream.Position = 0;
 
                     var callInfo = await _serializer

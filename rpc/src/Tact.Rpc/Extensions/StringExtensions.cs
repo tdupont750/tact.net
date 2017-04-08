@@ -10,13 +10,13 @@ namespace Tact.Rpc
 
         public static string GetRpcName(this string name)
         {
-            if (PrefixRegex.IsMatch(name))
-                name = name.Substring(1);
+            var startIndex = PrefixRegex.IsMatch(name) ? 1 : 0;
 
-            if (name.EndsWith(Suffix))
-                name = name.Substring(0, name.Length - Suffix.Length);
+            var length = name.EndsWith(Suffix)
+                ? name.Length - Suffix.Length - startIndex
+                : name.Length - startIndex;
 
-            return name;
+            return name.Substring(startIndex, length);
         }
     }
 }

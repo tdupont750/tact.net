@@ -2,11 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Tact.Practices;
-using Tact.Rpc.Practices;
 using Tact.Rpc.Serialization;
+using Tact.Rpc.Services;
 
 namespace Tact.Rpc.Controllers
 {
@@ -14,13 +13,13 @@ namespace Tact.Rpc.Controllers
     public class RpcController : Controller
     {
         private readonly IResolver _resolver;
-        private readonly IReadOnlyList<RpcServiceInfo> _rpcServices;
+        private readonly IReadOnlyList<IRpcHandler> _rpcHandlers;
         private readonly IReadOnlyList<ISerializer> _serializers;
 
         public RpcController(IResolver resolver)
         {
             _resolver = resolver;
-            _rpcServices = resolver.Resolve<IReadOnlyList<RpcServiceInfo>>();
+            _rpcHandlers = resolver.Resolve<IReadOnlyList<IRpcHandler>>();
             _serializers = resolver.Resolve<IReadOnlyList<ISerializer>>();
         }
 
@@ -31,7 +30,7 @@ namespace Tact.Rpc.Controllers
             if (serializer == null)
                 BadRequest($"Invalid Content Type: {HttpContext.Request.ContentType}");
 
-            foreach (var rpcService in _rpcServices)
+            foreach (var rpcService in _rpcHandlers)
                 if (rpcService.CanHandle(service, method, out Type type))
                 {
                     object model;

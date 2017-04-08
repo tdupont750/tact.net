@@ -1,40 +1,27 @@
 ﻿using Demo.Rpc.Configuration;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Tact;
-using Tact.Practices;
 using Tact.Rpc.Serialization;
 
-namespace Demo.Rpc.Services.Base
+namespace Tact.Rpc.Clients.Implementation
 {
-    public abstract class HttpClientBase
+    public class HttpRpcClient : IRpcClient
     {
-        private readonly string _serviceName;
-        private readonly string _hostUrl;
+        private readonly HttpClientConfig _clientConfig;
         private readonly ISerializer _serializer;
         private readonly HttpClient _httpClient;
-
-        protected HttpClientBase(IResolver resolver, string serviceName)
+        
+        public HttpRpcClient(ISerializer serializer, HttpClientConfig clientConfig)
         {
-            var config = resolver.Resolve<HttpClientConfig>(serviceName);
-
-            _serviceName = serviceName;
-            _hostUrl = config.Url;
-            _serializer = resolver.Resolve<ISerializer>(config.Serializer);
-            _httpClient = new HttpClient();
-        }
-
-        protected HttpClientBase(string serviceName, string hostUrl, ISerializer serializer)
-        {
-            _serviceName = serviceName;
-            _hostUrl = hostUrl;
+            _clientConfig = clientConfig;
             _serializer = serializer;
             _httpClient = new HttpClient();
         }
 
-        protected async Task<TResponse> SendAsync<TRequest, TResponse>(TRequest request, string method)
+        public async Task<TResponse> SendAsync<TRequest, TResponse>(string service, string method, TRequest request)
         {
-            var uri = $"{_hostUrl}rpc/{_serviceName}/{method}";
+            // TODO Make this better
+            var uri = $"{_clientConfig.Url}rpc/{service}/{method}";
             var seralizedRequest = _serializer.SerializeToString(request);
 
             using (var content = new StringContent(seralizedRequest, _serializer.Encoding, _serializer.ContentType))

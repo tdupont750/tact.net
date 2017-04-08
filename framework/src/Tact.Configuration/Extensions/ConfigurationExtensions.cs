@@ -116,12 +116,11 @@ namespace Tact
             context.ValidateObject();
         }
 
-        private static void Bind(IConfiguration config, object value, string[] configPaths)
+        public static IReadOnlyList<IConfigurationSection> GetSections(this IConfiguration config, params string[] configPaths)
         {
-            if (config == null)
-                throw new ArgumentNullException(nameof(config));
+            var sections = new List<IConfigurationSection>();
 
-            foreach(var configPath in configPaths.Reverse())
+            foreach (var configPath in configPaths.Reverse())
             {
                 var sectionNames = configPath.Split('.');
                 var firstSectionName = sectionNames.First();
@@ -130,8 +129,20 @@ namespace Tact
                 foreach (var sectionName in sectionNames.Skip(1))
                     section = section.GetSection(sectionName);
 
-                section.Bind(value);
+                sections.Add(section);
             }
+
+            return sections;
+        }
+
+        private static void Bind(IConfiguration config, object value, string[] configPaths)
+        {
+            if (config == null)
+                throw new ArgumentNullException(nameof(config));
+
+            var sections = config.GetSections(configPaths);
+            foreach (var section in sections)
+                section.Bind(value);
         }
     }
 }

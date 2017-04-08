@@ -18,6 +18,7 @@ using Tact.Rpc.Hosts;
 using Tact.Rpc.Models;
 using Tact.Rpc.Practices;
 using Tact.Rpc.Serialization;
+using Tact.Rpc.Services;
 
 namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
 {
@@ -26,17 +27,17 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
     {
         private readonly IResolver _resolver;
         private readonly IWebHost _webHost;
-        private readonly IReadOnlyList<RpcServiceInfo> _rpcServices;
+        private readonly IReadOnlyList<IRpcHandler> _rpcHandlers;
         private readonly IReadOnlyList<ISerializer> _serializers;
         private readonly ILog _log;
 
-        public WebSocketHost(IResolver resolver, IReadOnlyList<RpcServiceInfo> rpcServices, IReadOnlyList<ISerializer> serializers, WebSocketHostConfig hostConfig, ILog log)
+        public WebSocketHost(IResolver resolver, IReadOnlyList<IRpcHandler> rpcHandlers, IReadOnlyList<ISerializer> serializers, WebSocketHostConfig hostConfig, ILog log)
         {
             _resolver = resolver;
 
             _log = log;
 
-            _rpcServices = rpcServices;
+            _rpcHandlers = rpcHandlers;
 
             _serializers = serializers;
 
@@ -106,7 +107,7 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
 
                     var callInfoPosition = stream.Position;
 
-                    foreach (var rpcService in _rpcServices)
+                    foreach (var rpcService in _rpcHandlers)
                         if (rpcService.CanHandle(callInfo.Service, callInfo.Method, out Type type))
                         {
                             var model = await serializer
