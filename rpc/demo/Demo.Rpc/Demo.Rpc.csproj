@@ -4,12 +4,21 @@
     <TargetFramework>netstandard1.6</TargetFramework>
     <RootNamespace>Demo.Rpc</RootNamespace>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <PreBuildEvent>
+      cd $(SolutionDir)rpc\demo\Demo.Rpc
+      dotnet tactrpcgen
+    </PreBuildEvent>
+    <PackageTargetFallback>dnxcore50;portable-net45+win8+wp8+wpa81</PackageTargetFallback>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>full</DebugType>
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
+
+  <ItemGroup>
+    <DotNetCliToolReference Include="Tact.Rpc.Generator" Version="1.0.3" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\framework\src\Tact\Tact.csproj" />

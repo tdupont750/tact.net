@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Tact.Rpc.Practices;
+//using Tact.Rpc.Practices;
 
 namespace Tact.Rpc.Generator
 {
@@ -25,7 +25,7 @@ namespace Tact.Rpc.Generator
 
             var isServiceDefinition = interfaceNode.AttributeLists
                 .SelectMany(al => al.Attributes)
-                .Any(a => nameof(RpcServiceDefinitionAttribute).StartsWith(a.Name.ToString()));
+                .Any(a => "RpcServiceDefinitionAttribute".StartsWith(a.Name.ToString()));
 
             if (!isServiceDefinition)
                 return null;

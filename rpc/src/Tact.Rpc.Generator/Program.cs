@@ -13,10 +13,12 @@ namespace Tact.Rpc.Generator
     {
         public static int Main(string[] args)
         {
-            var config = new ConfigurationBuilder()
+            var config = new GeneratorConfig();
+
+            new ConfigurationBuilder()
                 .AddCommandLine(args)
                 .Build()
-                .CreateAndValidate<GeneratorConfig>(string.Empty);
+                .Bind(config);
             
             config
                 .GetType()
