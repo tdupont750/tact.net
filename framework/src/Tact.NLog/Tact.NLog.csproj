@@ -7,6 +7,7 @@
     <VersionPrefix>1.0.3</VersionPrefix>
     <VersionSufix>beta03</VersionSufix>
     <Authors>Tom DuPont</Authors>
+    <RootNamespace>Tact</RootNamespace>
     <AssemblyName>Tact.NLog</AssemblyName>
     <PackageId>Tact.NLog</PackageId>
     <PackageIconUrl>https://sites.google.com/site/tdupont750/Tact_NET_S.png</PackageIconUrl>

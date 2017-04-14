@@ -13,9 +13,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="1.1.1" />
+    <PackageReference Include="NLog" Version="5.0.0-beta06" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\framework\src\Tact.NLog\Tact.NLog.csproj" />
     <ProjectReference Include="..\..\..\framework\src\Tact\Tact.csproj" />
     <ProjectReference Include="..\..\..\framework\src\Tact.Configuration\Tact.Configuration.csproj" />
     <ProjectReference Include="..\..\src\Tact.Rpc.Client.Http\Tact.Rpc.Client.Http.csproj" />
@@ -44,6 +46,9 @@
     <None Update="AppSettings.Server.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <DependentUpon>AppSettings.json</DependentUpon>
+    </None>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

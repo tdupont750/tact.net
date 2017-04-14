@@ -3,7 +3,12 @@ using Demo.Rpc.Services;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using Tact;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices;
@@ -31,7 +36,7 @@ namespace ConsoleApp
             }
 
             // Step 1 - Create a logger.
-            var log = new InMemoryLog();
+            var log = NLogWrapper.GetLog("Default");
 
             // Step 2 - Create a container.
             using (var container = new TactContainer(log))
