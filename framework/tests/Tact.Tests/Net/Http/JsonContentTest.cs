@@ -34,7 +34,7 @@ namespace Tact.Tests.Net.Http
 
             Assert.Equal(s0, s1);
             Assert.Equal(s1, s2);
-            Assert.True(sw1.Elapsed > sw2.Elapsed);
+            Assert.True(sw1.Elapsed > sw2.Elapsed, $"{sw1.Elapsed} > {sw2.Elapsed}");
         }
         
         private class TestObject
