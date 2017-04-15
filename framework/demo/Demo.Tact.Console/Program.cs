@@ -1,13 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
+using Demo.Tact.Console.Services;
 using Microsoft.Extensions.Configuration;
-using Tact.Diagnostics.Implementation;
-using Tact.Practices;
-using Tact.Practices.Implementation;
-using Tact.Tests.Console.Services;
 using Xunit;
 
-namespace Tact.Tests.Console
+namespace Demo.Tact.Console
 {
     public class Program
     {

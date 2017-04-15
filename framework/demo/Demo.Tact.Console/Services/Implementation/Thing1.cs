@@ -1,7 +1,6 @@
-using Tact.Practices.LifetimeManagers.Attributes;
-using Tact.Tests.Console.Configuration;
+using Demo.Tact.Console.Configuration;
 
-namespace Tact.Tests.Console.Services.Implementation
+namespace Demo.Tact.Console.Services.Implementation
 {
     [RegisterSingleton(typeof(IThing), "1")]
     public class Thing1 : IThing

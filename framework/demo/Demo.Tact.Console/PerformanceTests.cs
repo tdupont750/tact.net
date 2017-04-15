@@ -3,10 +3,8 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Tact.Diagnostics.Implementation;
-using Tact.Practices.Implementation;
 
-namespace Tact.Tests.Console
+namespace Demo.Tact.Console
 {
     public static class PerformanceTests
     {

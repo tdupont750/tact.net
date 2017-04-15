@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
-using Tact.AspNetCore.Demo.Services;
+﻿using Demo.Tact.AspNetCore.Services;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Tact.AspNetCore.Demo
+namespace Demo.Tact.AspNetCore.Controllers
 {
     [Route("api/[controller]")]
     public class DemoController: Controller
