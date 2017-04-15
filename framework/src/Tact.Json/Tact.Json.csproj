@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard1.5</TargetFramework>
     <Description>A JSON library for Tact.NET - A tactful collection of utilities for .NET development.</Description>
-    <Copyright>2016 Tom DuPont</Copyright>
-    <VersionPrefix>1.0.3</VersionPrefix>
+    <Copyright>2017 Tom DuPont</Copyright>
+    <VersionPrefix>1.1.0</VersionPrefix>
     <Authors>Tom DuPont</Authors>
+    <RootNamespace>Tact</RootNamespace>
     <AssemblyName>Tact.Json</AssemblyName>
     <PackageId>Tact.Json</PackageId>
     <PackageIconUrl>https://sites.google.com/site/tdupont750/Tact_NET_S.png</PackageIconUrl>

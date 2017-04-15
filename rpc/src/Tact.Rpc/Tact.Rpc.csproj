@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
-    <Description>The core library for Tact.NET RPC - A tactful collection of utilities for .NET development.</Description>
-    <Copyright>2016 Tom DuPont</Copyright>
-    <VersionPrefix>1.0.3</VersionPrefix>
+    <TargetFramework>netstandard1.5</TargetFramework>
+    <Description>The core library for Tact.NET RPC - A config driven, mutli protocol, multi content type RPC framework.</Description>
+    <Copyright>2017 Tom DuPont</Copyright>
+    <VersionPrefix>1.0.0</VersionPrefix>
     <Authors>Tom DuPont</Authors>
+    <RootNamespace>Tact.Rpc</RootNamespace>
     <AssemblyName>Tact.Rpc</AssemblyName>
     <PackageId>Tact.Rpc</PackageId>
     <PackageIconUrl>https://sites.google.com/site/tdupont750/Tact_NET_S.png</PackageIconUrl>

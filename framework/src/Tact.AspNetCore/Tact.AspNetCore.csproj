@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard1.5</TargetFramework>
     <Description>The AspNetCore library for Tact.NET - A tactful collection of utilities for .NET development.</Description>
-    <Copyright>2016 Tom DuPont</Copyright>
-    <VersionPrefix>1.0.3</VersionPrefix>
+    <Copyright>2017 Tom DuPont</Copyright>
+    <VersionPrefix>1.1.0</VersionPrefix>
     <Authors>Tom DuPont</Authors>
+    <RootNamespace>Tact</RootNamespace>
     <AssemblyName>Tact.AspNetCore</AssemblyName>
     <PackageId>Tact.AspNetCore</PackageId>
     <PackageIconUrl>https://sites.google.com/site/tdupont750/Tact_NET_S.png</PackageIconUrl>
@@ -13,7 +14,6 @@
     <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <RootNamespace>Tact</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
