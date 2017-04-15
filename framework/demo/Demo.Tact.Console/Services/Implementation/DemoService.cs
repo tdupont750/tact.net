@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Tact.Practices.LifetimeManagers.Attributes;
 
-namespace Tact.Tests.Console.Services.Implementation
+namespace Demo.Tact.Console.Services.Implementation
 {
     [RegisterPerScope(typeof(IDemoService))]
     public class DemoService : IDemoService, IDisposable

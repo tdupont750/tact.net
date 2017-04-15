@@ -1,4 +1,4 @@
-﻿namespace Tact.AspNetCore.Demo.Services
+﻿namespace Demo.Tact.AspNetCore.Services
 {
     public interface IHelloService
     {

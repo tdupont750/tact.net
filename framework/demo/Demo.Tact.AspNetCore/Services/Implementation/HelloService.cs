@@ -1,6 +1,6 @@
 ﻿using Tact.Practices.LifetimeManagers.Attributes;
 
-namespace Tact.AspNetCore.Demo.Services.Implementation
+namespace Demo.Tact.AspNetCore.Services.Implementation
 {
     [RegisterSingleton(typeof(IHelloService))]
     public class HelloService : IHelloService

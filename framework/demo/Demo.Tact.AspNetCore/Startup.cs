@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Reflection;
+using Tact;
 using Tact.Diagnostics.Implementation;
 using Tact.Practices.Implementation;
 
-namespace Tact.AspNetCore.Demo.Service
+namespace Demo.Tact.AspNetCore
 {
     public class Startup
     {

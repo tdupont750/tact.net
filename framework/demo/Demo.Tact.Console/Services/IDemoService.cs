@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Tact.Tests.Console.Services
+namespace Demo.Tact.Console.Services
 {
     public interface IDemoService
     {

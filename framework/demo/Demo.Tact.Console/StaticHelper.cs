@@ -1,9 +1,10 @@
 ﻿using System;
+using Demo.Tact.Console.Configuration;
+using Tact;
 using Tact.Configuration;
 using Tact.Practices;
-using Tact.Tests.Console.Configuration;
 
-namespace Tact.Tests.Console
+namespace Demo.Tact.Console
 {
     [Initialize]
     public static class StaticHelper

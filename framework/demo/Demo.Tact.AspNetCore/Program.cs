@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using System.Linq;
+﻿using System.Linq;
+using Microsoft.AspNetCore.Hosting;
 
-namespace Tact.AspNetCore.Demo.Service
+namespace Demo.Tact.AspNetCore
 {
     public static class Program
     {

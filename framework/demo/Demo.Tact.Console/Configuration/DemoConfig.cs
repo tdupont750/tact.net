@@ -1,7 +1,7 @@
 ﻿using Tact.ComponentModel.DataAnnotations;
 using Tact.Configuration.Attributes;
 
-namespace Tact.Tests.Console.Configuration
+namespace Demo.Tact.Console.Configuration
 {
     [RegisterConfiguration]
     public class DemoConfig
