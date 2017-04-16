@@ -6,7 +6,7 @@
     <OutputType>exe</OutputType>
     <OutputTypeEx>exe</OutputTypeEx>
     <VersionPrefix>1.0.3</VersionPrefix>
-    <AssemblyName>Tact.Tests.Console</AssemblyName>
+    <AssemblyName>Demo.Tact.Console</AssemblyName>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
@@ -19,9 +19,13 @@
     <None Update="AppSettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Tact.NLog\Tact.NLog.csproj" />
     <ProjectReference Include="..\..\src\Tact\Tact.csproj" />
     <ProjectReference Include="..\..\src\Tact.Configuration\Tact.Configuration.csproj" />
   </ItemGroup>

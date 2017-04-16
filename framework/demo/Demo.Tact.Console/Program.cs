@@ -52,20 +52,27 @@ namespace Demo.Tact.Console
 
         private static IResolver CreateResolver()
         {
-            var configBuilder = new ConfigurationBuilder();
-            configBuilder.AddJsonFile("AppSettings.json");
-            var config = configBuilder.Build();
+            // Step 1 - Create a logger.
+            var log = NLogWrapper.GetLog("Default");
 
-            var logger = new InMemoryLog();
-            var container = new TactContainer(logger);
+            // Step 2 - Create a container.
+            var container = new TactContainer(log);
 
-            var assembly = Assembly.GetEntryAssembly();
+            // Step 3 - Read and aggregate configuration files.
+            var config = container.BuildConfiguration(cb =>
+                cb.AddJsonFile("AppSettings.json"));
 
-            container.ConfigureByAttribute(config, assembly);
-            container.RegisterByAttribute(assembly);
-            container.InitializeByAttribute(assembly);
-            
-            Assert.Equal(11, logger.LogLines.Count);
+            // Step 4 - Load assemblies from the configuration.
+            var assemblies = config.LoadAssembliesFromConfig();
+
+            // Step 5 - Create and validate configuration objects.
+            container.ConfigureByAttribute(config, assemblies);
+
+            // Step 6 - Register services by reflection using attributes.
+            container.RegisterByAttribute(assemblies);
+
+            // Step 7 - Initialize / start services in the container.
+            container.InitializeByAttribute(assemblies);
 
             return container;
         }
