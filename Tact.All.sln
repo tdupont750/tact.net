@@ -44,10 +44,16 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tact.Rpc.Server.Http", "rpc\src\Tact.Rpc.Server.Http\Tact.Rpc.Server.Http.csproj", "{B88B70C9-54FA-48F2-80D2-ABD2EAF4A2A9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Demo.Rpc", "rpc\demo\Demo.Rpc\Demo.Rpc.csproj", "{E6156BA4-2B84-4923-98EC-474A86A3F976}"
+	ProjectSection(ProjectDependencies) = postProject
+		{570AECD7-21CF-44F2-BF93-A9A1E806DEC4} = {570AECD7-21CF-44F2-BF93-A9A1E806DEC4}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Demo.Rpc.Server", "rpc\demo\Demo.Rpc.Server\Demo.Rpc.Server.csproj", "{6B106FE6-0F60-47DA-B0C8-3274B2108DA6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "rpc\demo\ConsoleApp\ConsoleApp.csproj", "{B6B27D0E-F7CC-4596-A898-A44284680225}"
+	ProjectSection(ProjectDependencies) = postProject
+		{570AECD7-21CF-44F2-BF93-A9A1E806DEC4} = {570AECD7-21CF-44F2-BF93-A9A1E806DEC4}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tact.Rpc.Json", "rpc\src\Tact.Rpc.Json\Tact.Rpc.Json.csproj", "{30391A4F-CAAD-4335-AA21-CAC8A88FC640}"
 EndProject

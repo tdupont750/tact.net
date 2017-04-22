@@ -15,11 +15,11 @@
     <PackageProjectUrl>https://github.com/tdupont750/tact.net</PackageProjectUrl>
     <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <PostBuildEvent>dotnet pack $(SolutionDir)rpc\src\Tact.Rpc.Generator -c $(Configuration) -o $(SolutionDir)packages --no-build --include-symbols</PostBuildEvent>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <PostBuildEvent>dotnet pack $(SolutionDir)rpc\src\Tact.Rpc.Generator -o $(SolutionDir)packages --no-build</PostBuildEvent>
     <DebugType>full</DebugType>
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
