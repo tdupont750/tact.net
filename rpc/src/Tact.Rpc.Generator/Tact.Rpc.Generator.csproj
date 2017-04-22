@@ -3,12 +3,29 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.0</TargetFramework>
+    <PackageTargetFallback>dnxcore50;portable-net45+win8+wp8+wpa81</PackageTargetFallback>
+    <Description>The code generation library for Tact.NET RPC - A config driven, mutli protocol, multi content type RPC framework.</Description>
+    <Copyright>2017 Tom DuPont</Copyright>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <Authors>Tom DuPont</Authors>
+    <RootNamespace>Tact.Rpc.Generator</RootNamespace>
     <AssemblyName>dotnet-tactrpcgen</AssemblyName>
     <PackageId>Tact.Rpc.Generator</PackageId>
+    <PackageIconUrl>https://sites.google.com/site/tdupont750/Tact_NET_S.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/tdupont750/tact.net</PackageProjectUrl>
+    <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <PostBuildEvent>dotnet pack $(SolutionDir)rpc\src\Tact.Rpc.Generator -o $(SolutionDir)packages --no-build</PostBuildEvent>
-    <PackageTargetFallback>dnxcore50;portable-net45+win8+wp8+wpa81</PackageTargetFallback>
-    <Version>1.0.3</Version>
+    <DebugType>full</DebugType>
+    <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>

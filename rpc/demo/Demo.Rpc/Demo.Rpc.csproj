@@ -8,7 +8,6 @@
       cd $(SolutionDir)rpc\demo\Demo.Rpc
       dotnet tactrpcgen
     </PreBuildEvent>
-    <PackageTargetFallback>dnxcore50;portable-net45+win8+wp8+wpa81</PackageTargetFallback>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

@@ -4,7 +4,7 @@
     <TargetFramework>netstandard1.6</TargetFramework>
     <Description>The HTTP Server library for Tact.NET RPC - A config driven, mutli protocol, multi content type RPC framework.</Description>
     <Copyright>2017 Tom DuPont</Copyright>
-    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionPrefix>0.1.0</VersionPrefix>
     <Authors>Tom DuPont</Authors>
     <RootNamespace>Tact.Rpc</RootNamespace>
     <AssemblyName>Tact.Rpc.Server.Http</AssemblyName>
@@ -12,13 +12,16 @@
     <PackageIconUrl>https://sites.google.com/site/tdupont750/Tact_NET_S.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/tdupont750/tact.net</PackageProjectUrl>
     <PackageLicenseUrl>http://www.opensource.org/licenses/MIT</PackageLicenseUrl>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DebugType>full</DebugType>
     <DebugSymbols>True</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
