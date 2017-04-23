@@ -16,7 +16,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="Tact.Rpc.Generator" Version="0.1.0" />
+    <DotNetCliToolReference Include="Tact.Rpc.Generator" Version="0.1.1" />
   </ItemGroup>
 
   <ItemGroup>

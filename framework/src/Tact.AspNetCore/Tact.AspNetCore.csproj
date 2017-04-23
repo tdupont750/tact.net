@@ -4,7 +4,7 @@
     <TargetFramework>netstandard1.5</TargetFramework>
     <Description>The AspNetCore library for Tact.NET - A tactful collection of utilities for .NET development.</Description>
     <Copyright>2017 Tom DuPont</Copyright>
-    <VersionPrefix>1.1.0</VersionPrefix>
+    <VersionPrefix>1.1.1</VersionPrefix>
     <Authors>Tom DuPont</Authors>
     <RootNamespace>Tact</RootNamespace>
     <AssemblyName>Tact.AspNetCore</AssemblyName>

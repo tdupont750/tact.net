@@ -4,7 +4,7 @@
     <TargetFramework>netstandard1.5</TargetFramework>
     <Description>The WebSocket Client library for Tact.NET RPC - A config driven, mutli protocol, multi content type RPC framework.</Description>
     <Copyright>2017 Tom DuPont</Copyright>
-    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionPrefix>0.1.1</VersionPrefix>
     <Authors>Tom DuPont</Authors>
     <RootNamespace>Tact.Rpc</RootNamespace>
     <AssemblyName>Tact.Rpc.Client.WebSocket</AssemblyName>
