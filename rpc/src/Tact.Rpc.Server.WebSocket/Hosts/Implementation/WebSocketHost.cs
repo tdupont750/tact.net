@@ -1,26 +1,24 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Tact.Diagnostics;
 using Tact.Net.WebSockets;
 using Tact.Practices;
 using Tact.Practices.LifetimeManagers;
 using Tact.Practices.LifetimeManagers.Attributes;
 using Tact.Rpc.Configuration;
-using Tact.Rpc.Hosts;
 using Tact.Rpc.Models;
-using Tact.Rpc.Practices;
 using Tact.Rpc.Serialization;
 using Tact.Rpc.Services;
 
-namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
+namespace Tact.Rpc.Hosts.Implementation
 {
     [RegisterCondition, RegisterSingleton(typeof(IHost), nameof(WebSocketHost))]
     public class WebSocketHost : IHost
@@ -130,13 +128,21 @@ namespace Tact.Rpc.Server.WebSocket.Hosts.Implementation
                                 .SendAsync(resultBytes, connection.HttpContext.RequestAborted)
                                 .ConfigureAwait(false);
 
-                            break;
+                            return;
                         }
+
+                    throw new InvalidOperationException("Handler Not Found");
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                var messageBytes = Encoding.UTF8.GetBytes(ex.Message);
+
+                await connection
+                    .SendAsync(messageBytes, connection.HttpContext.RequestAborted)
+                    .ConfigureAwait(false);
+
+                throw;
             }
         }
 

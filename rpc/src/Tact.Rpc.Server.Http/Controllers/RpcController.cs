@@ -28,7 +28,7 @@ namespace Tact.Rpc.Controllers
         {
             var serializer = _serializers.FirstOrDefault(s => HttpContext.Request.ContentType.StartsWith(s.ContentType, StringComparison.OrdinalIgnoreCase));
             if (serializer == null)
-                BadRequest($"Invalid Content Type: {HttpContext.Request.ContentType}");
+                return BadRequest($"Invalid Content Type: {HttpContext.Request.ContentType}");
 
             foreach (var rpcService in _rpcHandlers)
                 if (rpcService.CanHandle(service, method, out Type type))

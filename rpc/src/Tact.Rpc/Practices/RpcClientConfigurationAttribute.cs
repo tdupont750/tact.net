@@ -9,10 +9,10 @@ namespace Tact.Rpc.Practices
 {
     public class RpcClientConfigurationAttribute : Attribute, IRegisterConfigurationAttribute
     {
-        private readonly string Protocol;
+        private readonly string _protocol;
 
         public RpcClientConfigurationAttribute(string protocol) =>
-            Protocol = protocol;
+            _protocol = protocol;
 
         public void Register(IContainer container, IConfiguration configuration, Type type)
         {
@@ -33,9 +33,9 @@ namespace Tact.Rpc.Practices
                         configPaths = new[] { configPath, Constants.ServiceConfigDefaults };
                     }
 
-                    var config = configuration.CreateAndValidate(type, configPaths) as IRpcClientConfig;
+                    var config = (IRpcClientConfig) configuration.CreateAndValidate(type, configPaths);
 
-                    if (Protocol.Equals(config.Protocol, StringComparison.OrdinalIgnoreCase))
+                    if (_protocol.Equals(config.Protocol, StringComparison.OrdinalIgnoreCase))
                         container.RegisterInstance(config, section.Key);
                 }
             }

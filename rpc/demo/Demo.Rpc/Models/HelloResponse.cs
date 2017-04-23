@@ -1,7 +1,11 @@
-﻿namespace Demo.Rpc.Models
+﻿using System.Collections.Generic;
+using Tact.Rpc.Practices;
+
+namespace Demo.Rpc.Models
 {
+    [RpcModel]
     public class HelloResponse
     {
-        public string Message { get; set; }
+        public List<string> Messages { get; set; }
     }
 }

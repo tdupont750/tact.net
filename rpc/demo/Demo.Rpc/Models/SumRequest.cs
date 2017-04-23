@@ -1,5 +1,8 @@
-﻿namespace Demo.Rpc.Models
+﻿using Tact.Rpc.Practices;
+
+namespace Demo.Rpc.Models
 {
+    [RpcModel]
     public class SumRequest
     {
         public int X { get; set; }

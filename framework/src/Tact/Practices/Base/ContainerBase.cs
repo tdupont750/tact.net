@@ -193,9 +193,10 @@ namespace Tact.Practices.Base
                 foreach (var lifetimeManager in lifetimeManagers)
                     instances.Add(lifetimeManager.Resolve(this, stack));
 
-                foreach (var resolutionHandler in ResolutionHandlers)
-                    if (resolutionHandler.TryResolve(out object instance, this, stack, type, string.Empty, false))
-                        instances.Add(instance);
+                if (instances.Count == 0)
+                    foreach (var resolutionHandler in ResolutionHandlers)
+                        if (resolutionHandler.TryResolve(out object instance, this, stack, type, string.Empty, false))
+                            instances.Add(instance);
             }
 
             return instances;

@@ -2,14 +2,12 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Tact.Practices;
 using Tact.Practices.LifetimeManagers;
 using Tact.Practices.LifetimeManagers.Attributes;
 using Tact.Rpc.Configuration;
-using Tact.Rpc.Services;
 
 namespace Tact.Rpc.Hosts.Implementation
 {
@@ -18,7 +16,7 @@ namespace Tact.Rpc.Hosts.Implementation
     {
         private readonly IWebHost _webHost;
 
-        public HttpHost(IResolver resolver, IReadOnlyList<IRpcHandler> rpcHandlers, HttpHostConfig hostConfig)
+        public HttpHost(IResolver resolver, HttpHostConfig hostConfig)
         {
             _webHost = new WebHostBuilder()
                 .UseKestrel()

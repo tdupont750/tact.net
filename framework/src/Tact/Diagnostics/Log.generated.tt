@@ -8,6 +8,7 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
  
 // ReSharper disable once CheckNamespace
 namespace Tact
@@ -57,12 +58,13 @@ namespace Tact
 <# for(var argCount = 0; argCount <= 8; argCount++) { #>
 <# var paramName = argCount == 0 ? "message" : "format"; #>
 <# for(var hasException = 0; hasException < 2; hasException++) { #>
+<# var paramDefault = hasException == 1 && argCount == 0 ? " = \"\"" : string.Empty; #>
         public static void <#= level #>(
             this ILog log,
 <# if (hasException == 1) { #>
             Exception ex,
 <# } #>
-            string <#= paramName #>,
+            string <#= paramName #><#= paramDefault #>,
 <# for(var i = 0; i < argCount; i++) { #>
             object arg<#= i #>,
 <# } #>

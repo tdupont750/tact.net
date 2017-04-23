@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Demo.Rpc.Models;
 using Tact.Rpc.Practices;
 
@@ -11,7 +12,7 @@ namespace Demo.Rpc.Services.Implementation
         {
             return Task.FromResult(new HelloResponse
             {
-                Message = $"Hello, {helloRequest.Name}!"
+                Messages = new List<string> { $"Hello, {helloRequest.Name}!", "...and goodbye!" }
             });
         }
     }

@@ -3,6 +3,7 @@ using Tact.Practices;
 using Tact.Rpc.Configuration;
 using Demo.Rpc.Configuration;
 using System;
+using Tact.Diagnostics;
 using Tact.Rpc.Serialization;
 
 namespace Tact.Rpc.Clients.Implementation
@@ -11,10 +12,12 @@ namespace Tact.Rpc.Clients.Implementation
     public class RpcClientManager : IRpcClientManager
     {
         private readonly IResolver _resolver;
+        private readonly ILog _log;
 
-        public RpcClientManager(IResolver resolver)
+        public RpcClientManager(IResolver resolver, ILog log)
         {
             _resolver = resolver;
+            _log = log;
         }
 
         public IRpcClient GetRpcClient(string service)
@@ -25,7 +28,7 @@ namespace Tact.Rpc.Clients.Implementation
 
             var serializer = _resolver.Resolve<ISerializer>(config.Serializer);
             var factory = _resolver.Resolve<IRpcClientFactory>(config.Protocol);
-            return factory.GetRpcClient(serializer, config);
+            return factory.GetRpcClient(serializer, _log, config);
         }
     }
 }

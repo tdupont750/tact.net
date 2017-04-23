@@ -9,12 +9,17 @@ using System.Threading;
 using Tact.Practices.LifetimeManagers.Attributes;
 using System.Threading.Tasks;
 using ProtoBuf;
+using Tact.Configuration;
+using Tact.Practices;
+using Tact.Rpc.Practices;
 
 namespace Tact.Rpc.Serialization.Implementation
 {
-    [RegisterSingleton(typeof(ISerializer), "Protobuf")]
+    [Initialize, RegisterSingleton(typeof(ISerializer), Name)]
     public class ProtobufSerializer : ISerializer
     {
+        public const string Name = "Protobuf";
+
         private static readonly ReaderWriterLockSlim Lock = new ReaderWriterLockSlim();
         private static readonly HashSet<Type> RegisteredTypes = new HashSet<Type>();
         private static readonly RuntimeTypeModel RuntimeTypeModel = TypeModel.Create();
@@ -84,24 +89,27 @@ namespace Tact.Rpc.Serialization.Implementation
                 if (RegisteredTypes.Contains(type))
                     return;
                 
-                var metaType = RuntimeTypeModel.Add(type, false);
-                metaType.AsReferenceDefault = true;
-                metaType.UseConstructor = false;
-
                 var serializableFields = type
                     .GetProperties(BindingFlags.Public | BindingFlags.Instance)
                     .OrderBy(fi => fi.Name)
                     .Select((fi, index) => new { info = fi, index });
 
+                var metaType = RuntimeTypeModel.Add(type, false);
                 foreach (var field in serializableFields)
-                {
-                    var metaField = metaType.AddField(field.index + 1, field.info.Name);
-                    metaField.AsReference = !field.info.PropertyType.GetTypeInfo().IsValueType;
-                    metaField.DynamicType = field.info.PropertyType == typeof(object);
-                }
+                    metaType.AddField(field.index + 1, field.info.Name);
 
                 metaType.CompileInPlace();
                 RegisteredTypes.Add(type);
+            }
+        }
+
+        public class InitializeAttribute : Attribute, IInitializeAttribute
+        {
+            public void Initialize(IContainer container)
+            {
+                var models = container.ResolveAll<RpcModelAttribute>();
+                foreach (var model in models)
+                    TryRegisterType(model.Type);
             }
         }
     }

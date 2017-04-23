@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
  
 // ReSharper disable once CheckNamespace
 namespace Tact
 {
     using Diagnostics;
-    using System.Text;
 
     namespace Diagnostics
     {
@@ -67,7 +67,7 @@ namespace Tact
         public static void Trace(
             this ILog log,
             Exception ex,
-            string message,
+            string message = "",
             LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
@@ -400,7 +400,7 @@ namespace Tact
         public static void Debug(
             this ILog log,
             Exception ex,
-            string message,
+            string message = "",
             LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
@@ -733,7 +733,7 @@ namespace Tact
         public static void Info(
             this ILog log,
             Exception ex,
-            string message,
+            string message = "",
             LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
@@ -1066,7 +1066,7 @@ namespace Tact
         public static void Warn(
             this ILog log,
             Exception ex,
-            string message,
+            string message = "",
             LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
@@ -1399,7 +1399,7 @@ namespace Tact
         public static void Error(
             this ILog log,
             Exception ex,
-            string message,
+            string message = "",
             LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
@@ -1732,7 +1732,7 @@ namespace Tact
         public static void Fatal(
             this ILog log,
             Exception ex,
-            string message,
+            string message = "",
             LogCallSite logCallSite = LogCallSite.Enabled,
             [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "",
