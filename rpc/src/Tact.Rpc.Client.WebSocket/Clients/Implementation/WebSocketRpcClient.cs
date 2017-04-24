@@ -52,8 +52,17 @@ namespace Tact.Rpc.Clients.Implementation
 
             try
             {
-                if (!_isConnected)
+                var tcs = new TaskCompletionSource<object>();
+                _responseMap.TryAdd(callInfo.Id, Tuple.Create(typeof(TResponse), tcs));
+
+                var callInfoBytes = _serializer.SerializeToBytes(callInfo);
+                var callInfoSegment = new ArraySegment<byte>(callInfoBytes);
+
+                var requestBytes = _serializer.SerializeToBytes(request);
+                var requestSegment = new ArraySegment<byte>(requestBytes);
+
                 using (await _semaphore.UseAsync(linkedSource.Token).ConfigureAwait(false))
+                {
                     if (!_isConnected)
                     {
                         var uri = new Uri(_config.Url);
@@ -65,20 +74,14 @@ namespace Tact.Rpc.Clients.Implementation
                         _isConnected = true;
                     }
 
-                var tcs = new TaskCompletionSource<object>();
-                _responseMap.TryAdd(callInfo.Id, Tuple.Create(typeof(TResponse), tcs));
+                    await _client
+                        .SendAsync(callInfoSegment, WebSocketMessageType.Binary, false, linkedSource.Token)
+                        .ConfigureAwait(false);
 
-                var callInfoBytes = _serializer.SerializeToBytes(callInfo);
-                var callInfoSegment = new ArraySegment<byte>(callInfoBytes);
-                await _client
-                    .SendAsync(callInfoSegment, WebSocketMessageType.Binary, false, linkedSource.Token)
-                    .ConfigureAwait(false);
-
-                var requestBytes = _serializer.SerializeToBytes(request);
-                var requestSegment = new ArraySegment<byte>(requestBytes);
-                await _client
-                    .SendAsync(requestSegment, WebSocketMessageType.Binary, true, linkedSource.Token)
-                    .ConfigureAwait(false);
+                    await _client
+                        .SendAsync(requestSegment, WebSocketMessageType.Binary, true, linkedSource.Token)
+                        .ConfigureAwait(false);
+                }
 
                 return (TResponse)await tcs.Task.ConfigureAwait(false);
             }
@@ -99,7 +102,7 @@ namespace Tact.Rpc.Clients.Implementation
 
         private async Task ReadLoopAsync()
         {
-            var buffer = new byte[1024];
+            var buffer = new byte[1024 * 32];
             using (var memoryStream = new MemoryStream())
                 while (_client.State == WebSocketState.Open && !_cancelSource.IsCancellationRequested)
                 {

@@ -91,7 +91,7 @@ namespace ConsoleApp
                     .SayHelloAsync(new HelloRequest { Name = "Tom" })
                     .ConfigureAwait(false);
 
-                Console.WriteLine($"{DateTime.Now.Minute}:{DateTime.Now.Second} - Say: {helloResponse.Messages.FirstOrDefault()} - Count: {helloResponse.Messages.Count}");
+                Console.WriteLine($"{DateTime.Now.Minute}:{DateTime.Now.Second} - Say: {helloResponse.Messages.First().Message} - Count: {helloResponse.Messages.Count}");
 
                 var sumResponse = await mathService
                     .SumAsync(new SumRequest { X = 1, Y = y++ })

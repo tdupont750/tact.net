@@ -7,6 +7,6 @@ namespace Demo.Rpc.Services
     [RpcServiceDefinition]
     public interface IHelloService
     {
-        Task<HelloResponse> SayHelloAsync(HelloRequest helloRequest);
+        Task<HelloResponseCollection> SayHelloAsync(HelloRequest helloRequest);
     }
 }

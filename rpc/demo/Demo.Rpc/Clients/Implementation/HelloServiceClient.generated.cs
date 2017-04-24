@@ -17,8 +17,8 @@ namespace Demo.Rpc.Clients.Implementation
         public HelloServiceClient(IRpcClientManager clientManager) =>
             _rpcClient = clientManager.GetRpcClient(ServiceName);
 
-        public Task<HelloResponse> SayHelloAsync(HelloRequest model) =>
-            _rpcClient.SendAsync<HelloRequest, HelloResponse>(
+        public Task<HelloResponseCollection> SayHelloAsync(HelloRequest model) =>
+            _rpcClient.SendAsync<HelloRequest, HelloResponseCollection>(
                 ServiceName,
                 "SayHello",
                 model);

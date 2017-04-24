@@ -108,7 +108,7 @@ namespace Tact.Rpc.Serialization.Implementation
             public void Initialize(IContainer container)
             {
                 var models = container.ResolveAll<RpcModelAttribute>();
-                foreach (var model in models)
+                foreach (var model in models.OrderBy(m => m.Order))
                     TryRegisterType(model.Type);
             }
         }

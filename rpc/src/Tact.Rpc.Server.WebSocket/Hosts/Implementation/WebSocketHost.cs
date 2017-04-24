@@ -67,7 +67,9 @@ namespace Tact.Rpc.Hosts.Implementation
 
         private void OnConnection(IWebSocketConnection connection)
         {
-            connection.OnBinary = b => Task.Run(() => HandleRequestAsync(connection, b), connection.HttpContext.RequestAborted);
+            var semaphore = new SemaphoreSlim(1, 1);
+
+            connection.OnBinary = b => Task.Run(() => HandleRequestAsync(connection, semaphore, b), connection.HttpContext.RequestAborted);
             connection.OnClose = (s, m) => _log.Debug("OnClose - {0}: {1}", s, m);
             connection.OnError = ex =>
             {
@@ -76,16 +78,16 @@ namespace Tact.Rpc.Hosts.Implementation
             };
             connection.OnFatalError = ex => _log.Fatal(ex, "OnFatalError");
             connection.OnOpen = ws => _log.Debug("OnOpen");
-            connection.OnMessage = m => Task.Run(() => HandleRequestAsync(connection, m), connection.HttpContext.RequestAborted);
+            connection.OnMessage = m => Task.Run(() => HandleRequestAsync(connection, semaphore, m), connection.HttpContext.RequestAborted);
         }
 
-        private Task HandleRequestAsync(IWebSocketConnection connection, string message)
+        private Task HandleRequestAsync(IWebSocketConnection connection, SemaphoreSlim semaphore, string message)
         {
             var bytes = Encoding.UTF8.GetBytes(message);
-            return HandleRequestAsync(connection, bytes);
+            return HandleRequestAsync(connection, semaphore, bytes);
         }
 
-        private async Task HandleRequestAsync(IWebSocketConnection connection, byte[] requestBytes)
+        private async Task HandleRequestAsync(IWebSocketConnection connection, SemaphoreSlim semaphore, byte[] requestBytes)
         {
             try
             {
@@ -124,9 +126,12 @@ namespace Tact.Rpc.Hosts.Implementation
 
                             var resultBytes = stream.ToArray();
 
-                            await connection
-                                .SendAsync(resultBytes, connection.HttpContext.RequestAborted)
-                                .ConfigureAwait(false);
+                            using (await semaphore.UseAsync(connection.HttpContext.RequestAborted).ConfigureAwait(false))
+                            {
+                                await connection
+                                    .SendAsync(resultBytes, connection.HttpContext.RequestAborted)
+                                    .ConfigureAwait(false);
+                            }
 
                             return;
                         }
@@ -137,12 +142,15 @@ namespace Tact.Rpc.Hosts.Implementation
             catch (Exception ex)
             {
                 var messageBytes = Encoding.UTF8.GetBytes(ex.Message);
+                
+                using (await semaphore.UseAsync(connection.HttpContext.RequestAborted).ConfigureAwait(false))
+                {
+                    await connection
+                        .SendAsync(messageBytes, connection.HttpContext.RequestAborted)
+                        .ConfigureAwait(false);
+                }
 
-                await connection
-                    .SendAsync(messageBytes, connection.HttpContext.RequestAborted)
-                    .ConfigureAwait(false);
-
-                throw;
+                _log.Error(ex);
             }
         }
 

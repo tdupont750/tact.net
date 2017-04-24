@@ -8,11 +8,15 @@ namespace Demo.Rpc.Services.Implementation
     [RpcServiceImplementation(typeof(IHelloService))]
     public class HelloService : IHelloService
     {
-        public Task<HelloResponse> SayHelloAsync(HelloRequest helloRequest)
+        public Task<HelloResponseCollection> SayHelloAsync(HelloRequest helloRequest)
         {
-            return Task.FromResult(new HelloResponse
+            return Task.FromResult(new HelloResponseCollection
             {
-                Messages = new List<string> { $"Hello, {helloRequest.Name}!", "...and goodbye!" }
+                Messages = new List<HelloResponse>
+                {
+                    new HelloResponse { Message = $"Hello, {helloRequest.Name}!" },
+                    new HelloResponse { Message = $"...and goodbye!" }
+                }
             });
         }
     }
